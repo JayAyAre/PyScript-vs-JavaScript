@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmarking: JavaScript vs PyScript</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    <script src="javascript/main.js" defer></script>
+    <script type="py" src="python/main.py" config="python/pyscript.json"></script>
+    <script>
+        // Medir el tiempo de inicialización de PyScript
+        let startTime = performance.now();
+        var performanceasd = 5;
+        document.addEventListener('py:ready', () => {
+            let endTime = performance.now();
+            let loadTime = endTime - startTime;
+            console.log(`PyScript listo en: ${loadTime} ms`);
+            document.getElementById("output").innerText += `PyScript listo en: ${loadTime} ms\n`;
+        });
+    </script>
+</head>
+<body>
+    <h1>Benchmarking: JavaScript vs PyScript (Listas/Arrays Básicos)</h1>
+
+    <button onclick="runJSBenchmark()">Ejecutar en JavaScript</button>
+    <button py-click="run_py_benchmark">Ejecutar en PyScript</button>
+    <h2>Resultados</h2>
+
+    <pre id="output"></pre>
+</body>
+</html>
