@@ -11,20 +11,32 @@
     <script>
         // Medir el tiempo de inicialización de PyScript
         let startTime = performance.now();
-        var performanceasd = 5;
         document.addEventListener('py:ready', () => {
             let endTime = performance.now();
             let loadTime = endTime - startTime;
             console.log(`PyScript listo en: ${loadTime} ms`);
             document.getElementById("output").innerText += `PyScript listo en: ${loadTime} ms\n`;
         });
+
+        var startTimerWebAssembly;
+        function startTimer() {
+            startTimerWebAssembly = performance.now();
+        }
+
+        function endTimerWebAssembly() {
+            var endTime = performance.now();
+            var totalElapsedTime = endTime - startTimerWebAssembly;
+            var resultDiv = document.createElement("div");
+            resultDiv.textContent = `Tiempo (PyScript + WebAssembly): ${totalElapsedTime} ms`;
+            document.getElementById("output").appendChild(resultDiv);
+        }
     </script>
 </head>
 <body>
     <h1>Benchmarking: JavaScript vs PyScript (Listas/Arrays Básicos)</h1>
 
     <button onclick="runJSBenchmark()">Ejecutar en JavaScript</button>
-    <button py-click="run_py_benchmark">Ejecutar en PyScript</button>
+    <button onclick="startTimer()" py-click="run_py_benchmark">Ejecutar en PyScript</button>
     <h2>Resultados</h2>
 
     <pre id="output"></pre>

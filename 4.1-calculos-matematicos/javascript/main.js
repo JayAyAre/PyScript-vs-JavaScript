@@ -32,6 +32,20 @@ function multiplyMatrices(size) {
     document.getElementById("output").appendChild(resultDiv);
 }
 
+function getMemoryUsageJS() {
+    if (performance.memory) {
+        let memoryUsed = performance.memory.usedJSHeapSize / (1024 * 1024); // Convertir a MB
+        return `Memoria usada en JavaScript: ${memoryUsed.toFixed(2)} MB`;
+    } else {
+        return "Medición de memoria no soportada en este navegador.";
+    }
+}
+
 function runJSBenchmark() {
-    multiplyMatrices(200);  // Prueba con matrices de 200x200
+    multiplyMatrices(200);
+    let memoryUsage = getMemoryUsageJS();
+
+    let memoryDiv = document.createElement("div");
+    memoryDiv.textContent = memoryUsage;
+    document.getElementById("output").appendChild(memoryDiv);
 }
