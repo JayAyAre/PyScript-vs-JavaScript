@@ -1,3 +1,29 @@
+function runNodeBenchmark() {
+    fetch("http://localhost:3000/")
+        .then(response => response.json())
+        .then(data => {
+            let outputDiv = document.getElementById("nodeJs-output");
+
+            let titleDiv = document.createElement("div");
+            titleDiv.textContent = "Node.js (Servidor)";
+            outputDiv.appendChild(titleDiv);
+
+            let timeDiv = document.createElement("div");
+            timeDiv.textContent = `Tiempo de Ejecucion: ${data.executionTime} ms`;
+            outputDiv.appendChild(timeDiv);
+
+            let cpuDiv = document.createElement("div");
+            cpuDiv.textContent = `Uso de CPU: ${data.cpuUsage} %`;
+            outputDiv.appendChild(cpuDiv);
+
+            let memoryDiv = document.createElement("div");
+            memoryDiv.textContent = `Uso de Memoria: ${data.memoryUsage} MB`;
+            outputDiv.appendChild(memoryDiv);
+
+        })
+        .catch(error => console.error("Error:", error));
+}
+
 function createMatrix(size) {
     let matrix = new Array(size);
     for (let i = 0; i < size; i++) {
@@ -26,11 +52,13 @@ function multiplyMatrices(size) {
     }
     let end = performance.now();
 
-    let result = `JavaScript (Arrays nativos): ${end - start} ms`;
+    let resultTime = Number((end - start).toFixed(2));
+    let result = `JavaScript (Arrays nativos): ${resultTime} ms`;
     let resultDiv = document.createElement("div");
     resultDiv.textContent = result;
-    document.getElementById("output").appendChild(resultDiv);
+    document.getElementById("javascript-output").appendChild(resultDiv);
 }
+
 
 function getMemoryUsageJS() {
     if (performance.memory) {
@@ -43,9 +71,8 @@ function getMemoryUsageJS() {
 
 function runJSBenchmark() {
     multiplyMatrices(200);
-    let memoryUsage = getMemoryUsageJS();
 
     let memoryDiv = document.createElement("div");
-    memoryDiv.textContent = memoryUsage;
-    document.getElementById("output").appendChild(memoryDiv);
+    memoryDiv.textContent = getMemoryUsageJS;
+    document.getElementById("javascript-output").appendChild(memoryDiv);
 }

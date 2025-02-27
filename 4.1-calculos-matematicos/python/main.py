@@ -11,11 +11,9 @@ def create_matrix(size):
 
 
 def get_memory_usage_py():
-    gc.collect()  # Forzar limpieza antes de medir
-    memory_used = sum(sys.getsizeof(obj)
-                      # Convertir a MB
-                      for obj in gc.get_objects()) / (1024 * 1024)
-    return f"Memoria usada en PyScript: {memory_used:.2f} MB"
+    gc.collect()
+    return sum(sys.getsizeof(obj)
+               for obj in gc.get_objects()) / (1024 * 1024)
 
 
 def multiply_matrices(size):
@@ -24,6 +22,7 @@ def multiply_matrices(size):
     C = [[0] * size for _ in range(size)]
 
     start = time.time()
+
     for i in range(size):
         for j in range(size):
             _sum = 0
@@ -32,15 +31,16 @@ def multiply_matrices(size):
             C[i][j] = _sum
     end = time.time()
 
-    execution_time = (end - start) * 1000  # Convertimos a milisegundos
+    #   Execution time
+
+    execution_time = (end - start) * 1000
     display(
-        f"PyScript (Listas nativas): {execution_time} ms", target="output")
+        f"PyScript (Listas nativas): {execution_time:.3f} ms", target="pyscript-output")
 
-    # Medir memoria y mostrar
+    #   RAM
     memory_usage = get_memory_usage_py()
-    display(f"Uso de memoria: {memory_usage}", target="output")
+    display(f"Uso de memoria: {memory_usage:.3f} MB", target="pyscript-output")
 
-    # Llamar a la función de JS para medir el tiempo total
     js.endTimerWebAssembly()
 
 
