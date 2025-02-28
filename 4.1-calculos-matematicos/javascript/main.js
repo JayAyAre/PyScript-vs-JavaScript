@@ -1,23 +1,20 @@
 function runNodeBenchmark() {
+    clearCell("nodeJs-output");
     fetch("http://localhost:3000/")
         .then(response => response.json())
         .then(data => {
             let outputDiv = document.getElementById("nodeJs-output");
 
-            let titleDiv = document.createElement("div");
-            titleDiv.textContent = "Node.js (Servidor)";
-            outputDiv.appendChild(titleDiv);
-
             let timeDiv = document.createElement("div");
-            timeDiv.textContent = `Tiempo de Ejecucion: ${data.executionTime} ms`;
+            timeDiv.textContent = `ET: ${data.executionTime} ms`;
             outputDiv.appendChild(timeDiv);
 
             let cpuDiv = document.createElement("div");
-            cpuDiv.textContent = `Uso de CPU: ${data.cpuUsage} %`;
+            cpuDiv.textContent = `CPU: ${data.cpuUsage} %`;
             outputDiv.appendChild(cpuDiv);
 
             let memoryDiv = document.createElement("div");
-            memoryDiv.textContent = `Uso de Memoria: ${data.memoryUsage} MB`;
+            memoryDiv.textContent = `RAM: ${data.memoryUsage} MB`;
             outputDiv.appendChild(memoryDiv);
 
         })
@@ -53,26 +50,27 @@ function multiplyMatrices(size) {
     let end = performance.now();
 
     let resultTime = Number((end - start).toFixed(2));
-    let result = `JavaScript (Arrays nativos): ${resultTime} ms`;
+    let result = `ET: ${resultTime} ms`;
     let resultDiv = document.createElement("div");
     resultDiv.textContent = result;
     document.getElementById("javascript-output").appendChild(resultDiv);
 }
 
+function runJSBenchmark() {
+    clearCell("javascript-output");
+    document.getElementById("javascript-output").textContent = ""
+    multiplyMatrices(300);
+
+    let memoryDiv = document.createElement("div");
+    memoryDiv.textContent = getMemoryUsageJS();
+    document.getElementById("javascript-output").appendChild(memoryDiv);
+}
 
 function getMemoryUsageJS() {
     if (performance.memory) {
-        let memoryUsed = performance.memory.usedJSHeapSize / (1024 * 1024); // Convertir a MB
-        return `Memoria usada en JavaScript: ${memoryUsed.toFixed(2)} MB`;
+        let memoryUsed = performance.memory.usedJSHeapSize / (1024 * 1024);
+        return `RAM: ${memoryUsed.toFixed(2)} MB`;
     } else {
-        return "Medición de memoria no soportada en este navegador.";
+        return `RAM unsopported measurement in this browser.`;
     }
-}
-
-function runJSBenchmark() {
-    multiplyMatrices(200);
-
-    let memoryDiv = document.createElement("div");
-    memoryDiv.textContent = getMemoryUsageJS;
-    document.getElementById("javascript-output").appendChild(memoryDiv);
 }

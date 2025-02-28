@@ -8,19 +8,20 @@
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
     <script src="javascript/main.js" defer></script>
     <script type="py" src="python/main.py" config="python/pyscript.json"></script>
-    
+
     <script>
         // Medir el tiempo de inicialización de PyScript
         let startTime = performance.now();
+
         document.addEventListener('py:ready', () => {
             let endTime = performance.now();
             let loadTime = endTime - startTime;
-            console.log(`PyScript listo en: ${loadTime} ms`);
-            document.getElementById("output").innerText += `PyScript listo en: ${loadTime.toFixed(3)} ms`;
+            document.getElementById("output").innerText += `PLT: ${loadTime.toFixed(2)} ms`;
         });
 
         var startTimerWebAssembly;
-        function startTimer() {
+
+        function runPyBenchmark() {
             startTimerWebAssembly = performance.now();
         }
 
@@ -28,33 +29,31 @@
             var endTime = performance.now();
             var totalElapsedTime = endTime - startTimerWebAssembly;
             var resultDiv = document.createElement("div");
-            resultDiv.textContent = `Tiempo (PyScript + WebAssembly): ${totalElapsedTime.toFixed(3)} ms`;
+            resultDiv.textContent = `ET (Py + WA): ${totalElapsedTime.toFixed(2)} ms`;
             document.getElementById("pyscript-output").appendChild(resultDiv);
         }
-    </script>
-    <script>
-        // Función para ejecutar la petición y obtener los resultados del servidor Python
-        function runPyBenchmark() {
+
+        function clearCell(elementId) {
+            document.getElementById(elementId).textContent = "";
+        }
+
+        function runPyBackendBenchmark() {
+            clearCell("pythonBackend-output");
             fetch("http://localhost:5000/")  // URL del servidor Python
                 .then(response => response.json())
                 .then(data => {
                     let outputDiv = document.getElementById("pythonBackend-output");
 
-                    // Crear divs separados para cada parte de la información
-                    let titleDiv = document.createElement("div");
-                    titleDiv.textContent = "Resultados desde Python Backend";
-                    outputDiv.appendChild(titleDiv);
-
                     let timeDiv = document.createElement("div");
-                    timeDiv.textContent = `Tiempo de Ejecución: ${data.time} ms`;
+                    timeDiv.textContent = `E: ${data.time} ms`;
                     outputDiv.appendChild(timeDiv);
 
                     let cpuDiv = document.createElement("div");
-                    cpuDiv.textContent = `Uso de CPU: ${data.cpu_usage} %`;
+                    cpuDiv.textContent = `CPU: ${data.cpu_usage} %`;
                     outputDiv.appendChild(cpuDiv);
 
                     let memoryDiv = document.createElement("div");
-                    memoryDiv.textContent = `Uso de Memoria: ${data.memory_usage} MB`;
+                    memoryDiv.textContent = `RAM: ${data.memory_usage} MB`;
                     outputDiv.appendChild(memoryDiv);
                 })
                 .catch(error => console.error("Error:", error));
@@ -64,10 +63,10 @@
 <body>
     <h1>Benchmarking: JavaScript vs PyScript (Listas/Arrays Básicos)</h1>
 
-    <button onclick="runNodeBenchmark()">Ejecutar en Node</button>
     <button onclick="runJSBenchmark()">Ejecutar en JavaScript</button>
-    <button onclick="startTimer()" py-click="run_py_benchmark">Ejecutar en PyScript</button>
-    <button onclick="runPyBenchmark()">Ejecutar en Python Backend</button>
+    <button onclick="runPyBenchmark()" py-click="run_py_benchmark">Ejecutar en PyScript</button>
+    <button onclick="runNodeBenchmark()">Ejecutar en Node</button>
+    <button onclick="runPyBackendBenchmark()">Ejecutar en Python Backend</button>
 
     <h2>Resultados</h2>
 
@@ -75,17 +74,17 @@
     <table border="1">
         <thead>
             <tr>
-                <th>Node.js</th>
                 <th>JavaScript</th>
                 <th>PyScript</th>
+                <th>Node.js</th>
                 <th>Python Backend</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td id="nodeJs-output">Esperando...</td>
                 <td id="javascript-output">Esperando...</td>
                 <td id="pyscript-output">Esperando...</td>
+                <td id="nodeJs-output">Esperando...</td>
                 <td id="pythonBackend-output">Esperando...</td>
             </tr>
         </tbody>

@@ -59,7 +59,7 @@ async function multiplyMatrices(size) {
 }
 
 app.get("/", async (req, res) => {
-    let result = await multiplyMatrices(200);
+    let result = await multiplyMatrices(300);
     res.json(result);
 });
 

@@ -3,6 +3,7 @@ import json
 import random
 import time
 import psutil
+import os
 
 
 def create_matrix(size):
@@ -10,12 +11,17 @@ def create_matrix(size):
 
 
 def get_memory_usage():
-    memory_info = psutil.virtual_memory()
-    return memory_info.total - memory_info.available
+    process = psutil.Process(os.getpid())
+    return round(process.memory_info().rss / (1024 * 1024), 2)
+
+
+def get_cpu_usage():
+    return psutil.cpu_percent(interval=1)
 
 
 def multiply_matrices(size):
     start_memory = get_memory_usage()
+    start_cpu = get_cpu_usage()
 
     A = create_matrix(size)
     B = create_matrix(size)
@@ -33,20 +39,16 @@ def multiply_matrices(size):
     end_time = time.time()
 
     end_memory = get_memory_usage()
+    end_cpu = get_cpu_usage()
 
-    psutil.cpu_percent(interval=1)
+    execution_time = round((end_time - start_time) * 1000, 2)  # Tiempo en ms
 
-    cpu_before = psutil.cpu_percent(interval=1)
-    cpu_after = psutil.cpu_percent(interval=1)
-
-    memory_used = round((end_memory - start_memory) /
-                        (1024 * 1024), 3)
-
-    execution_time = round((end_time - start_time) * 1000, 2)
+    memory_used = round(end_memory - start_memory, 2)
+    cpu_usage = round(end_cpu - start_cpu, 2)  # Diferencia de CPU en %
 
     return {
         'time': execution_time,
-        'cpu_usage': round(cpu_after - cpu_before, 2),
+        'cpu_usage': cpu_usage,
         'memory_usage': memory_used
     }
 
@@ -64,7 +66,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.end_headers()
 
-            results = multiply_matrices(200)
+            results = multiply_matrices(300)
             response = json.dumps(results)
             self.wfile.write(response.encode())
 
@@ -72,7 +74,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 def run_server():
     server_address = ('', 5000)
     httpd = HTTPServer(server_address, RequestHandler)
-    print("Servidor corriendo en http://localhost:5000")
+    print("Server running at http://localhost:5000")
     httpd.serve_forever()
 
 
