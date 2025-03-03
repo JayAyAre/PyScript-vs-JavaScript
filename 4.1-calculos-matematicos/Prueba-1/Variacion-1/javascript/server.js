@@ -44,9 +44,15 @@ async function multiplyMatrices(size) {
 
     let endReal = performance.now();
 
+    // ET (Execution Time)
+
     let executionTime = (endReal - startReal).toFixed(2);
 
+    // CPU
+
     let cpuUsage = cpuAvg.toFixed(2);
+
+    // RAM
 
     const endMemory = process.memoryUsage().heapUsed;
     const memoryUsage = ((endMemory - startMemory) / (1024 * 1024)).toFixed(2); // Convertir a MB

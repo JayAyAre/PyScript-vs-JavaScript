@@ -1,13 +1,13 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-import random
 import time
 import psutil
 import os
+import numpy as np
 
 
 def create_matrix(size):
-    return [[random.random() for _ in range(size)] for _ in range(size)]
+    return np.random.rand(size, size)
 
 
 def get_memory_usage():
@@ -25,26 +25,28 @@ def multiply_matrices(size):
 
     A = create_matrix(size)
     B = create_matrix(size)
-    C = [[0] * size for _ in range(size)]
+    C = np.zeros((size, size))
 
     start_time = time.time()
 
-    for i in range(size):
-        for j in range(size):
-            _sum = 0
-            for k in range(size):
-                _sum += A[i][k] * B[k][j]
-            C[i][j] = _sum
+    C = np.dot(A, B)
 
     end_time = time.time()
 
     end_memory = get_memory_usage()
     end_cpu = get_cpu_usage()
 
-    execution_time = round((end_time - start_time) * 1000, 2)  # Tiempo en ms
+    # ET (Execution Time)
+
+    execution_time = round((end_time - start_time) * 1000, 2)
+
+    # RAM
 
     memory_used = round(end_memory - start_memory, 2)
-    cpu_usage = round(end_cpu - start_cpu, 2)  # Diferencia de CPU en %
+
+    # CPU
+
+    cpu_usage = round(end_cpu - start_cpu, 2)
 
     return {
         'time': execution_time,
@@ -66,7 +68,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.end_headers()
 
-            results = multiply_matrices(300)
+            results = multiply_matrices(1000)
             response = json.dumps(results)
             self.wfile.write(response.encode())
 

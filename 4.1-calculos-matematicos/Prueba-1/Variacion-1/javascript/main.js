@@ -49,6 +49,8 @@ function multiplyMatrices(size) {
     }
     let end = performance.now();
 
+    // ET (Execution Time)
+
     let resultTime = Number((end - start).toFixed(2));
     let result = `ET: ${resultTime} ms`;
     let resultDiv = document.createElement("div");
@@ -67,6 +69,7 @@ function runJSBenchmark() {
 }
 
 function getMemoryUsageJS() {
+    // RAM
     if (performance.memory) {
         let memoryUsed = performance.memory.usedJSHeapSize / (1024 * 1024);
         return `RAM: ${memoryUsed.toFixed(2)} MB`;

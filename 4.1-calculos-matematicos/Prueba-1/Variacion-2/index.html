@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Benchmarking: JavaScript vs PyScript</title>
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.5.2"></script>
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
     <script src="javascript/main.js" defer></script>
-    <script type="py" src="python/main.py" config="python/pyscript.json"></script>
-
+    <script type="py" src="python/main.py" config="python/pyscript.toml"></script>
     <script>
-        // Medir el tiempo de inicialización de PyScript
         let startTime = performance.now();
 
         document.addEventListener('py:ready', () => {
+
             let endTime = performance.now();
             let loadTime = endTime - startTime;
             document.getElementById("output").innerText += `PLT: ${loadTime.toFixed(2)} ms`;
@@ -39,13 +39,13 @@
 
         function runPyBackendBenchmark() {
             clearCell("pythonBackend-output");
-            fetch("http://localhost:5000/")  // URL del servidor Python
+            fetch("http://localhost:5000/")
                 .then(response => response.json())
                 .then(data => {
                     let outputDiv = document.getElementById("pythonBackend-output");
 
                     let timeDiv = document.createElement("div");
-                    timeDiv.textContent = `E: ${data.time} ms`;
+                    timeDiv.textContent = `TE: ${data.time} ms`;
                     outputDiv.appendChild(timeDiv);
 
                     let cpuDiv = document.createElement("div");
@@ -59,9 +59,9 @@
                 .catch(error => console.error("Error:", error));
         }
     </script>
-</head>
+    </head>
 <body>
-    <h1>Benchmarking: JavaScript vs PyScript (Listas/Arrays Básicos)</h1>
+    <h1>Benchmarking: JavaScript vs PyScript (Numpy/TypeArrays)</h1>
 
     <button onclick="runJSBenchmark()">Ejecutar en JavaScript</button>
     <button onclick="runPyBenchmark()" py-click="run_py_benchmark">Ejecutar en PyScript</button>
@@ -70,7 +70,6 @@
 
     <h2>Resultados</h2>
 
-    <!-- Tabla de Resultados -->
     <table border="1">
         <thead>
             <tr>
