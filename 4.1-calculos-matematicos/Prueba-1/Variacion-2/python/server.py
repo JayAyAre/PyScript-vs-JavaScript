@@ -25,50 +25,42 @@ def multiply_matrices(size):
 
     A = create_matrix(size)
     B = create_matrix(size)
-    C = np.zeros((size, size))
 
     start_time = time.time()
-
     C = np.dot(A, B)
-
     end_time = time.time()
 
     end_memory = get_memory_usage()
     end_cpu = get_cpu_usage()
 
-    # ET (Execution Time)
-
     execution_time = round((end_time - start_time) * 1000, 2)
-
-    # RAM
-
     memory_used = round(end_memory - start_memory, 2)
-
-    # CPU
-
     cpu_usage = round(end_cpu - start_cpu, 2)
 
     return {
-        'time': execution_time,
+        'size': f'{size}x{size}',
+        'execution_time': execution_time,
         'cpu_usage': cpu_usage,
         'memory_usage': memory_used
     }
-
-# Handler HTTP
 
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/":
-            self.send_response(code=200)
+            self.send_response(200)
             self.send_header('Access-Control-Allow-Origin', '*')
             self.send_header('Access-Control-Allow-Headers', 'Content-Type')
             self.send_header('Access-Control-Allow-Methods', 'GET')
-            self.send_header("User-Agent", "Anything")
             self.send_header('Content-type', 'application/json')
             self.end_headers()
 
-            results = multiply_matrices(1000)
+            results = {
+                "matrices500": multiply_matrices(500),
+                "matrices1000": multiply_matrices(1000),
+                "matrices2000": multiply_matrices(2000)
+            }
+
             response = json.dumps(results)
             self.wfile.write(response.encode())
 

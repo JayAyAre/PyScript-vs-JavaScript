@@ -11,9 +11,9 @@ def create_matrix(size):
 
 def multiply_matrices(size):
     tracemalloc.start()
+
     A = create_matrix(size)
     B = create_matrix(size)
-    C = np.zeros((size, size))
 
     start = time.time()
 
@@ -23,20 +23,26 @@ def multiply_matrices(size):
 
     # ET (Execution Time)
     execution_time = (end - start) * 1000
-    display(f"ET: {round(execution_time, 2)} ms", target="pyscript-output")
+
+    # RAM
+    memory_usage = tracemalloc.get_traced_memory()[1] / (1024 * 1024)
+    tracemalloc.stop()
+
+    # 📌 Modificar el HTML directamente desde JavaScript
+    output_element = js.document.getElementById("pyscript-output")
+    output_element.innerHTML += f"""
+        <div style="font-weight: bold;">Matriz {size}x{size}</div>
+        <div>ET: {round(execution_time, 2)} ms</div>
+        <div>RAM: {round(memory_usage, 2)} MB</div>
+    """
 
     # PLT
     js.endTimerWebAssembly()
 
-    # RAM
-    memory_usage = tracemalloc.get_traced_memory()[1] / (1024 * 1024)
-    display(f"RAM: {round(memory_usage, 2)} MB",
-            target="pyscript-output")
-    tracemalloc.stop()
-
 
 def run_py_benchmark(event):
-    js.clearCell('pyscript-output')
+    js.clearCell("pyscript-output")
+
     multiply_matrices(500)
     multiply_matrices(1000)
     multiply_matrices(2000)

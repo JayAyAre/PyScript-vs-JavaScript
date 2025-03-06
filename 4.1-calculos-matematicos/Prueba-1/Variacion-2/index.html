@@ -31,6 +31,7 @@
             var resultDiv = document.createElement("div");
             resultDiv.textContent = `ET (Py + WA): ${totalElapsedTime.toFixed(2)} ms`;
             document.getElementById("pyscript-output").appendChild(resultDiv);
+            document.getElementById("pyscript-output").appendChild(document.createElement("hr"))
         }
 
         function clearCell(elementId) {
@@ -44,20 +45,30 @@
                 .then(data => {
                     let outputDiv = document.getElementById("pythonBackend-output");
 
-                    let timeDiv = document.createElement("div");
-                    timeDiv.textContent = `TE: ${data.time} ms`;
-                    outputDiv.appendChild(timeDiv);
+                    Object.entries(data).forEach(([key, value]) => {
+                        let titleDiv = document.createElement("div");
+                        titleDiv.textContent = `Matriz ${value.size}`;
+                        titleDiv.style.fontWeight = "bold";
+                        outputDiv.appendChild(titleDiv);
 
-                    let cpuDiv = document.createElement("div");
-                    cpuDiv.textContent = `CPU: ${data.cpu_usage} %`;
-                    outputDiv.appendChild(cpuDiv);
+                        let timeDiv = document.createElement("div");
+                        timeDiv.textContent = `TE: ${value.execution_time} ms`;
+                        outputDiv.appendChild(timeDiv);
 
-                    let memoryDiv = document.createElement("div");
-                    memoryDiv.textContent = `RAM: ${data.memory_usage} MB`;
-                    outputDiv.appendChild(memoryDiv);
+                        let cpuDiv = document.createElement("div");
+                        cpuDiv.textContent = `CPU: ${value.cpu_usage} %`;
+                        outputDiv.appendChild(cpuDiv);
+
+                        let memoryDiv = document.createElement("div");
+                        memoryDiv.textContent = `RAM: ${value.memory_usage} MB`;
+                        outputDiv.appendChild(memoryDiv);
+
+                        outputDiv.appendChild(document.createElement("hr")); // Separador visual
+                    });
                 })
                 .catch(error => console.error("Error:", error));
         }
+
     </script>
     </head>
 <body>

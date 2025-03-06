@@ -1,59 +1,72 @@
 function runNodeBenchmark() {
     clearCell("nodeJs-output");
+
     fetch("http://localhost:3000/")
         .then(response => response.json())
         .then(data => {
             let outputDiv = document.getElementById("nodeJs-output");
 
-            let timeDiv = document.createElement("div");
-            timeDiv.textContent = `ET: ${data.executionTime} ms`;
-            outputDiv.appendChild(timeDiv);
+            Object.values(data).forEach((result) => {
+                let titleDiv = document.createElement("div");
+                titleDiv.textContent = `Matriz ${result.size}`;
+                titleDiv.style.fontWeight = "bold";
+                outputDiv.appendChild(titleDiv);
 
-            let cpuDiv = document.createElement("div");
-            cpuDiv.textContent = `CPU: ${data.cpuUsage} %`;
-            outputDiv.appendChild(cpuDiv);
+                let timeDiv = document.createElement("div");
+                timeDiv.textContent = `ET: ${result.executionTime} ms`;
+                outputDiv.appendChild(timeDiv);
 
-            let memoryDiv = document.createElement("div");
-            memoryDiv.textContent = `RAM: ${data.memoryUsage} MB`;
-            outputDiv.appendChild(memoryDiv);
+                let cpuDiv = document.createElement("div");
+                cpuDiv.textContent = `CPU: ${result.cpuUsage} %`;
+                outputDiv.appendChild(cpuDiv);
 
+                let memoryDiv = document.createElement("div");
+                memoryDiv.textContent = `RAM: ${result.memoryUsage} MB`;
+                outputDiv.appendChild(memoryDiv);
+
+                outputDiv.appendChild(document.createElement("hr")); // Separador visual
+            });
         })
         .catch(error => console.error("Error:", error));
 }
 
 async function multiplyMatrices(size) {
-
     let A = tf.randomNormal([size, size]);
     let B = tf.randomNormal([size, size]);
 
     let start = performance.now();
-
     let C = tf.matMul(A, B);
-
     await C.data();
-
     let end = performance.now();
 
-    // ET (Execution Time)
-    let resultTime = Number((end - start).toFixed(2));
-    let result = `ET: ${resultTime} ms`;
-    let resultDiv = document.createElement("div");
-    resultDiv.textContent = result;
-    document.getElementById("javascript-output").appendChild(resultDiv);
+    // Mostrar resultados en la interfaz
+    let outputDiv = document.getElementById("javascript-output");
+
+    let titleDiv = document.createElement("div");
+    titleDiv.textContent = `Matriz ${size}x${size}`;
+    titleDiv.style.fontWeight = "bold";
+    outputDiv.appendChild(titleDiv);
+
+    let timeDiv = document.createElement("div");
+    timeDiv.textContent = `ET: ${Number((end - start).toFixed(2))} ms`;
+    outputDiv.appendChild(timeDiv);
+
+    let memoryDiv = document.createElement("div");
+    memoryDiv.textContent = getMemoryUsageJS();
+    outputDiv.appendChild(memoryDiv);
+
+    outputDiv.appendChild(document.createElement("hr")); // Separador visual
 }
 
 async function runJSBenchmark() {
     clearCell("javascript-output");
-    document.getElementById("javascript-output").textContent = "";
-    await multiplyMatrices(1000);
 
-    let memoryDiv = document.createElement("div");
-    memoryDiv.textContent = getMemoryUsageJS();
-    document.getElementById("javascript-output").appendChild(memoryDiv);
+    await multiplyMatrices(500);
+    await multiplyMatrices(1000);
+    await multiplyMatrices(2000);
 }
 
 function getMemoryUsageJS() {
-    // RAM
     if (performance.memory) {
         let memoryUsed = performance.memory.usedJSHeapSize / (1024 * 1024);
         return `RAM: ${memoryUsed.toFixed(2)} MB`;
