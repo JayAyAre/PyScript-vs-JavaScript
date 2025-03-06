@@ -1,13 +1,22 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-import random
 import time
 import psutil
 import os
 
 
-def create_matrix(size):
-    return [[random.random() for _ in range(size)] for _ in range(size)]
+def is_prime(n):
+    if n < 2:
+        return False
+    if n in (2, 3):
+        return True
+    if n % 2 == 0 or n % 3 == 0:
+        return False
+
+    for k in range(5, int(n**0.5) + 1, 2):
+        if n % k == 0:
+            return False
+    return True
 
 
 def get_memory_usage():
@@ -19,22 +28,18 @@ def get_cpu_usage():
     return psutil.cpu_percent()
 
 
-def multiply_matrices(size):
+def primes_to_n(n):
     start_memory = get_memory_usage()
     start_cpu = get_cpu_usage()
-
-    A = create_matrix(size)
-    B = create_matrix(size)
-    C = [[0] * size for _ in range(size)]
-
     start_time = time.time()
 
-    for i in range(size):
-        for j in range(size):
-            _sum = 0
-            for k in range(size):
-                _sum += A[i][k] * B[k][j]
-            C[i][j] = _sum
+    primes = []
+    if n > 2:
+        primes.append(2)
+
+    for i in range(3, n, 2):
+        if is_prime(i):
+            primes.append(i)
 
     end_time = time.time()
 
@@ -73,7 +78,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.end_headers()
 
-            results = multiply_matrices(300)
+            results = primes_to_n(1000000)
             response = json.dumps(results)
             self.wfile.write(response.encode())
 

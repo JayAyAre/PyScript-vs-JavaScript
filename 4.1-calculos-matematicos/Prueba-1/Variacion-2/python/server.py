@@ -16,7 +16,7 @@ def get_memory_usage():
 
 
 def get_cpu_usage():
-    return psutil.cpu_percent(interval=1)
+    return psutil.cpu_percent()
 
 
 def multiply_matrices(size):
