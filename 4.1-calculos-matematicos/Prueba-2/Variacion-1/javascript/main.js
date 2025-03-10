@@ -70,8 +70,7 @@ function primes_to_n(size) {
 function runJSBenchmark() {
     clearCell("javascript-output");
     document.getElementById("javascript-output").textContent = ""
-    primes_to_n(1000000);
-
+    primes_to_n(1_000_000);
     let memoryDiv = document.createElement("div");
     memoryDiv.textContent = getMemoryUsageJS();
     document.getElementById("javascript-output").appendChild(memoryDiv);
