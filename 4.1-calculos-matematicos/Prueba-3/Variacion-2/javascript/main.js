@@ -1,5 +1,6 @@
 function runNodeBenchmark() {
     const outputDiv = document.getElementById("nodeJs-output");
+    clearCell("nodeJs-output");
     fetch("http://localhost:3000/")
         .then(response => {
             if (!response.ok) {
