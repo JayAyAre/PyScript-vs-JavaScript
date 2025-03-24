@@ -6,6 +6,7 @@
     <title>Benchmarking: JavaScript vs PyScript</title>
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.js"></script>
     <script src="javascript/main.js" defer></script>
     <script type="py" src="python/main.py" config="python/pyscript.toml"></script>
     <script>
@@ -43,35 +44,34 @@
                     let outputDiv = document.getElementById("pythonBackend-output");
 
                     let timeDiv = document.createElement("div");
-                    timeDiv.textContent = `Total ET (1000x): ${data.time} ms`;
+                    timeDiv.textContent = `Total ET (10x): ${data.time} ms`;
                     outputDiv.appendChild(timeDiv);
 
                     let avgTimeDiv = document.createElement("div");
-                    avgTimeDiv.textContent = `ET (avg, 1000x): ${data.avg_time} ms`;
+                    avgTimeDiv.textContent = `ET (avg, 10x): ${data.avg_time} ms`;
                     outputDiv.appendChild(avgTimeDiv);
 
                     let cpuDiv = document.createElement("div");
-                    cpuDiv.textContent = `CPU (avg, 1000x): ${data.avg_cpu_usage} %`;
+                    cpuDiv.textContent = `CPU (avg, 10x): ${data.avg_cpu_usage} %`;
                     outputDiv.appendChild(cpuDiv);
 
                     let memoryDiv = document.createElement("div");
-                    memoryDiv.textContent = `RAM (avg, 1000x): ${data.avg_memory_usage} MB`;
+                    memoryDiv.textContent = `RAM (avg, 10x): ${data.avg_memory_usage} MB`;
                     outputDiv.appendChild(memoryDiv);
                 })
                 .catch(error => console.error("Error:", error));
         }
     </script>
 <body>
-    <h1>Calculo de digitos de PI (Mpmath)</h1>
+    <h1>PI Digit Calculation (Gauss-Legendre)</h1>
 
-    <button onclick="runJSBenchmark()">Ejecutar en JavaScript</button>
-    <button onclick="runPyBenchmark()" py-click="run_py_benchmark">Ejecutar en PyScript</button>
-    <button onclick="runNodeBenchmark()">Ejecutar en Node</button>
-    <button onclick="runPyBackendBenchmark()">Ejecutar en Python Backend</button>
+    <button onclick="runJSBenchmark()">Run in JavaScript</button>
+    <button onclick="runPyBenchmark()" py-click="run_py_benchmark">Run in PyScript</button>
+    <button onclick="runNodeBenchmark()">Run in Node</button>
+    <button onclick="runPyBackendBenchmark()">Run in Python Backend</button>
 
-    <h2>Resultados</h2>
+    <h2>Results</h2>
 
-    <!-- Tabla de Resultados -->
     <table border="1">
         <thead>
             <tr>
@@ -83,14 +83,12 @@
         </thead>
         <tbody>
             <tr>
-                <td id="javascript-output">Esperando...</td>
-                <td id="pyscript-output">Esperando...</td>
-                <td id="nodeJs-output">Esperando...</td>
-                <td id="pythonBackend-output">Esperando...</td>
+                <td id="javascript-output">Waiting...</td>
+                <td id="pyscript-output">Waiting...</td>
+                <td id="nodeJs-output">Waiting...</td>
+                <td id="pythonBackend-output">Waiting...</td>
             </tr>
         </tbody>
     </table>
-
-    <pre id="output"></pre>
 </body>
 </html>

@@ -63,6 +63,8 @@ function n_digits_pi(repetitions, digits) {
 
     const outputDiv = document.getElementById("javascript-output");
 
+    // ET (Execution Time)
+
     let timeDiv = document.createElement("div");
     timeDiv.textContent = `Total ET: ${totalExecTime} s`;
     outputDiv.appendChild(timeDiv);
@@ -70,6 +72,8 @@ function n_digits_pi(repetitions, digits) {
     let avgTimeDiv = document.createElement("div");
     avgTimeDiv.textContent = `ET (avg, 1000x): ${avgTime} ms`;
     outputDiv.appendChild(avgTimeDiv);
+
+    // RAM
 
     let avgMemoryDiv = document.createElement("div");
     avgMemoryDiv.textContent = `RAM (avg, 1000x): ${avgMemory} MB`;

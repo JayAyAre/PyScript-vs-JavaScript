@@ -48,10 +48,17 @@ async function benchmarkPrimesJS(repetitions, n) {
         totalMemory += (endMemory - startMemory) / (1024 * 1024);
     }
 
+    // ET (Execution Time)
+
     let endTotal = performance.now();
     let totalExecTime = (endTotal - startTotal).toFixed(2);
     let avgTime = (totalTime / repetitions).toFixed(2);
+
+    // RAM
+
     let avgMemory = (totalMemory / repetitions).toFixed(2);
+
+    // CPU
     let avgCPU = (totalCPU / repetitions).toFixed(2);
 
     return {

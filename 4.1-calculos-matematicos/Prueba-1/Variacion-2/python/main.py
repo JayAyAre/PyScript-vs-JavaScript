@@ -2,7 +2,7 @@ import time
 import js  # type: ignore
 import tracemalloc
 from pyscript import display  # type: ignore
-import numpy as np  # Importamos numpy
+import numpy as np
 
 
 def create_matrix(size):
@@ -22,13 +22,14 @@ def multiply_matrices(size):
     end = time.time()
 
     # ET (Execution Time)
+
     execution_time = (end - start) * 1000
 
     # RAM
+
     memory_usage = tracemalloc.get_traced_memory()[1] / (1024 * 1024)
     tracemalloc.stop()
 
-    # 📌 Modificar el HTML directamente desde JavaScript
     output_element = js.document.getElementById("pyscript-output")
     output_element.innerHTML += f"""
         <div style="font-weight: bold;">Matriz {size}x{size}</div>
@@ -37,6 +38,7 @@ def multiply_matrices(size):
     """
 
     # PLT
+
     js.endTimerWebAssembly()
 
 

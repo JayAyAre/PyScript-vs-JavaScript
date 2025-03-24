@@ -77,7 +77,9 @@ function runJSBenchmark() {
 }
 
 function getMemoryUsageJS() {
+
     // RAM
+
     if (performance.memory) {
         let memoryUsed = performance.memory.usedJSHeapSize / (1024 * 1024);
         return `RAM: ${memoryUsed.toFixed(2)} MB`;

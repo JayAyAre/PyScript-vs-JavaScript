@@ -1,6 +1,5 @@
 function runNodeBenchmark() {
     clearCell("nodeJs-output");
-
     fetch("http://localhost:3000/")
         .then(response => response.json())
         .then(data => {
@@ -8,7 +7,7 @@ function runNodeBenchmark() {
 
             Object.values(data).forEach((result) => {
                 let titleDiv = document.createElement("div");
-                titleDiv.textContent = `Matriz ${result.size}`;
+                titleDiv.textContent = `Matrix ${result.size}`;
                 titleDiv.style.fontWeight = "bold";
                 outputDiv.appendChild(titleDiv);
 
@@ -24,7 +23,7 @@ function runNodeBenchmark() {
                 memoryDiv.textContent = `RAM: ${result.memoryUsage} MB`;
                 outputDiv.appendChild(memoryDiv);
 
-                outputDiv.appendChild(document.createElement("hr")); // Separador visual
+                outputDiv.appendChild(document.createElement("hr"));
             });
         })
         .catch(error => console.error("Error:", error));
@@ -39,7 +38,6 @@ async function multiplyMatrices(size) {
     await C.data();
     let end = performance.now();
 
-    // Mostrar resultados en la interfaz
     let outputDiv = document.getElementById("javascript-output");
 
     let titleDiv = document.createElement("div");
@@ -47,15 +45,19 @@ async function multiplyMatrices(size) {
     titleDiv.style.fontWeight = "bold";
     outputDiv.appendChild(titleDiv);
 
+    // ET (Execution Time)
+
     let timeDiv = document.createElement("div");
     timeDiv.textContent = `ET: ${Number((end - start).toFixed(2))} ms`;
     outputDiv.appendChild(timeDiv);
+
+    // RAM
 
     let memoryDiv = document.createElement("div");
     memoryDiv.textContent = getMemoryUsageJS();
     outputDiv.appendChild(memoryDiv);
 
-    outputDiv.appendChild(document.createElement("hr")); // Separador visual
+    outputDiv.appendChild(document.createElement("hr"));
 }
 
 async function runJSBenchmark() {

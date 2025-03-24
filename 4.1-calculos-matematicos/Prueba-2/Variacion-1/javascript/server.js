@@ -60,7 +60,7 @@ async function primes_to_n(size) {
     // RAM
 
     const endMemory = process.memoryUsage().heapUsed;
-    const memoryUsage = ((endMemory - startMemory) / (1024 * 1024)).toFixed(2); // Convertir a MB
+    const memoryUsage = ((endMemory - startMemory) / (1024 * 1024)).toFixed(2);
 
     return {
         executionTime: executionTime,
@@ -75,5 +75,5 @@ app.get("/", async (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Servidor corriendo en http://localhost:${port}`);
+    console.log(`Server running at http://localhost:${port}`);
 });

@@ -64,8 +64,6 @@ def primes_to_n(n):
         'memory_usage': memory_used
     }
 
-# Handler HTTP
-
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):

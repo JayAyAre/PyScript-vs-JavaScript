@@ -33,8 +33,16 @@ def multiply_matrices(size):
     end_memory = get_memory_usage()
     end_cpu = get_cpu_usage()
 
+    # ET (Execution Time)
+
     execution_time = round((end_time - start_time) * 1000, 2)
+
+    # RAM
+
     memory_used = round(end_memory - start_memory, 2)
+
+    # CPU
+
     cpu_usage = round(end_cpu - start_cpu, 2)
 
     return {

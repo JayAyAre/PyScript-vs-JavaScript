@@ -36,10 +36,14 @@ def n_digits_pi(repetitions, digits):
         total_time += (end - start) * 1000
         total_memory += memory_usage
 
+    # ET (Execution Time)
+
     end_total = time.time()
     total_exec_time = round((end_total - start_total) * 1000, 2)
-
     avg_time = round(total_time / repetitions, 2)
+
+    # RAM
+
     avg_memory = round(total_memory / repetitions, 2)
 
     display(f"Total ET (1000x): {total_exec_time} ms",

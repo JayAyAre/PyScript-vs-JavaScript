@@ -3,17 +3,27 @@ import json
 import time
 import psutil
 import tracemalloc
+from mpmath import mp
 
 
 def calculate_pi(digits):
-    pi = 0.0
-    for k in range(digits):
-        pi += (1 / (16**k)) * (
-            (4 / (8 * k + 1)) -
-            (2 / (8 * k + 4)) -
-            (1 / (8 * k + 5)) -
-            (1 / (8 * k + 6))
-        )
+    mp.dps = digits
+
+    a = mp.mpf(1)
+    b = 1 / mp.sqrt(2)
+    t = mp.mpf(1) / 4
+    p = mp.mpf(1)
+
+    num_iter = int(mp.log10(digits) * 1.4)
+
+    for _ in range(num_iter):
+        a_next = (a + b) / 2
+        b = mp.sqrt(a * b)
+        t -= p * (a - a_next) ** 2
+        a = a_next
+        p *= 2
+
+    pi = ((a + b) ** 2) / (4 * t)
     return pi
 
 
@@ -44,11 +54,18 @@ def n_digits_pi(repetitions, digits):
         total_memory += memory_usage
         total_cpu += cpu_after
 
+    # ET (Execution time)
+
     end_total = time.time()
     total_exec_time = round((end_total - start_total) * 1000, 2)
-
     avg_time = round(total_time / repetitions, 2)
+
+    # RAM
+
     avg_memory = round(total_memory / repetitions, 2)
+
+    # CPU
+
     avg_cpu = round(total_cpu / repetitions, 2)
 
     return {
@@ -70,7 +87,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.end_headers()
 
-            results = n_digits_pi(1_000, 1_000)
+            results = n_digits_pi(10, 10_000)
             response = json.dumps(results)
             self.wfile.write(response.encode())
 

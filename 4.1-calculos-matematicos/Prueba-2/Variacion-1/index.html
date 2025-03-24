@@ -43,7 +43,7 @@
                     let outputDiv = document.getElementById("pythonBackend-output");
 
                     let timeDiv = document.createElement("div");
-                    timeDiv.textContent = `TE: ${data.time} ms`;
+                    timeDiv.textContent = `ET: ${data.time} ms`;
                     outputDiv.appendChild(timeDiv);
 
                     let cpuDiv = document.createElement("div");
@@ -59,16 +59,15 @@
     </script>
 </head>
 <body>
-    <h1>Deteccion de numeros primos (Listas/Arrays Básicos)</h1>
+    <h1>Prime Number Detection (Native Lists/Arrays)</h1>
 
-    <button onclick="runJSBenchmark()">Ejecutar en JavaScript</button>
-    <button onclick="runPyBenchmark()" py-click="run_py_benchmark">Ejecutar en PyScript</button>
-    <button onclick="runNodeBenchmark()">Ejecutar en Node</button>
-    <button onclick="runPyBackendBenchmark()">Ejecutar en Python Backend</button>
+    <button onclick="runJSBenchmark()">Run in JavaScript</button>
+    <button onclick="runPyBenchmark()" py-click="run_py_benchmark">Run in PyScript</button>
+    <button onclick="runNodeBenchmark()">Run in Node</button>
+    <button onclick="runPyBackendBenchmark()">Run in Python Backend</button>
 
-    <h2>Resultados</h2>
+    <h2>Results</h2>
 
-    <!-- Tabla de Resultados -->
     <table border="1">
         <thead>
             <tr>
@@ -80,10 +79,10 @@
         </thead>
         <tbody>
             <tr>
-                <td id="javascript-output">Esperando...</td>
-                <td id="pyscript-output">Esperando...</td>
-                <td id="nodeJs-output">Esperando...</td>
-                <td id="pythonBackend-output">Esperando...</td>
+                <td id="javascript-output">Waiting...</td>
+                <td id="pyscript-output">Waiting...</td>
+                <td id="nodeJs-output">Waiting...</td>
+                <td id="pythonBackend-output">Waiting...</td>
             </tr>
         </tbody>
     </table>
