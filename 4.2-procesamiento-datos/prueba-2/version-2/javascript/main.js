@@ -1,99 +1,70 @@
-function createDataStructure(size) {
-    const arr = new Int32Array(size);
-    for (let i = 0; i < size; i++) {
-        arr[i] = Math.floor(Math.random() * 1001);
-    }
-    return arr;
-}
-
-async function calculateInParallel(data, operation) {
-    const workerCount = navigator.hardwareConcurrency || 4;
-    const chunkSize = Math.ceil(data.length / workerCount);
-    const promises = [];
-
-    for (let i = 0; i < workerCount; i++) {
-        const start = i * chunkSize;
-        const end = Math.min(start + chunkSize, data.length);
-        const chunk = data.slice(start, end);
-
-        promises.push(new Promise((resolve) => {
-            const worker = new Worker('statsWorker.js');
-            worker.onmessage = (e) => {
-                resolve(e.data);
-                worker.terminate();
-            };
-            worker.postMessage({ chunk, operation });
-        }));
-    }
-
-    const results = await Promise.all(promises);
-    return results.reduce((acc, val) => acc + val, 0);
-}
-
-async function doStatisticalAnalysis(size) {
-    const metrics = {};
-    const startTotal = performance.now();
-    let maxMemory = 0;
-
-    let memoryBefore = performance.memory?.usedJSHeapSize || 0;
-    let startOp = performance.now();
-    const data = createDataStructure(size);
-    metrics['create'] = {
-        time: performance.now() - startOp,
-        memory: data.byteLength / (1024 * 1024)
-    };
-    maxMemory = metrics['create'].memory;
-
-    const operations = ['sum', 'mean', 'std'];
-
-    for (const op of operations) {
-        startOp = performance.now();
-        let result;
-
-        if (op === 'sum') {
-            result = await calculateInParallel(data, 'sum');
-        } else if (op === 'mean') {
-            const sum = await calculateInParallel(data, 'sum');
-            result = sum / data.length;
-        } else if (op === 'std') {
-            const sum = await calculateInParallel(data, 'sum');
-            const sumSquares = await calculateInParallel(data, 'sumSquares');
-            result = Math.sqrt(sumSquares / data.length - Math.pow(sum / data.length, 2));
-        }
-
-        metrics[op] = {
-            time: performance.now() - startOp,
-            memory: metrics['create'].memory,
-            value: result
-        };
-    }
-
-    metrics['output'] = {
-        totalTime: performance.now() - startTotal,
-        memoryPeak: maxMemory
-    };
-
-    for (const [op, data] of Object.entries(metrics)) {
-        if (op !== 'output') {
-            const element = document.getElementById(`javascript-${op}`);
-            if (element) {
-                const displayText = op === 'create'
-                    ? `CREATE - Time: ${data.time.toFixed(2)} ms | RAM: ${data.memory.toFixed(2)} MB`
-                    : `${op.toUpperCase()} = ${data.value?.toFixed(2)} | Time: ${data.time.toFixed(2)} ms | RAM: ${data.memory.toFixed(2)} MB`;
-                element.textContent = displayText;
-            }
-        }
-    }
-
-    const outputElement = document.getElementById("javascript-output");
-    if (outputElement) {
-        outputElement.textContent =
-            `TOTAL - Time: ${metrics['output'].totalTime.toFixed(2)} ms | ` +
-            `RAM Peak: ${metrics['output'].memoryPeak.toFixed(2)} MB`;
-    }
-}
+let jsWorker = null;
+let jsBenchmarkStartTime = 0;
 
 function runJSBenchmark() {
-    clearCell("javascript");
-    doStatisticalAnalysis(10_000_000);
+    clearJSCells();
+    displayJSText('javascript-create', 'Running...');
+    displayJSText('javascript-sum', 'Running...');
+    displayJSText('javascript-mean', 'Running...');
+    displayJSText('javascript-std', 'Running...');
+    displayJSText('javascript-output', 'Running...');
+
+    jsBenchmarkStartTime = performance.now();
+
+    if (jsWorker) {
+        jsWorker.terminate();
+    }
+    jsWorker = new Worker('./javascript/worker.js');
+
+    jsWorker.onmessage = function(event) {
+        if (event.data.error) {
+            console.error("Error in JS Worker:", event.data.error, event.data.stack);
+            displayJSText('javascript-output', `Error: ${event.data.error}`);
+            clearJSCellsButOutput();
+            return;
+        }
+
+        const results = event.data.results;
+
+        displayJSText('javascript-create', `${results.create.time.toFixed(2)} ms | ${results.create.memory.toFixed(2)} MB`);
+        displayJSText('javascript-sum',    `${results.sum.time.toFixed(2)} ms | ${results.sum.memory.toFixed(2)} MB`);
+        displayJSText('javascript-mean',   `${results.mean.time.toFixed(2)} ms | ${results.mean.memory.toFixed(2)} MB`);
+        displayJSText('javascript-std',    `${results.std.time.toFixed(2)} ms | ${results.std.memory.toFixed(2)} MB`);
+
+        displayJSText('javascript-output', `TOTAL: ${results.total.time.toFixed(2)} ms | Peak: ${results.total.memory.toFixed(2)} MB`);
+
+
+    };
+
+    jsWorker.onerror = function(error) {
+        console.error("JS Worker Error:", error);
+        displayJSText('javascript-output', `Worker Error: ${error.message}`);
+        clearJSCellsButOutput();
+        if (jsWorker) {
+            jsWorker.terminate();
+            jsWorker = null;
+        }
+    };
+
+    const dataSize = 10_000_000;
+    jsWorker.postMessage({ size: dataSize });
+}
+
+function displayJSText(elementId, text) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = text;
+    } else {
+        console.warn(`Element with ID ${elementId} not found.`);
+    }
+}
+
+function clearJSCells() {
+    const ids = ['javascript-create', 'javascript-sum', 'javascript-mean', 'javascript-std', 'javascript-output'];
+    ids.forEach(id => displayJSText(id, ''));
+}
+
+function clearJSCellsButOutput() {
+     const ids = ['javascript-create', 'javascript-sum', 'javascript-mean', 'javascript-std'];
+    ids.forEach(id => displayJSText(id, ''));
 }

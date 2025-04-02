@@ -1,38 +1,75 @@
 import asyncio
-import sys
+from pyscript import display, PyWorker, document
+import js  # type: ignore
 
-from pyscript import display, document, sync, window, PyWorker
-from pyscript.ffi import create_proxy   # type: ignore
-
-
-async def tick():
-    counter = document.getElementById("counter")
-    for i in range(100):
-        counter.innerText = str(i)
-        await asyncio.sleep(.1)
+worker_ready = False
+worker = None
 
 
-asyncio.create_task(tick())
+async def initialize_worker():
+    global worker, worker_ready
+    worker = PyWorker(
+        "./python/worker.py",
+        type="pyodide",
+        config="./json/pyscript-worker.json"
+    )
+    await worker.ready
+    worker_ready = True
+    display("Worker listo", target="pyscript-output")
+
+asyncio.create_task(initialize_worker())
 
 
-print("Main running:", sys.version)
+async def run_py_benchmark(event):
+    await worker.ready
+
+    try:
+        js.clearCell("pyscript")
+        result = await worker.sync.do_statistical_analysis(10_000_000)
+
+        results = parse_result(result)
+        update_ui(results)
+
+    except Exception as e:
+        display(f"Error: {str(e)}", target="pyscript-output")
 
 
-worker = PyWorker("python/worker.py", type="pyodide",
-                  config="json/pyscript-worker.json")
-await worker.ready
+def parse_result(result_str):
+    """Convierte el string de resultados en un diccionario"""
+    results = {}
+    for line in result_str.split('\n'):
+        if ' - Time:' in line and not line.startswith("TOTAL"):
+            parts = line.split(' - Time: ')
+            op = parts[0].lower()
+            values = parts[1].split(' ms | RAM: ')
+            results[op] = {
+                'time': float(values[0]),
+                'memory': float(values[1].replace(' MB', ''))
+            }
+        elif line.startswith('TOTAL - Time:'):
+            line = line.replace("TOTAL - Time: ", "")
+            parts = line.split(" ms | RAM Peak: ")
+            results['total'] = {
+                'time': float(parts[0]),
+                'memory': float(parts[1].replace(' MB', ''))
+            }
+    return results
 
-display("Calling worker...")
-result = await worker.sync.take_a_long_time()
-display("Done.")
-display(f"result is: {result}")
-print(result)
+
+def update_ui(results):
+    for op in ['create', 'sum', 'mean', 'std']:
+        if op in results:
+            display(
+                f"{results[op]['time']:.2f} ms | {results[op]['memory']:.2f} MB",
+                target=f"pyscript-{op}"
+            )
+
+    if 'total' in results:
+        display(
+            f"TOTAL: {results['total']['time']:.2f} ms | Peak: {results['total']['memory']: .2f} MB",
+            target="pyscript-output"
+        )
 
 
-# async def on_worker_ready(event):
-#     print("on_worker_ready", event)
-#     result = await event.target.xworker.sync.take_a_long_time()
-#     window.alert("result is:", result)
-
-
-# document.getElementById("the-worker").addEventListener("py:ready", create_proxy(on_worker_ready))
+def js_run_py_benchmark(event):
+    asyncio.ensure_future(run_py_benchmark(None))
