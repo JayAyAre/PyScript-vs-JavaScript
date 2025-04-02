@@ -4,10 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Benchmarking: JavaScript vs PyScript</title>
-    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
-    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    <!-- PyScript CSS -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.5.2/core.css">
+
+    <!-- This script tag bootstraps PyScript -->
+    <script type="module" src="https://pyscript.net/releases/2024.5.2/core.js"></script>
     <script src="javascript/main.js" defer></script>
-    <script type="py" src="python/main.py"></script>
+<!--     <script type="py" src="./worker.py" config="./pyscript-worker.json" id="the-worker" worker></script>-->
+
+    <py-config>
+        packages = ["numpy"]
+        runtimes = [
+            {
+                "src": "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js",
+                "name": "pyodide",
+                "lang": "python"
+            }
+        ]
+    </py-config>
     <script>
         let startTime = performance.now();
 
@@ -34,11 +48,13 @@
         }
     </script>
 <body>
-    <h1>Statistical analysis (Native Lists/Arrays)</h1>
+    <h1>Statistical analysis (NumPy/Typed Arrays)</h1>
 
     <button onclick="runJSBenchmark()">Run in JavaScript</button>
-    <button onclick="runPyBenchmark()" py-click="run_py_benchmark">Run in PyScript</button>
-
+    <!-- <button id="run-button" onclick="runPyBenchmark()" py-click="run_py_benchmark">Run in PyScript</button> -->
+    <script type="mpy" src="python/main.py" config="python/pyscript-main.json" async></script>
+    <!--     <script type="py" src="./worker.py" config="./pyscript-worker.json" id="the-worker" worker></script>-->
+    <div id="counter"></div>
     <h2>Results</h2>
 
     <table border="1">
@@ -77,6 +93,8 @@
             </tr>
         </tbody>
     </table>
+    <div id="counter"></div>
+
 
     <pre id="output"></pre>
 </body>

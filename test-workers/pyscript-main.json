@@ -1,0 +1,5 @@
+{
+    "files": {
+        "./worker.py": "worker.py"
+    }
+}
