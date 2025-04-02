@@ -18,8 +18,8 @@ asyncio.create_task(tick())
 print("Main running:", sys.version)
 
 
-worker = PyWorker("./worker.py", type="pyodide",
-                  config="./pyscript-worker.json")
+worker = PyWorker("python/worker.py", type="pyodide",
+                  config="json/pyscript-worker.json")
 await worker.ready
 
 display("Calling worker...")

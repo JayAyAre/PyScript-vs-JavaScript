@@ -11,7 +11,7 @@ def take_a_long_time():
     import time
     time.sleep(3)
     print("Awake!")
-    return 42
+    return "hola"
 
 
 sync.take_a_long_time = take_a_long_time
