@@ -6,16 +6,11 @@
     <title>Benchmarking: JavaScript vs PyScript</title>
 
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.5.2/core.css">
-
-    <!-- This script tag bootstraps PyScript -->
     <script type="module" src="https://pyscript.net/releases/2024.5.2/core.js"></script>
+
     <script src="javascript/main.js" defer></script>
-    <!-- <script type="mpy" src="python/worker.py" config="python/pyscript-worker.json" id="the-worker" worker></script> -->
-    <!-- Cambiar el botón -->
-    
 
     <script>
-        // Manejar el estado de carga
         document.addEventListener('py:ready', () => {
             document.getElementById("run-button").disabled = false;
 
@@ -39,7 +34,7 @@
         }
 
         function clearCell(elementId) {
-            const operations = ['create', 'sum', 'mean', 'std', 'output'];
+            const operations = ['create', 'sum', 'mean', 'std', 'output', 'exact'];
             operations.forEach(op => {
                 const element = document.getElementById(`${elementId}-${op}`);
                 if (element) {
@@ -53,8 +48,16 @@
 
     <h1>Statistical analysis (NumPy/Typed Arrays)</h1>
 
+    <label for="num-executions">Repeticiones:</label>
+    <input type="number" id="num-executions-javascript" value="1" min="1">
     <button onclick="runJSBenchmark()">Run in JavaScript</button>
+
+
+    <label for="num-executions">Repeticiones:</label>
+    <input type="number" id="num-executions-pyscript" value="1" min="1">
+    <input type="number" id="parallel-workers-pyscript" value="1" min="1" max="16">
     <button id="run-button" onclick="runPyBenchmark()" py-click="js_run_py_benchmark">Run in PyScript (Loading...)</button>
+
     <h2>Results</h2>
     </button>
     <table border="1">
@@ -87,9 +90,14 @@
                 <td id="pyscript-std">Waiting...</td>
             </tr>
             <tr>
-                <td>Total</td>
+                <td>Total (Av.)</td>
                 <td id="javascript-output">Waiting...</td>
                 <td id="pyscript-output">Waiting...</td>
+            </tr>
+            <tr>
+                <td>Total exact</td>
+                <td id="javascript-exact">Waiting...</td>
+                <td id="pyscript-exact">Waiting...</td>
             </tr>
         </tbody>
     </table>

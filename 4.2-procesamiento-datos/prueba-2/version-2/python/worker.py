@@ -1,6 +1,8 @@
 import time
 import numpy as np
 from pyscript import sync
+import json
+from concurrent.futures import ThreadPoolExecutor
 
 
 def create_data_structure(size):
@@ -19,43 +21,56 @@ def calculate_std(data):
     return np.std(data, ddof=0)
 
 
+def timed(func, *args, **kwargs):
+    start = time.perf_counter()
+    result = func(*args, **kwargs)
+    duration = (time.perf_counter() - start) * 1000  # ms
+    return result, duration
+
+
 def do_statistical_analysis(size):
-    metrics = {}
-    start_total = time.perf_counter()
-
-    start_op = time.perf_counter()
-    data = create_data_structure(size)
-    metrics['create'] = {
-        'time': (time.perf_counter() - start_op) * 1000,
-        'memory': (data.nbytes) / (1024 ** 2)
+    metrics = {
+        "create": {"time": 0.0, "memory": 0.0},
+        "sum": {"time": 0.0, "memory": 0.0},
+        "mean": {"time": 0.0, "memory": 0.0},
+        "std": {"time": 0.0, "memory": 0.0},
+        "total": {"time": 0.0},
+        "error": None
     }
 
-    operations = {
-        'sum': calculate_sum,
-        'mean': calculate_mean,
-        'std': calculate_std
-    }
+    try:
+        total_start = time.perf_counter()
 
-    for op_name, op_func in operations.items():
-        start_op = time.perf_counter()
-        result = op_func(data)
-        metrics[op_name] = {
-            'time': (time.perf_counter() - start_op) * 1000,
-            'memory': (data.nbytes) / (1024 ** 2)
-        }
+        # CREACIÓN
+        start = time.perf_counter()
+        data = np.random.randint(0, 1000, size=size, dtype=np.int32)
+        create_time = (time.perf_counter() - start) * 1000
+        memory_usage = data.nbytes / (1024 ** 2)
+        metrics['create'] = {'time': create_time, 'memory': memory_usage}
 
-    metrics['output'] = {
-        'total_time': (time.perf_counter() - start_total) * 1000,
-        'memory_peak': metrics['create']['memory']
-    }
+        # Ejecutar cálculos secuencialmente SIN ThreadPoolExecutor
+        start = time.perf_counter()
+        calculate_sum(data)
+        metrics['sum'] = {
+            'time': (time.perf_counter() - start) * 1000, 'memory': memory_usage}
 
-    result_str = ""
-    for op in ['create', 'sum', 'mean', 'std']:
-        result_str += f"{op.upper()} - Time: {metrics[op]['time']:.2f} ms | RAM: {metrics[op]['memory']:.2f} MB\n"
+        start = time.perf_counter()
+        calculate_mean(data)
+        metrics['mean'] = {
+            'time': (time.perf_counter() - start) * 1000, 'memory': memory_usage}
 
-    result_str += f"TOTAL - Time: {metrics['output']['total_time']:.2f} ms | RAM Peak: {metrics['output']['memory_peak']:.2f} MB"
+        start = time.perf_counter()
+        calculate_std(data)
+        metrics['std'] = {
+            'time': (time.perf_counter() - start) * 1000, 'memory': memory_usage}
 
-    return result_str
+        # TIEMPO TOTAL
+        metrics['total'] = {'time': (time.perf_counter() - total_start) * 1000}
+
+    except Exception as e:
+        metrics["error"] = str(e)
+
+    return json.dumps(metrics)
 
 
 sync.do_statistical_analysis = do_statistical_analysis
