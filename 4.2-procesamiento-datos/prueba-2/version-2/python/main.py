@@ -13,11 +13,9 @@ async def initialize_worker():
     num_workers = int(js.document.querySelector(
         "#parallel-workers-pyscript").value)
 
-    # Si ya hay trabajadores, eliminarlos antes de crear nuevos
     if len(workers) > num_workers:
-        workers = workers[:num_workers]  # Mantener solo los necesarios
+        workers = workers[:num_workers]
     elif len(workers) < num_workers:
-        # Crear los trabajadores faltantes
         additional_workers = num_workers - len(workers)
         for _ in range(additional_workers):
             worker = PyWorker(
@@ -28,7 +26,7 @@ async def initialize_worker():
             await worker.ready
             workers.append(worker)
 
-    workers_ready = True  # Confirmar que los trabajadores están listos
+    workers_ready = True
 
 asyncio.create_task(initialize_worker())
 
@@ -42,16 +40,13 @@ async def run_py_benchmark(event):
         num_workers = int(js.document.querySelector(
             "#parallel-workers-pyscript").value)
 
-        # Asegurar que tenemos la cantidad correcta de trabajadores antes de ejecutar
         await initialize_worker()
 
         js.clearCell("pyscript")
         start_time = time.perf_counter()
 
-        # Distribuir las tareas entre los trabajadores disponibles
         tasks = []
         for i in range(num_executions):
-            # Evita acceder a un índice fuera de rango
             worker = workers[i % num_workers]
             tasks.append(worker.sync.do_statistical_analysis(10_000_000))
 
@@ -67,7 +62,6 @@ async def run_py_benchmark(event):
             'total_per_execution': 0.0,
         }
 
-        # Procesar resultados
         for result in results_list:
             data = json.loads(result)
             for op in ['create', 'sum', 'mean', 'std']:
@@ -75,7 +69,6 @@ async def run_py_benchmark(event):
                 accumulated[op]['memory'] += data[op]['memory']
             accumulated['total_per_execution'] += data['total']['time']
 
-        # Promediar resultados
         results = {op: {
             'time': accumulated[op]['time'] / num_executions,
             'memory': accumulated[op]['memory'] / num_executions
@@ -86,7 +79,6 @@ async def run_py_benchmark(event):
             'total_time': (time.perf_counter() - start_time) * 1000
         }
 
-        # Actualizar UI
         update_ui(results)
 
     except Exception as e:
@@ -96,16 +88,16 @@ async def run_py_benchmark(event):
 def update_ui(results):
     for operation in ['create', 'sum', 'mean', 'std']:
         display(
-            f"{results[operation]['time']:.2f} | {results[operation]['memory']: .2f}",
+            f"{results[operation]['time']:.2f} ms | {results[operation]['memory']: .2f} MB",
             target=f"pyscript-{operation}"
         )
 
     display(
-        f"{results['total']['average_per_execution']:.2f}",
+        f"{results['total']['average_per_execution']:.2f} ms",
         target="pyscript-output"
     )
     display(
-        f"{results['total']['total_time']:.2f}",
+        f"{results['total']['total_time']:.2f} ms",
         target="pyscript-exact"
     )
 

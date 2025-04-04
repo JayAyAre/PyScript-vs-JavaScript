@@ -1,86 +1,159 @@
-function runJSBenchmark() {
-    const numExecutions = parseInt(document.getElementById("num-executions-javascript").value) || 1;
-    clearCell("javascript");
-    let simulationStartTime = performance.now();
+let workers = [];
+let workersReady = false;
 
-    const promises = [];
+function initializeWorkers() {
+    return new Promise((resolve) => {
+        const numWorkers =
+            parseInt(
+                document.getElementById("parallel-workers-javascript").value
+            ) || 1;
 
-    for (let i = 0; i < numExecutions; i++) {
-        promises.push(new Promise((resolve, reject) => {
+        if (workers.length > numWorkers) {
+            workers = workers.slice(0, numWorkers);
+            workersReady = true;
+            resolve();
+            return;
+        }
+
+        const additionalWorkers = numWorkers - workers.length;
+        let initialized = 0;
+
+        for (let i = 0; i < additionalWorkers; i++) {
             const worker = new Worker("./javascript/worker.js");
 
-            worker.onmessage = function (event) {
-                if (event.data.error) {
-                    console.error("Error in JS Worker:", event.data.error, event.data.stack);
-                    reject(event.data.error);
-                } else {
-                    resolve(event.data.results);
+            worker.onmessage = (event) => {
+                const { id, results } = event.data;
+                if (pendingPromises.has(id)) {
+                    pendingPromises.get(id)(results);
+                    pendingPromises.delete(id);
                 }
-                worker.terminate();
             };
 
-            worker.onerror = function (error) {
-                console.error("JS Worker Error:", error);
-                reject(error);
-                worker.terminate();
-            };
+            workers.push(worker);
+            initialized++;
 
-            const dataSize = 10_000_000;
-            worker.postMessage({ size: dataSize });
-        }));
-    }
-
-    Promise.all(promises)
-        .then((resultsArray) => {
-            let totalResults = {
-                create: { time: 0, memory: 0 },
-                sum: { time: 0, memory: 0 },
-                mean: { time: 0, memory: 0 },
-                std: { time: 0, memory: 0 },
-                total: { time: 0, memory: 0, total_time_exact: 0 }
-            };
-
-            resultsArray.forEach(results => {
-                for (let op in totalResults) {
-                    if (results[op]) {
-                        totalResults[op].time += results[op].time;
-                        totalResults[op].memory += results[op].memory;
-                    }
-                }
-            });
-
-            for (let op in totalResults) {
-                totalResults[op].time /= numExecutions;
-                totalResults[op].memory /= numExecutions;
+            if (initialized === additionalWorkers) {
+                workersReady = true;
+                resolve();
             }
+        }
 
-            totalResults.total.total_time_exact = performance.now() - simulationStartTime;
+        if (additionalWorkers === 0) {
+            workersReady = true;
+            resolve();
+        }
+    });
+}
+const pendingPromises = new Map();
 
-            displayResults(totalResults);
-        })
-        .catch((error) => {
-            console.error("Worker error:", error);
-            displayJSText("javascript-output", `Worker Error: ${error}`);
+async function runJSBenchmark(event) {
+    try {
+        const numExecutions =
+            parseInt(
+                document.getElementById("num-executions-javascript").value
+            ) || 1;
+        const numWorkers =
+            parseInt(
+                document.getElementById("parallel-workers-javascript").value
+            ) || 1;
+
+        await initializeWorkers();
+        clearCell("javascript");
+
+        const simulationStartTime = performance.now();
+        const promises = [];
+
+        for (let i = 0; i < numExecutions; i++) {
+            const worker = workers[i % numWorkers];
+            const id = `${i}-${Date.now()}`;
+
+            promises.push(
+                new Promise((resolve, reject) => {
+                    pendingPromises.set(id, resolve);
+                    worker.postMessage({ id, size: 10_000_000 });
+                })
+            );
+        }
+
+        const resultsArray = await Promise.all(promises);
+
+        let accumulated = {
+            create: { time: 0, memory: 0 },
+            sum: { time: 0, memory: 0 },
+            mean: { time: 0, memory: 0 },
+            std: { time: 0, memory: 0 },
+            total_per_execution: 0,
+        };
+
+        resultsArray.forEach((result) => {
+            console.log(result);
+            ["create", "sum", "mean", "std"].forEach((op) => {
+                accumulated[op].time += result[op].time;
+                accumulated[op].memory += result[op].memory;
+            });
+            accumulated.total_per_execution += result.total.time;
         });
+
+        const results = {};
+        ["create", "sum", "mean", "std"].forEach((op) => {
+            results[op] = {
+                time: accumulated[op].time / numExecutions,
+                memory: accumulated[op].memory / numExecutions,
+            };
+        });
+
+        results.total = {
+            average_per_execution:
+                accumulated.total_per_execution / numExecutions,
+            total_time: performance.now() - simulationStartTime,
+        };
+
+        displayResults(results);
+    } catch (error) {
+        console.error("Worker error:", error);
+        displayJSText("javascript-output", `Worker Error: ${error}`);
+    }
 }
 
 function displayResults(results) {
-    displayJSText("javascript-create", `${results.create.time.toFixed(2)} ms | ${results.create.memory.toFixed(2)} MB`);
-    displayJSText("javascript-sum", `${results.sum.time.toFixed(2)} ms | ${results.sum.memory.toFixed(2)} MB`);
-    displayJSText("javascript-mean", `${results.mean.time.toFixed(2)} ms | ${results.mean.memory.toFixed(2)} MB`);
-    displayJSText("javascript-std", `${results.std.time.toFixed(2)} ms | ${results.std.memory.toFixed(2)} MB`);
-    displayJSText("javascript-output",
-        `TOTAL (Promedio): ${results.total.time.toFixed(2)} ms | Peak: ${results.total.memory.toFixed(2)} MB`
+    displayJSText(
+        "javascript-create",
+        `${results.create.time.toFixed(2)} ms | ${results.create.memory.toFixed(
+            2
+        )} MB`
     );
-    displayJSText("javascript-exact",
-        `TOTAL Exacto: ${results.total.total_time_exact.toFixed(2)} ms`
+    displayJSText(
+        "javascript-sum",
+        `${results.sum.time.toFixed(2)} ms | ${results.sum.memory.toFixed(
+            2
+        )} MB`
+    );
+    displayJSText(
+        "javascript-mean",
+        `${results.mean.time.toFixed(2)} ms | ${results.mean.memory.toFixed(
+            2
+        )} MB`
+    );
+    displayJSText(
+        "javascript-std",
+        `${results.std.time.toFixed(2)} ms | ${results.std.memory.toFixed(
+            2
+        )} MB`
+    );
+    displayJSText(
+        "javascript-output",
+        `${results.total.average_per_execution.toFixed(2)} ms`
+    );
+    displayJSText(
+        "javascript-exact",
+        `${results.total.total_time.toFixed(2)} ms`
     );
 }
 
-function clearCell(elementId) {
-    const operations = ['create', 'sum', 'mean', 'std', 'output', 'exact'];
-    operations.forEach(op => {
-        const element = document.getElementById(`${elementId}-${op}`);
+function clearCell(prefix) {
+    const operations = ["create", "sum", "mean", "std", "output", "exact"];
+    operations.forEach((op) => {
+        const element = document.getElementById(`${prefix}-${op}`);
         if (element) {
             element.innerHTML = "";
         }
