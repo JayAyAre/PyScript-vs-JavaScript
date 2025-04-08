@@ -1,3 +1,5 @@
+importScripts("https://unpkg.com/mathjs@14.4.0/lib/browser/math.js");
+
 function createDataStructure(size) {
     const start = performance.now();
     const data = new Int32Array(size);

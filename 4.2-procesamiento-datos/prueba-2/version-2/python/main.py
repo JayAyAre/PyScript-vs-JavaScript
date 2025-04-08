@@ -42,7 +42,6 @@ async def run_py_benchmark(event):
 
         await initialize_worker()
 
-        js.clearCell("pyscript")
         start_time = time.perf_counter()
 
         tasks = []
@@ -50,9 +49,7 @@ async def run_py_benchmark(event):
             worker = workers[i % num_workers]
             tasks.append(worker.sync.do_statistical_analysis(10_000_000))
 
-        # Ejecutar en paralelo
         results_list = await asyncio.gather(*tasks)
-        print("📥 Resultados recibidos en run_py_benchmark:", results_list)
 
         accumulated = {
             'create': {'time': 0.0, 'memory': 0.0},
@@ -103,4 +100,5 @@ def update_ui(results):
 
 
 def js_run_py_benchmark(event):
+    js.clearCell("pyscript")
     asyncio.ensure_future(run_py_benchmark(None))

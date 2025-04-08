@@ -76,7 +76,6 @@ async function runJSBenchmark(event) {
         }
 
         const resultsArray = await Promise.all(promises);
-
         let accumulated = {
             create: { time: 0, memory: 0 },
             sum: { time: 0, memory: 0 },
@@ -86,7 +85,6 @@ async function runJSBenchmark(event) {
         };
 
         resultsArray.forEach((result) => {
-            console.log(result);
             ["create", "sum", "mean", "std"].forEach((op) => {
                 accumulated[op].time += result[op].time;
                 accumulated[op].memory += result[op].memory;
