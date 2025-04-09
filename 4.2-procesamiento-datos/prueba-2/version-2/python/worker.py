@@ -2,7 +2,6 @@ import time
 import numpy as np
 from pyscript import sync
 import json
-from concurrent.futures import ThreadPoolExecutor
 
 
 def create_data_structure(size):
@@ -24,7 +23,7 @@ def calculate_std(data):
 def timed(func, *args, **kwargs):
     start = time.perf_counter()
     result = func(*args, **kwargs)
-    duration = (time.perf_counter() - start) * 1000  # ms
+    duration = (time.perf_counter() - start) * 1000
     return result, duration
 
 
@@ -35,20 +34,17 @@ def do_statistical_analysis(size):
         "mean": {"time": 0.0, "memory": 0.0},
         "std": {"time": 0.0, "memory": 0.0},
         "total": {"time": 0.0},
-        "error": None
     }
 
     try:
         total_start = time.perf_counter()
 
-        # CREACIÓN
         start = time.perf_counter()
         data = np.random.randint(0, 1000, size=size, dtype=np.int32)
         create_time = (time.perf_counter() - start) * 1000
         memory_usage = data.nbytes / (1024 ** 2)
         metrics['create'] = {'time': create_time, 'memory': memory_usage}
 
-        # Ejecutar cálculos secuencialmente SIN ThreadPoolExecutor
         start = time.perf_counter()
         calculate_sum(data)
         metrics['sum'] = {
@@ -64,7 +60,6 @@ def do_statistical_analysis(size):
         metrics['std'] = {
             'time': (time.perf_counter() - start) * 1000, 'memory': memory_usage}
 
-        # TIEMPO TOTAL
         metrics['total'] = {'time': (time.perf_counter() - total_start) * 1000}
 
     except Exception as e:
