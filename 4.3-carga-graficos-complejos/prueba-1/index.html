@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmarking: JavaScript vs PyScript</title>
+
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.5.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.5.2/core.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/danfojs@1.2.0/lib/bundle.min.js"></script>
+    <script src="javascript/main.js" defer></script>
+    <script>
+        document.addEventListener('py:ready', () => {
+            document.getElementById("run-button").disabled = false;
+
+            document.getElementById("run-button").textContent = 'Run in PyScript';
+            console.log('PyScript fully loaded');
+        });
+        let pyTimerInterval = null;
+        let pyStartTime = 0;
+    
+        function startPyTimer() {
+            pyStartTime = performance.now();
+            const timerElement = document.getElementById("py-timer-display");
+    
+            clearInterval(pyTimerInterval);
+    
+            pyTimerInterval = setInterval(() => {
+                const elapsed = (performance.now() - pyStartTime) / 1000;
+                timerElement.textContent = `Timer: ${elapsed.toFixed(4)} s`;
+            }, 100);
+        }
+    
+        function stopPyTimer() {
+            clearInterval(pyTimerInterval);
+            pyTimerInterval = null;
+        }
+    </script>
+    <script>
+        let startTime = performance.now();
+
+        document.addEventListener('py:ready', () => {
+            let endTime = performance.now();
+            let loadTime = endTime - startTime;
+            document.getElementById("output").innerText += `PLT: ${loadTime.toFixed(2)} ms`;
+        });
+
+        var startTimerWebAssembly;
+
+        function runPyBenchmark() {
+            startTimerWebAssembly = performance.now();
+        }
+
+        function clearCell(elementId) {
+            const operations = ['output', 'exact'];
+            operations.forEach(op => {
+                const element = document.getElementById(`${elementId}-${op}`);
+                if (element) {
+                    element.innerHTML = "";
+                }
+            });
+        }
+    </script>
+<body>
+    <script>
+        function clearGraphContainer() {
+            const container = document.getElementById("graph-container");
+            container.innerHTML = "";
+        }
+
+        function displayPlot(base64Data) {
+            const img = document.createElement("img");
+            img.src = `data:image/png;base64,${base64Data}`;
+            img.style.maxWidth = "100%";
+            document.getElementById("graph-container").appendChild(img);
+        }
+    </script>
+    <script type="py" src="python/main.py" config="json/pyscript-main.json" async></script>
+    <h1>Graph Rendering Benchmark (Matplotlib)</h1>
+    <h2 id="py-timer-display">Timer: 0.00 s</h2>
+
+    <button onclick="runJSBenchmark()">Run in JavaScript</button>
+    <button id="run-button" onclick="runPyBenchmark()" py-click="js_run_py_benchmark">Run in PyScript (Loading...)</button>
+    <pre id="output"></pre>
+    <div id="graph-container"></div>
+    <div id="metrics-container">
+        <div id="pyscript-output" class="metric"></div>
+        <div id="pyscript-exact" class="metric"></div>
+    </div>
+</body>
+</html>
