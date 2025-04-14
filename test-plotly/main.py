@@ -2,10 +2,9 @@
 import plotly.graph_objs as go
 import plotly.utils
 import json
-import js  # type: ignore
+
 from pyscript import window, document
 # from pyscript.js_modules import plotly_js
-import asyncio
 
 # app = Flask(__name__)
 window.console.log("1-----")
@@ -33,13 +32,7 @@ data = {
 }
 
 
-async def wait_for_plotly():
-    while not hasattr(js, "Plotly"):
-        await asyncio.sleep(0.1)
-    return js.Plotly
-
-
-async def index():
+def index():
     years = list(data.keys())
     parties = list(data.values())
 
@@ -70,9 +63,10 @@ async def index():
     window.console.log("1-----")
     window.console.log(graphJSON)
     window.console.log("2-----")
-    await wait_for_plotly()
     plot = window.Plotly.newPlot("chart1", window.JSON.parse(graphJSON))
 
+    # return render_template('index.html', graphJSON=graphJSON)
+    # plot = js.Plotly.newPlot("chart1", js.JSON.parse(graphJSON))
 
-# Ejecutar la función asíncrona principal en el loop de PyScript
-asyncio.ensure_future(index())
+
+index()

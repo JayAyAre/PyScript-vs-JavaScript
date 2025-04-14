@@ -5,15 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Benchmarking: JavaScript vs PyScript</title>
 
-    <link rel="stylesheet" href="https://pyscript.net/releases/2024.5.2/core.css">
-    <script type="module" src="https://pyscript.net/releases/2024.5.2/core.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/danfojs@1.2.0/lib/bundle.min.js"></script>
-    <script src="javascript/main.js" defer></script>
-    <script>
-        document.addEventListener('py:ready', () => {
-            document.getElementById("run-button").disabled = false;
 
-            document.getElementById("run-button").textContent = 'Run in PyScript';
+    <script type="module" src="https://pyscript.net/releases/2024.8.1/core.js"></script>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.1/core.css">
+    
+    <script src="javascript/main.js" defer></script>
+    <script src="https://cdn.plot.ly/plotly-3.0.1.min.js" charset="utf-8"></script>
+    
+    <script>
+        if (!crypto.randomUUID) {
+            crypto.randomUUID = function() {
+                // Genera un UUID v4
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+                });
+            }
+        }
+        document.addEventListener('py:ready', () => {
+            document.getElementById("run-button-py").disabled = false;
+
+            document.getElementById("run-button-py").textContent = 'Run in PyScript';
             console.log('PyScript fully loaded');
         });
         let pyTimerInterval = null;
@@ -67,15 +80,19 @@
             container.innerHTML = "";
         }
 
-        function displayPlotPy(base64Data) {
-            const img = document.createElement("img");
-            img.src = `data:image/png;base64,${base64Data}`;
-            img.style.maxWidth = "100%";
-            document.getElementById("graph-container-py").appendChild(img);
+        function displayPlotPy(graph_json) {
+            const container = document.getElementById("graph-container-py");
+            // Asegurarse de limpiar el contenedor
+            container.innerHTML = "";
+            // Parsear el JSON
+            const parsed = JSON.parse(graph_json);
+            // Ahora Plotly.newPlot requiere: container, data y layout.
+            // parsed tiene la forma {data: [...], layout: {...}, config: {...}}.
+            Plotly.newPlot(container, parsed.data, parsed.layout);
         }
     </script>
 <body>
-    <script type="py" src="python/main.py" config="json/pyscript-main.json" async></script>
+    <script type="py" src="python/main.py" config="json/pyscript-main.json"></script>
     <h1>Graph Rendering Benchmark (Matplotlib/Canva)</h1>
 
     <h2 id="js-timer-display">JS Timer: 0.00 s</h2>
@@ -83,18 +100,19 @@
 
     <label for="num-executions">Repeticiones:</label>
     <input type="number" id="num-executions-javascript" value="1" min="1">
-    <button onclick="runJSBenchmark()">Run in JavaScript</button>
+    <button id="run-button-js" onclick="runJSBenchmark()">Run in JavaScript</button>
 
 
     <label for="num-executions">Repeticiones:</label>
     <input type="number" id="num-executions-pyscript" value="1" min="1">
-    <button id="run-button" onclick="runPyBenchmark()" py-click="js_run_py_benchmark">Run in PyScript (Loading...)</button>
+    <button id="run-button-py" onclick="runPyBenchmark()" py-click="js_run_py_benchmark">Run in PyScript (Loading...)</button>
 
     <pre id="output"></pre>
     <div id="graph-containers" style="display: flex; flex-direction: row;">
         <div id="graph-container-js"></div>
         <div id="graph-container-py"></div>
     </div>
+    <div id="chart1" style="width:100%;height:100%;"></div>
 
     <table id="metrics-container">
         <thead>
@@ -117,5 +135,7 @@
             </tr>
         </tbody>
     </table>
+    <div id="chart1" style="width:100%;height:100%;"></div>
+
 </body>
 </html>

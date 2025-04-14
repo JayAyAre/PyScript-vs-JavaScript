@@ -1,5 +1,3 @@
 {
-    "files": {
-        "/python/worker.py": "worker.py"
-    }
+    "packages": ["numpy","plotly"]
 }

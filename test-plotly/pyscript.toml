@@ -1,0 +1,7 @@
+name = "Purple Art"
+
+packages = ["plotly"]
+
+# [js_modules.main]
+# # will simulate a standard JS module
+# "https://cdn.plot.ly/plotly-latest.min.js" = "plotly_js"
