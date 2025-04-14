@@ -1,78 +1,70 @@
-# from flask import Flask, render_template
-import plotly.graph_objs as go
-import plotly.utils
-import json
-import js  # type: ignore
-from pyscript import window, document
-# from pyscript.js_modules import plotly_js
 import asyncio
-
-# app = Flask(__name__)
-window.console.log("1-----")
-print("hi!")
-
-# Data for US presidential party control (simplified example)
-data = {
-    1960: "Democratic", 1961: "Democratic", 1962: "Democratic", 1963: "Democratic",
-    1964: "Democratic", 1965: "Democratic", 1966: "Democratic", 1967: "Democratic",
-    1968: "Democratic", 1969: "Republican", 1970: "Republican", 1971: "Republican",
-    1972: "Republican", 1973: "Republican", 1974: "Republican", 1975: "Republican",
-    1976: "Republican", 1977: "Democratic", 1978: "Democratic", 1979: "Democratic",
-    1980: "Democratic", 1981: "Republican", 1982: "Republican", 1983: "Republican",
-    1984: "Republican", 1985: "Republican", 1986: "Republican", 1987: "Republican",
-    1988: "Republican", 1989: "Republican", 1990: "Republican", 1991: "Republican",
-    1992: "Republican", 1993: "Democratic", 1994: "Democratic", 1995: "Democratic",
-    1996: "Democratic", 1997: "Democratic", 1998: "Democratic", 1999: "Democratic",
-    2000: "Democratic", 2001: "Republican", 2002: "Republican", 2003: "Republican",
-    2004: "Republican", 2005: "Republican", 2006: "Republican", 2007: "Republican",
-    2008: "Republican", 2009: "Democratic", 2010: "Democratic", 2011: "Democratic",
-    2012: "Democratic", 2013: "Democratic", 2014: "Democratic", 2015: "Democratic",
-    2016: "Democratic", 2017: "Republican", 2018: "Republican", 2019: "Republican",
-    2020: "Republican", 2021: "Democratic", 2022: "Democratic", 2023: "Democratic",
-    2024: "Democratic"
-}
+import time
+import json
+import numpy as np
+from pyscript import display
+import js  # type: ignore
+from plotly.graph_objects import Figure
+from plotly.io import to_json
 
 
-async def wait_for_plotly():
-    while not hasattr(js, "Plotly"):
-        await asyncio.sleep(0.1)
-    return js.Plotly
+async def js_run_py_benchmark(event):
+    try:
+        # Limpieza y preparación
+        js.clearCell("pyscript")
+        js.clearGraphContainer("graph-container-py")
+        js.startPyTimer()
 
+        # 1. Generación de datos
+        start_time = time.perf_counter()
+        num_series = 5
+        num_points = 10_000
+        x = np.linspace(0, 10, num_points)
+        rng = np.random.default_rng()
+        ys = [np.sin(x + i) + rng.normal(0, 0.1, num_points)
+              for i in range(num_series)]
+        data_gen_time = (time.perf_counter() - start_time) * 1000
 
-async def index():
-    years = list(data.keys())
-    parties = list(data.values())
+        # 2. Renderizado
+        render_start = time.perf_counter()
+        fig = Figure()
+        for i, y in enumerate(ys):
+            fig.add_scatter(
+                x=x,
+                y=y,
+                mode="lines",
+                name=f"Serie {i+1}",
+                line=dict(width=1)
+            )
 
-    trace = go.Scatter(
-        x=years,
-        y=parties,
-        mode='lines+markers',
-        name='US Presidential Party',
-        line=dict(color='blue'),
-        marker=dict(
-            size=8,
-            color=['blue' if party ==
-                   'Democratic' else 'red' for party in parties],
-            symbol=['circle' if party ==
-                    'Democratic' else 'square' for party in parties]
+        fig.update_layout(
+            title="Series Temporales (PyScript)",
+            width=700,
+            height=500
         )
-    )
 
-    layout = go.Layout(
-        title='US Presidential Party Control',
-        xaxis=dict(title='Year'),
-        yaxis=dict(title='Party', tickvals=['Democratic', 'Republican']),
-        hovermode='closest'
-    )
+        render_time = (time.perf_counter() - render_start) * 1000
 
-    fig = go.Figure(data=[trace], layout=layout)
-    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-    window.console.log("1-----")
-    window.console.log(graphJSON)
-    window.console.log("2-----")
-    await wait_for_plotly()
-    plot = window.Plotly.newPlot("chart1", window.JSON.parse(graphJSON))
+        # 3. Exportar la figura a JSON
+        graph_json = to_json(fig)
+
+        # 4. Mostrar resultados: Enviar el JSON al JS
+        js.displayPlotPy(graph_json)
+        update_ui({
+            "data_gen_time": data_gen_time,
+            "render_time": render_time,
+            "total_time": (time.perf_counter() - start_time) * 1000
+        })
+        js.stopPyTimer()
+
+    except Exception as e:
+        display(f"Error: {e}", target="pyscript-output")
 
 
-# Ejecutar la función asíncrona principal en el loop de PyScript
-asyncio.ensure_future(index())
+def update_ui(metrics):
+    display(f"Generación datos: {metrics['data_gen_time']:.2f} ms",
+            target="pyscript-output")
+    display(f"Renderizado: {metrics['render_time']:.2f} ms",
+            target="pyscript-output")
+    display(f"TOTAL: {metrics['total_time']:.2f} ms",
+            target="pyscript-exact")
