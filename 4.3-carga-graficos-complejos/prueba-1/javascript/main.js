@@ -19,89 +19,96 @@ function initializeWorker() {
     });
 }
 
+async function measureMemoryUsage(duration = 500, interval = 50) {
+    // Muestra el uso de memoria repetidamente durante 'duration' milisegundos
+    const memoryUsages = [];
+    const start = performance.now();
+    return new Promise((resolve) => {
+        const timer = setInterval(() => {
+            if (performance.memory) {
+                // Guardamos el uso actual en bytes
+                memoryUsages.push(performance.memory.usedJSHeapSize);
+            }
+            if (performance.now() - start >= duration) {
+                clearInterval(timer);
+                // Tomamos el máximo y lo convertimos a MB
+                const maxUsage = Math.max(...memoryUsages);
+                resolve(maxUsage / (1024 * 1024));
+            }
+        }, interval);
+    });
+}
+
 async function runJSBenchmark() {
     try {
-        startJsTimer();
-        const overallStart = performance.now();
+        startJSTimer();
+        const startWorkerTime = performance.now();
 
-        const initStart = performance.now();
-        await initializeWorker();
-        const workerTime = performance.now() - initStart;
+        if (!worker) {
+            worker = new Worker("./javascript/worker.js");
+            await setupWorker();
+        }
 
-        const numExecutions = parseInt(
-            document.querySelector("#num-executions-javascript").value
-        );
-
-        const resultsList = [];
+        const workerTime = performance.now() - startWorkerTime;
 
         clearCell("javascript");
         clearGraphContainer("graph-container-js");
 
-        for (let i = 0; i < numExecutions; i++) {
-            const id = `graph-${Date.now()}-${i}`;
-            const result = await new Promise((resolve) => {
-                pendingPromises.set(id, resolve);
-                worker.postMessage({ id, size: 100_000, draw: true });
-            });
-            resultsList.push(result);
+        const numSeries = parseInt(
+            document.getElementById("num-series-js").value
+        );
+        const numPoints = parseInt(
+            document.getElementById("num-points-js").value
+        );
+
+        // Enviar el mensaje al worker
+        const id = `graph-${Date.now()}`;
+        // Obtenemos el resultado del worker
+        const result = await new Promise((resolve) => {
+            pendingPromises.set(id, resolve);
+            worker.postMessage({ id, size: 100_000, draw: true });
+        });
+
+        // Esperar 500ms y medir el uso máximo de memoria durante ese período
+        const measuredMemory = await measureMemoryUsage(500, 50);
+
+        // Añadimos el uso de memoria medido a result
+        result.memory = measuredMemory;
+
+        stopJSTimer();
+
+        // Si existe la imagen, la mostramos
+        if (result.image_base64) {
+            displayPlotJs(result.image_base64);
         }
 
-        const totalElapsed = performance.now() - overallStart;
-
-        // Mostrar el gráfico de la última ejecución
-        const lastResult = resultsList[resultsList.length - 1];
-        if (lastResult.image_base64) {
-            displayPlotJs(lastResult.image_base64);
-        }
-
-        // Calcular promedios
-        const accumulated = {
-            data_gen_time: 0,
-            render_time: 0,
-            memory: 0,
-            total_time: 0,
-        };
-
-        for (const result of resultsList) {
-            accumulated.data_gen_time += result.data_gen_time;
-            accumulated.render_time += result.render_time;
-            accumulated.memory += result.memory;
-            accumulated.total_time += result.total_time;
-        }
-
-        const averaged = {
-            data_gen_time: accumulated.data_gen_time / numExecutions,
-            render_time: accumulated.render_time / numExecutions,
-            memory: accumulated.memory / numExecutions,
-            total_time: accumulated.total_time / numExecutions,
-        };
-
-        // Mostrar resultados
+        // Actualizamos la UI en un solo contenedor (javascript-output) con cada métrica en su propio div
         const outputContainer = document.getElementById("javascript-output");
         if (outputContainer) {
+            outputContainer.innerHTML = "";
             const metrics = [
                 `Worker Time: ${workerTime.toFixed(2)} ms`,
-                `Data Generation: ${averaged.data_gen_time.toFixed(2)} ms`,
-                `Rendering: ${averaged.render_time.toFixed(2)} ms`,
-                `Memory: ${averaged.memory.toFixed(2)} MB`,
-                `Average per Execution: ${averaged.total_time.toFixed(2)} ms`,
+                `Data Generation: ${result.data_gen_time.toFixed(2)} ms`,
+                `Rendering: ${result.render_time.toFixed(2)} ms`,
+                `Memory: ${result.memory.toFixed(2)} MB`,
             ];
-
-            for (const text of metrics) {
+            metrics.forEach((text) => {
                 const div = document.createElement("div");
                 div.textContent = text;
                 outputContainer.appendChild(div);
-            }
+            });
 
-            const totalContainer = document.getElementById("javascript-exact");
+            const exactContainer = document.getElementById("javascript-exact");
+            exactContainer.innerHTML = "";
             const totalDiv = document.createElement("div");
-            totalDiv.textContent = `TOTAL TIME: ${totalElapsed.toFixed(2)} ms`;
-            totalContainer.appendChild(totalDiv);
+            totalDiv.textContent = `TOTAL TIME: ${result.total_time.toFixed(
+                2
+            )} ms`;
+            exactContainer.appendChild(totalDiv);
         }
-
-        stopJsTimer();
     } catch (error) {
         console.error("Worker error:", error);
+        displayJSText("javascript-output", `Worker Error: ${error}`);
     }
 }
 

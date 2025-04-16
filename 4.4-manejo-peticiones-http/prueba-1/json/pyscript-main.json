@@ -1,0 +1,7 @@
+{
+    "files": {
+        "/python/worker.py": "worker.py"
+    },
+    "packages": ["aiohttp"]
+
+}

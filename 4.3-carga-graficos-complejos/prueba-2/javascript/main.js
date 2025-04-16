@@ -1,132 +1,135 @@
 let worker = null;
-const pendingPromises = new Map();
-
-function initializeWorker() {
-    return new Promise((resolve) => {
-        if (worker) {
-            resolve();
-            return;
-        }
-        worker = new Worker("./javascript/worker.js");
-        worker.onmessage = (event) => {
-            const { id, results } = event.data;
-            if (pendingPromises.has(id)) {
-                pendingPromises.get(id)(results);
-                pendingPromises.delete(id);
-            }
-        };
-        resolve();
-    });
-}
+let workerStartTime;
 
 async function runJSBenchmark() {
     try {
         startJsTimer();
-        const overallStart = performance.now();
+        const startWorkerTime = performance.now();
 
-        const initStart = performance.now();
-        await initializeWorker();
-        const workerTime = performance.now() - initStart;
+        if (!worker) {
+            worker = new Worker("javascript/worker.js");
+            await setupWorker();
+        }
 
-        const numExecutions = parseInt(
-            document.querySelector("#num-executions-javascript").value
+        const workerTime = performance.now() - startWorkerTime;
+
+        clearUI();
+
+        const numSeries = parseInt(
+            document.getElementById("num-series-js").value
+        );
+        const numPoints = parseInt(
+            document.getElementById("num-points-js").value
         );
 
-        const resultsList = [];
-
-        clearCell("javascript");
-        clearGraphContainer("graph-container-js");
-
-        for (let i = 0; i < numExecutions; i++) {
-            const id = `graph-${Date.now()}-${i}`;
-            const result = await new Promise((resolve) => {
-                pendingPromises.set(id, resolve);
-                worker.postMessage({ id, size: 100_000, draw: true });
-            });
-            resultsList.push(result);
-        }
-
-        const totalElapsed = performance.now() - overallStart;
-
-        // Mostrar el gráfico de la última ejecución
-        const lastResult = resultsList[resultsList.length - 1];
-        if (lastResult.image_base64) {
-            displayPlotJs(lastResult.image_base64);
-        }
-
-        // Calcular promedios
-        const accumulated = {
-            data_gen_time: 0,
-            render_time: 0,
-            memory: 0,
-            total_time: 0,
-        };
-
-        for (const result of resultsList) {
-            accumulated.data_gen_time += result.data_gen_time;
-            accumulated.render_time += result.render_time;
-            accumulated.memory += result.memory;
-            accumulated.total_time += result.total_time;
-        }
-
-        const averaged = {
-            data_gen_time: accumulated.data_gen_time / numExecutions,
-            render_time: accumulated.render_time / numExecutions,
-            memory: accumulated.memory / numExecutions,
-            total_time: accumulated.total_time / numExecutions,
-        };
-
-        // Mostrar resultados
-        const outputContainer = document.getElementById("javascript-output");
-        if (outputContainer) {
-            const metrics = [
-                `Worker Time: ${workerTime.toFixed(2)} ms`,
-                `Data Generation: ${averaged.data_gen_time.toFixed(2)} ms`,
-                `Rendering: ${averaged.render_time.toFixed(2)} ms`,
-                `Memory: ${averaged.memory.toFixed(2)} MB`,
-                `Average per Execution: ${averaged.total_time.toFixed(2)} ms`,
-            ];
-
-            for (const text of metrics) {
-                const div = document.createElement("div");
-                div.textContent = text;
-                outputContainer.appendChild(div);
+        worker.onmessage = (e) => {
+            if (e.data.type === "result") {
+                const result = e.data.payload;
+                result.metrics.workerTime = workerTime;
+                handleWorkerResult(result);
+                stopJsTimer();
+            } else if (e.data.type === "error") {
+                displayError(new Error(e.data.payload));
+                stopJsTimer();
             }
+        };
 
-            const totalContainer = document.getElementById("javascript-exact");
-            const totalDiv = document.createElement("div");
-            totalDiv.textContent = `TOTAL TIME: ${totalElapsed.toFixed(2)} ms`;
-            totalContainer.appendChild(totalDiv);
-        }
-
+        worker.postMessage({
+            type: "runBenchmark",
+            payload: {
+                numSeries: numSeries,
+                numPoints: numPoints,
+            },
+        });
         stopJsTimer();
-    } catch (error) {
-        console.error("Worker error:", error);
+    } catch (e) {
+        displayError(e);
     }
 }
 
-// Timer
-let jsTimerInterval = null;
+function setupWorker() {
+    return new Promise((resolve) => {
+        worker.onmessage = (e) => {
+            if (e.data.type === "ready") {
+                resolve();
+            } else if (e.data.type === "result") {
+                handleWorkerResult(e.data.payload);
+            } else if (e.data.type === "error") {
+                displayError(new Error(e.data.payload));
+            }
+        };
+
+        worker.onerror = (error) => {
+            displayError(error);
+        };
+    });
+}
+
+function handleWorkerResult({ metrics, graphData }) {
+    Plotly.newPlot(
+        "graph-container-js",
+        graphData.traces,
+        graphData.layout
+    ).then(() => {
+        attachRelayoutListener("graph-container-js", "javascript-output");
+    });
+    updateUI(metrics);
+    performance.measureMemory?.();
+}
+
+function clearUI() {
+    document.getElementById("javascript-output").innerHTML = "";
+    document.getElementById("javascript-exact").innerHTML = "";
+    Plotly.purge("graph-container-js");
+}
+
+function updateUI(metrics) {
+    const output = document.getElementById("javascript-output");
+    const exact = document.getElementById("javascript-exact");
+    output.innerHTML = `
+        <div>Worker Time: ${metrics.workerTime.toFixed(2)} ms</div>
+        <div>Generación datos: ${metrics.dataGenTime.toFixed(2)} ms</div>
+        <div>Renderizado: ${metrics.renderTime.toFixed(2)} ms</div>
+        <div>Memory DS: ${metrics.mem} MB</div>
+        <div>Memory by library: 2,6MB + 1.4MB</div>
+    `;
+
+    exact.innerHTML = `<div>TOTAL: ${metrics.totalTime.toFixed(2)} ms</div>`;
+}
+
+function displayError(error) {
+    document.getElementById(
+        "javascript-output"
+    ).innerHTML = `<div class="error">Error: ${error.message}</div>`;
+}
+let jsTimer = null;
 let jsStartTime = 0;
 
 function startJsTimer() {
     jsStartTime = performance.now();
     const timerElement = document.getElementById("js-timer-display");
-    clearInterval(jsTimerInterval);
-    jsTimerInterval = setInterval(() => {
-        const elapsed = (performance.now() - jsStartTime) / 1000;
-        timerElement.textContent = `JS Timer: ${elapsed.toFixed(4)} s`;
-    }, 100);
+
+    function updateTimer() {
+        if (!jsTimer) return;
+
+        const elapsedMs = performance.now() - jsStartTime;
+        const elapsed = (elapsedMs / 1000).toFixed(3);
+        timerElement.textContent = `JS Timer: ${elapsed} s`;
+
+        jsTimer = requestAnimationFrame(updateTimer);
+    }
+
+    cancelAnimationFrame(jsTimer);
+    jsTimer = requestAnimationFrame(updateTimer);
 }
 
 function stopJsTimer() {
-    clearInterval(jsTimerInterval);
-    jsTimerInterval = null;
-}
+    cancelAnimationFrame(jsTimer);
+    jsTimer = null;
 
-function displayPlotJs(base64Data) {
-    const img = document.createElement("img");
-    img.src = `data:image/png;base64,${base64Data}`;
-    img.style.maxWidth = "100%";
-    document.getElementById("graph-container-js").appendChild(img);
+    const elapsedMs = performance.now() - jsStartTime;
+    const elapsed = (elapsedMs / 1000).toFixed(3);
+    document.getElementById(
+        "js-timer-display"
+    ).textContent = `JS Timer: ${elapsed} s`;
 }
