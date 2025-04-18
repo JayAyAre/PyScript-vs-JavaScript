@@ -2,7 +2,6 @@ import subprocess
 import os
 import time
 import http.server
-import ssl
 import threading
 import sys
 from pathlib import Path
@@ -10,7 +9,7 @@ from pathlib import Path
 base_dir = Path(__file__).resolve().parent
 
 
-class SecureHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+class SimpleHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
         self.send_header('Cross-Origin-Opener-Policy', 'same-origin')
         self.send_header('Cross-Origin-Embedder-Policy', 'require-corp')
@@ -19,16 +18,12 @@ class SecureHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
 
-def run_secure_server():
+def run_http_server():
     os.chdir(base_dir)  # Servir desde el directorio actual
     server_address = ('', 8000)
-    httpd = http.server.HTTPServer(server_address, SecureHTTPRequestHandler)
+    httpd = http.server.HTTPServer(server_address, SimpleHTTPRequestHandler)
 
-    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    context.load_cert_chain(certfile="cert.pem", keyfile="key.pem")
-    httpd.socket = context.wrap_socket(httpd.socket, server_side=True)
-
-    print("🌐 HTTPS frontend disponible en https://localhost:8000")
+    print("🌐 HTTP frontend disponible en http://localhost:8000")
     httpd.serve_forever()
 
 
@@ -45,7 +40,7 @@ def run_js_api():
 
 
 commands = [
-    ("Secure HTTP Server", run_secure_server),
+    ("HTTP Server", run_http_server),
     ("Python API", run_python_api),
     ("JavaScript API", run_js_api)
 ]
@@ -71,3 +66,23 @@ except KeyboardInterrupt:
     for name, _ in threads:
         print(f"🔴 Cerrando {name}...")
     print("✅ Todos los servidores detenidos.")
+
+""" 
+
+const socket = new WebSocket("wss://localhost:5001");
+
+socket.onopen = () => {
+    console.log("✅ WebSocket conectado");
+    socket.send(JSON.stringify({ delay: 100 }));
+};
+
+socket.onmessage = (event) => {
+    console.log("📩 Mensaje recibido:", event.data);
+};
+
+socket.onerror = (err) => {
+    console.error("❌ Error en WebSocket:", err);
+};
+
+
+ """
