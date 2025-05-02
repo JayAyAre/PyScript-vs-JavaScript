@@ -1,0 +1,17 @@
+---
+export interface Props {
+    title: string;
+    versions: string[];
+}
+
+const { title, versions } = Astro.props;
+---
+
+<div
+    class="flex w-full max-w-sm flex-col rounded-md bg-gray-700 p-4 text-gray-300"
+>
+    <h4 class="mb-2 text-base font-semibold text-purple-300">{title}</h4>
+    <ul class="list-inside list-disc space-y-1 text-sm">
+        {versions.map((version) => <li>{version}</li>)}
+    </ul>
+</div>

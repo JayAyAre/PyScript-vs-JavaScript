@@ -1,0 +1,23 @@
+---
+// CardHeader.astro
+export interface Props {
+    id?: string;
+    title: string;
+    children?: any;
+}
+
+const { id, title, children } = Astro.props;
+---
+
+<section id={id} class="mt-12 w-full">
+    <div
+        class="mx-auto flex flex-col rounded-lg border border-gray-700 bg-gray-800 shadow-md"
+    >
+        <header class="p-6">
+            <h2 class="mb-4 text-3xl font-bold text-white">{title}</h2>
+            <div class="text-gray-300">
+                <slot>{children}</slot>
+            </div>
+        </header>
+    </div>
+</section>

@@ -1,0 +1,265 @@
+---
+import HeaderCard from '../components/cards/HeaderCard.astro';
+import Header from '../components/schedule/Header.astro';
+import PythonIcon from '../components/icons/PythonIcon.astro';
+import JavaScriptIcon from '../components/icons/JavaScriptIcon.astro';
+import BenchmarkIndexCard from '../components/cards/BenchmarkIndexCard.astro';
+import ArrowIcon from '../components/icons/ArrowIcon.astro';
+import LinkIcon from '../components/icons/LinkIcon.astro';
+
+export interface Props {
+    title: string;
+}
+
+
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+        <title>{title}</title>
+    </head>
+    <body class="min-h-screen bg-gray-900 pb-32">
+        <Header class="w-full"/>
+        <main class="mx-auto flex flex-col items-center justify-center max-w-7xl">
+            <!-- <h1>{title}</h1> -->
+            <!-- <div class="text-2xl">Welcome to Astro!</div> -->
+            <slot />
+            
+            <HeaderCard id="introduction" title="Introducción">
+                <p>
+                  Esta es la página de inicio del Trabajo de Fin de Grado de Jordi Ramírez. En ella se recopila información clave sobre el proyecto, incluyendo el análisis comparativo y los benchmarks de rendimiento y eficiencia entre <span class="text-[#EFD81D]">JavaScript</span> y <span class="text-[#FDA703]">PyScript</span>.
+                  <br><br>
+                  A nivel personal, este proyecto me ha permitido profundizar en el uso de Python <PythonIcon/>, un lenguaje que ya había utilizado durante la carrera, pero que aún no había explorado a fondo. Esta oportunidad me ha ayudado a descubrir su potencial dentro del desarrollo web, un ámbito dominado tradicionalmente por JavaScript <JavaScriptIcon/>. Tecnologías como PyScript y Pyodide abren la puerta a nuevas formas de integrar Python en el navegador, permitiendo soluciones innovadoras para el análisis y visualización de datos directamente en la web.
+                  <br><br>
+                  Además, el proyecto surge del interés por explorar el auge de estas tecnologías emergentes, planteando preguntas fundamentales como: ¿Pueden PyScript y Pyodide ofrecer un rendimiento comparable al de JavaScript en aplicaciones web? ¿Cuál es la tecnología más adecuada según las necesidades de una aplicación: visualización gráfica, análisis de datos en tiempo real, o interacción con el usuario?
+                  <br><br>
+                  Este trabajo busca dar respuesta a estas cuestiones, y ofrecer una visión más amplia sobre la relación y complementariedad entre JavaScript y PyScript en el desarrollo web moderno y la computación científica en el navegador.
+                </p>
+              </HeaderCard>
+            
+            <HeaderCard id="about" title="Sobre el proyecto">
+                <div class="space-y-4">
+                    <details class="group rounded-lg border border-gray-700 bg-gray-800 p-4">
+                        <summary class="cursor-pointer text-lg font-medium transition-all duration-200 ease-in-out text-white group-open:text-purple-400">
+                            ¿Qué se compara?
+                        </summary>
+                        <p class="mt-2 text-gray-400">
+                            En general, el proyecto definio en total 7 ambitos (El cual el ultimo, son los anteriores pero en dispositivos moviles) los cuales serian diferentes casos de uso de JavaScript y PyScript. Estos recopilan pruebas con diferentes objetivos, pero en gran medida, midiendo las mismas metricas de rendimiento y eficiencia.
+
+                            Los ambitos escogidos fueron:
+                        </p>
+                        <ul class="ml-6 mt-2 text-gray-400 list-disc">
+                            <li>Cálculos matemáticos intensivos</li>
+                            <li>
+                                Procesamiento de grandes volúmenes de datos en memoria
+                            </li>
+                            <li>
+                                Carga y representación de gráficos complejos
+                            </li>
+                            <li>
+                                Manejo de multiples solicitudes concurrentes
+                            </li>
+                            <li>
+                                Cálculo y verificación de integridad en datos sensibles
+                            </li>
+                            <li>
+                                Desempeño en teléfonos móviles
+                            </li>
+                        </ul>
+                        <p class="mt-2 text-gray-400">
+                            Cada uno de estos ambitos, recogen diferentes pruebas con sus diferentes versiones. Dichas versiones permiten observar el desempeño de las tecnologias empleando diferentes herramientas y métodos.
+                        </p>
+                    </details>
+                  
+                    <details class="group rounded-lg border border-gray-700 bg-gray-800 p-4">
+                        <summary class="cursor-pointer text-lg transition-all duration-200 ease-in-out font-medium text-white group-open:text-purple-400">
+                            ¿Por qué es importante?
+                        </summary>
+                        <p class="mt-2 text-gray-400">
+                            En un entorno donde JavaScript domina el desarrollo web, resulta esencial explorar tecnologías emergentes como PyScript que, sin reemplazar JavaScript, podrían complementar sus capacidades. Conocer los puntos fuertes y débiles de cada enfoque permite a los desarrolladores construir aplicaciones más eficientes, aprovechando lo mejor de ambos mundos dentro del mismo ecosistema.
+                        </p>
+                    </details>
+            
+                    <details class="group rounded-lg border border-gray-700 bg-gray-800 p-4">
+                        <summary class="cursor-pointer text-lg transition-all duration-200 ease-in-out font-medium text-white group-open:text-purple-400">
+                            Tecnologías usadas
+                        </summary>
+                        <p class="mt-2 text-gray-400">
+                            Para todo el desarrollo, tanto como BackEnd y FrontEnd, se emplearon muchas tecnologias y herramientas, que permitieron analizar y comparar el rendimiento de JavaScript y PyScript. Estas incluyen:
+                        </p>
+                        <ul class="ml-6 mt-2 text-gray-400 list-disc">
+                            <li>JavaScript
+                                <ul class="ml-6 text-gray-400 list-disc">
+                                    <li>NodeJS</li>
+                                    <li>Librerias</li>
+                                </ul>
+                            </li>
+                            <li>PyScript
+                                <ul class="ml-6 text-gray-400 list-disc">
+                                    <li>Python</li>
+                                    <li>Pyodide</li>
+                                    <li>Librerias</li>
+                                </ul>
+                            </li>
+                            <li>Astro</li>
+                            <li>TailwindCSS</li>
+                        </ul>
+                    </details>
+            
+                    <details class="group rounded-lg border border-gray-700 bg-gray-800 p-4">
+                        <summary class="cursor-pointer text-lg transition-all duration-200 ease-in-out font-medium text-white group-open:text-purple-400">
+                            Pruebas realizadas
+                        </summary>
+                        <p class="mt-2 text-gray-400">
+                            Como se menciono, cada ambito tiene diferentes pruebas, que permiten analizar el rendimiento de cada tecnología. Estas pruebas se realizan con diferentes herramientas y métodos, y en ellas mismas, contienen diferentes puntos de vista y enfoques. A continuacion, se lista el titulo de cada prueba (sin mencionar sus versiones):
+                        </p>
+                        <ul class="ml-6 mt-2 text-gray-400 list-disc">
+                            <li>Multiplicación de matrices</li>
+                            <li>Detección de Números Primos</li>
+                            <li>Cálculo de dígitos de π con aritmética de precisión arbitraria</li>
+                            <li>Carga, transformación y procesamiento sobre un gran conjunto de datos.</li>
+                            <li>Análisis Estadístico y Paralelización en Grandes Volúmenes de Datos</li>
+                            <li>Entre otras más...</li>
+                        </ul>
+                        <p class="mt-2 text-gray-400">
+                            Recapitulando, en total se incluyen 14 pruebas diferentes, sin incluir sus diferentes versiones, que puede variar entre 2 o 3 versiones diferentes de la misma prueba.
+                        </p>
+                    </details>
+                </div>
+            </HeaderCard>
+            
+            <HeaderCard id="benchmarks" title="Benchmarks">
+                <div class="space-y-4">
+                  <!-- Ámbito 1 -->
+                  <details class="group rounded-lg border border-gray-700 bg-gray-800 p-4 ">
+                    <summary class="flex justify-between items-start text-lg font-medium text-white transition-all duration-300 ease-in-out group-open:text-purple-400 hover:cursor-pointer ">
+                      <div class="flex items-start gap-2">
+                        <ArrowIcon/>
+                        <span>Cálculos matemáticos intensivos</span>
+                      </div>
+                      <LinkIcon ref="/calculators-intensive" />
+                    </summary>
+                    
+                    <div class="mt-2 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-open:mt-4 group-open:max-h-[1000px]">
+                      <div class="flex flex-wrap gap-4">
+                        <BenchmarkIndexCard
+                          title="Multiplicación de matrices"
+                          versions={[
+                            "Estructuras de Datos nativas",
+                            "Estructuras de Datos Optimizadas",
+                          ]}
+                        />
+                        <BenchmarkIndexCard
+                          title="Detección de números primos"
+                          versions={[
+                            "Algoritmos Convencionales (Estructuras Nativas)",
+                            "Algoritmos Optimizados con Librerías Especializadas"
+                          ]}
+                        />
+                        <BenchmarkIndexCard
+                          title="Cálculo de dígitos de π con aritmética de precisión arbitraria"
+                          versions={[
+                            "Bailey-Borwein-Plouffe (BBP con Estructuras nativas)",
+                            "Gauss-Legendre (Estructuras optimizadas)"
+                          ]}
+                        />
+                      </div>
+                    </div>
+                  </details>
+              
+                  <!-- Ámbito 2 -->
+                  <details class="group rounded-lg border border-gray-700 bg-gray-800 p-4 ">
+                    <summary class="flex justify-between items-start text-lg font-medium text-white transition-all duration-300 ease-in-out group-open:text-purple-400 hover:cursor-pointer ">
+                      <div class="flex items-start gap-2">
+                        <ArrowIcon/>
+                        <span>
+                            Procesamiento de grandes volúmenes de datos
+                        </span>
+                      </div>
+                      <LinkIcon ref="/large-data-processing" />
+                    </summary>
+                    <!-- <div class="mt-2 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-open:mt-4 group-open:max-h-[1000px]">
+                      <div class="space-y-2 text-gray-400">
+                        <h4 class="text-base font-semibold text-purple-300">Carga y transformación de datos</h4>
+                        <ul class="ml-6 list-disc">
+                          <li>Lectura CSV</li>
+                          <li>Transformación con Pandas/JS Arrays</li>
+                        </ul>
+              
+                        <h4 class="text-base font-semibold text-purple-300 mt-4">Análisis estadístico</h4>
+                        <ul class="ml-6 list-disc">
+                          <li>Promedio y desviación</li>
+                          <li>Paralelización</li>
+                        </ul>
+                      </div>
+                    </div> -->
+                    <div class="mt-2 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-open:mt-4 group-open:max-h-[1000px]">
+                        <div class="flex flex-wrap gap-4">
+                          <BenchmarkIndexCard
+                            title="Carga y transformación de datos"
+                            versions={[
+                              "Estructuras de Datos nativas",
+                              "Estructuras de Datos Optimizadas",
+                            ]}
+                          />
+                          <BenchmarkIndexCard
+                            title="Análisis estadístico y Paralelización"
+                            versions={[
+                              "Algoritmos Convencionales (Estructuras Nativas)",
+                              "Algoritmos Optimizados con Librerías Especializadas"
+                            ]}
+                          />
+                          <BenchmarkIndexCard
+                            title="Pandas vs Danfo.js"
+                            versions={[
+                              "Algoritmos Convencionales (Estructuras Nativas)",
+                              "Algoritmos Optimizados con Librerías Especializadas"
+                            ]}
+                          />
+                        </div>
+                      </div>
+                  </details>
+              
+                  <!-- Ámbitos 3 a 7 continuarían igual -->
+                  <!-- Solo estructura, puedes copiar y adaptar -->
+                </div>
+              </HeaderCard>
+              
+            
+            <HeaderCard id="results" title="Resultados">
+                <p>
+                Los benchmarks muestran que JavaScript es más rápido en carga y ejecución directa,
+                pero PyScript ofrece versatilidad para portar código Python fácilmente.
+                PyScript sufre en carga inicial por Pyodide, pero mejora con tareas pesadas en algunos casos.
+                </p>
+            </HeaderCard>
+        </main>
+    </body>
+</html>
+
+<style>
+    html {
+        font-family:
+            system-ui,
+            -apple-system,
+            BlinkMacSystemFont,
+            'Segoe UI',
+            Roboto,
+            Oxygen,
+            Ubuntu,
+            Cantarell,
+            'Open Sans',
+            'Helvetica Neue',
+            sans-serif;
+        background: #13151a;
+        background-size: 224px;
+        color-scheme: dark light;
+    }
+</>
