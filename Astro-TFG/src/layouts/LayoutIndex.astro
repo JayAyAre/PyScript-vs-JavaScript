@@ -1,0 +1,702 @@
+---
+import HeaderCard from '../components/cards/HeaderCard.astro';
+import HeaderIndex from '../components/schedule/HeaderIndex.astro';
+import PythonIcon from '../components/icons/PythonIcon.astro';
+import JavaScriptIcon from '../components/icons/JavaScriptIcon.astro';
+import BenchmarkIndexCard from '../components/cards/BenchmarkIndexCard.astro';
+import ArrowIcon from '../components/icons/ArrowIcon.astro';
+import LinkIcon from '../components/icons/LinkIcon.astro';
+import ResultsCard from '../components/cards/ResultsCard.astro';
+import Footer from '../components/schedule/Footer.astro';
+
+export interface Props {
+    title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+        <title>{title}</title>
+    </head>
+    <body class="min-h-screen bg-gray-900 pb-32">
+        <HeaderIndex class="w-full" />
+        <main
+            class="mx-auto flex max-w-7xl flex-col items-center justify-center"
+        >
+            <HeaderCard id="introduction" title="Introducción">
+                <p>
+                    Esta es la página de inicio del Trabajo de Fin de Grado de
+                    Jordi Ramírez. En ella se recopila información clave sobre
+                    el proyecto, incluyendo el análisis comparativo y los
+                    benchmarks de rendimiento y eficiencia entre <span
+                        class="text-[#EFD81D]">JavaScript</span
+                    > y <span class="text-[#FDA703]">PyScript</span>.
+                    <br /><br />
+                    A nivel personal, este proyecto me ha permitido profundizar en
+                    el uso de Python <PythonIcon />, un lenguaje que ya había
+                    utilizado durante la carrera, pero que aún no había
+                    explorado a fondo. Esta oportunidad me ha ayudado a
+                    descubrir su potencial dentro del desarrollo web, un ámbito
+                    dominado tradicionalmente por JavaScript <JavaScriptIcon />.
+                    Tecnologías como PyScript y Pyodide abren la puerta a nuevas
+                    formas de integrar Python en el navegador, permitiendo
+                    soluciones innovadoras para el análisis y visualización de
+                    datos directamente en la web.
+                    <br /><br />
+                    Además, el proyecto surge del interés por explorar el auge de
+                    estas tecnologías emergentes, planteando preguntas fundamentales
+                    como: ¿Pueden PyScript y Pyodide ofrecer un rendimiento comparable
+                    al de JavaScript en aplicaciones web? ¿Cuál es la tecnología
+                    más adecuada según las necesidades de una aplicación: visualización
+                    gráfica, análisis de datos en tiempo real, o interacción con
+                    el usuario?
+                    <br /><br />
+                    Este trabajo busca dar respuesta a estas cuestiones, y ofrecer
+                    una visión más amplia sobre la relación y complementariedad entre
+                    JavaScript y PyScript en el desarrollo web moderno y la computación
+                    científica en el navegador.
+                </p>
+            </HeaderCard>
+
+            <HeaderCard id="about" title="Sobre el proyecto">
+                <div class="space-y-4">
+                    <details
+                        class="group rounded-lg border border-gray-700 bg-gray-800 p-4"
+                    >
+                        <summary
+                            class="flex items-start justify-between text-lg font-medium text-white transition-all duration-300 ease-in-out group-open:text-purple-400 hover:cursor-pointer"
+                        >
+                            <div class="flex items-start gap-2">
+                                <ArrowIcon />
+                                <span> ¿Qué se compara? </span>
+                            </div>
+                        </summary>
+                        <p class="mt-2 text-gray-400">
+                            En general, el proyecto definio en total 7 ambitos
+                            (El cual el ultimo, son los anteriores pero en
+                            dispositivos moviles) los cuales serian diferentes
+                            casos de uso de JavaScript y PyScript. Estos
+                            recopilan pruebas con diferentes objetivos, pero en
+                            gran medida, midiendo las mismas metricas de
+                            rendimiento y eficiencia. Los ambitos escogidos
+                            fueron:
+                        </p>
+                        <ul class="mt-2 ml-6 list-disc text-gray-400">
+                            <li>Cálculos matemáticos intensivos</li>
+                            <li>
+                                Procesamiento de grandes volúmenes de datos en
+                                memoria
+                            </li>
+                            <li>
+                                Carga y representación de gráficos complejos
+                            </li>
+                            <li>
+                                Manejo de multiples solicitudes concurrentes
+                            </li>
+                            <li>
+                                Cálculo y verificación de integridad en datos
+                                sensibles
+                            </li>
+                            <li>Desempeño en teléfonos móviles</li>
+                        </ul>
+                        <p class="mt-2 text-gray-400">
+                            Cada uno de estos ambitos, recogen diferentes
+                            pruebas con sus diferentes versiones. Dichas
+                            versiones permiten observar el desempeño de las
+                            tecnologias empleando diferentes herramientas y
+                            métodos.
+                        </p>
+                    </details>
+
+                    <details
+                        class="group rounded-lg border border-gray-700 bg-gray-800 p-4"
+                    >
+                        <summary
+                            class="flex items-start justify-between text-lg font-medium text-white transition-all duration-300 ease-in-out group-open:text-purple-400 hover:cursor-pointer"
+                        >
+                            <div class="flex items-start gap-2">
+                                <ArrowIcon />
+                                <span> ¿Por qué es importante? </span>
+                            </div>
+                        </summary>
+                        <p class="mt-2 text-gray-400">
+                            En un entorno donde JavaScript domina el desarrollo
+                            web, resulta esencial explorar tecnologías
+                            emergentes como PyScript que, sin reemplazar
+                            JavaScript, podrían complementar sus capacidades.
+                            Conocer los puntos fuertes y débiles de cada enfoque
+                            permite a los desarrolladores construir aplicaciones
+                            más eficientes, aprovechando lo mejor de ambos
+                            mundos dentro del mismo ecosistema.
+                        </p>
+                    </details>
+
+                    <details
+                        class="group rounded-lg border border-gray-700 bg-gray-800 p-4"
+                    >
+                        <summary
+                            class="flex items-start justify-between text-lg font-medium text-white transition-all duration-300 ease-in-out group-open:text-purple-400 hover:cursor-pointer"
+                        >
+                            <div class="flex items-start gap-2">
+                                <ArrowIcon />
+                                <span> Tecnologías usadas </span>
+                            </div>
+                        </summary>
+                        <p class="mt-2 text-gray-400">
+                            Para todo el desarrollo, tanto como BackEnd y
+                            FrontEnd, se emplearon muchas tecnologias y
+                            herramientas, que permitieron analizar y comparar el
+                            rendimiento de JavaScript y PyScript. Estas
+                            incluyen:
+                        </p>
+                        <ul class="mt-2 ml-6 list-disc text-gray-400">
+                            <li>
+                                JavaScript
+                                <ul class="ml-6 list-disc text-gray-400">
+                                    <li>NodeJS</li>
+                                    <li>Librerias</li>
+                                </ul>
+                            </li>
+                            <li>
+                                PyScript
+                                <ul class="ml-6 list-disc text-gray-400">
+                                    <li>Python</li>
+                                    <li>Pyodide</li>
+                                    <li>Librerias</li>
+                                </ul>
+                            </li>
+                            <li>Astro</li>
+                            <li>TailwindCSS</li>
+                        </ul>
+                    </details>
+
+                    <details
+                        class="group rounded-lg border border-gray-700 bg-gray-800 p-4"
+                    >
+                        <summary
+                            class="flex items-start justify-between text-lg font-medium text-white transition-all duration-300 ease-in-out group-open:text-purple-400 hover:cursor-pointer"
+                        >
+                            <div class="flex items-start gap-2">
+                                <ArrowIcon />
+                                <span> Pruebas realizadas </span>
+                            </div>
+                        </summary>
+                        <p class="mt-2 text-gray-400">
+                            Como se menciono, cada ambito tiene diferentes
+                            pruebas, que permiten analizar el rendimiento de
+                            cada tecnología. Estas pruebas se realizan con
+                            diferentes herramientas y métodos, y en ellas
+                            mismas, contienen diferentes puntos de vista y
+                            enfoques. A continuacion, se lista el titulo de cada
+                            prueba (sin mencionar sus versiones):
+                        </p>
+                        <ul class="mt-2 ml-6 list-disc text-gray-400">
+                            <li>Multiplicación de matrices</li>
+                            <li>Detección de Números Primos</li>
+                            <li>
+                                Cálculo de dígitos de π con aritmética de
+                                precisión arbitraria
+                            </li>
+                            <li>
+                                Carga, transformación y procesamiento sobre un
+                                gran conjunto de datos.
+                            </li>
+                            <li>
+                                Análisis Estadístico y Paralelización en Grandes
+                                Volúmenes de Datos
+                            </li>
+                            <li>Entre otras más...</li>
+                        </ul>
+                        <p class="mt-2 text-gray-400">
+                            Recapitulando, en total se incluyen 14 pruebas
+                            diferentes, sin incluir sus diferentes versiones,
+                            que puede variar teniendo versiones o no de la misma
+                            prueba.
+                        </p>
+                    </details>
+                </div>
+            </HeaderCard>
+
+            <HeaderCard id="benchmarks" title="Benchmarks">
+                <div class="space-y-4">
+                    <!-- Ámbito 1 -->
+                    <details
+                        class="group rounded-lg border border-gray-700 bg-gray-800 p-4"
+                    >
+                        <summary
+                            class="flex items-start justify-between text-lg font-medium text-white transition-all duration-300 ease-in-out group-open:text-purple-400 hover:cursor-pointer"
+                        >
+                            <div class="flex items-start gap-2">
+                                <ArrowIcon />
+                                <span>Cálculos matemáticos intensivos</span>
+                            </div>
+                            <LinkIcon ref="/calculators-intensive" />
+                        </summary>
+
+                        <div
+                            class="mt-2 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-open:mt-4 group-open:max-h-[1000px]"
+                        >
+                            <div class="flex flex-wrap gap-4">
+                                <BenchmarkIndexCard
+                                    title="Multiplicación de matrices"
+                                    versions={[
+                                        'Estructuras de Datos nativas',
+                                        'Estructuras de Datos Optimizadas',
+                                    ]}
+                                />
+                                <BenchmarkIndexCard
+                                    title="Detección de números primos"
+                                    versions={[
+                                        'Algoritmos Convencionales (Estructuras Nativas)',
+                                        'Algoritmos Optimizados con Librerías Especializadas',
+                                    ]}
+                                />
+                                <BenchmarkIndexCard
+                                    title="Cálculo de dígitos de π con aritmética de precisión arbitraria"
+                                    versions={[
+                                        'Bailey-Borwein-Plouffe (BBP con Estructuras nativas)',
+                                        'Gauss-Legendre (Estructuras optimizadas)',
+                                    ]}
+                                />
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Ámbito 2 -->
+                    <details
+                        class="group rounded-lg border border-gray-700 bg-gray-800 p-4"
+                    >
+                        <summary
+                            class="flex items-start justify-between text-lg font-medium text-white transition-all duration-300 ease-in-out group-open:text-purple-400 hover:cursor-pointer"
+                        >
+                            <div class="flex items-start gap-2">
+                                <ArrowIcon />
+                                <span>
+                                    Procesamiento de grandes volúmenes de datos
+                                </span>
+                            </div>
+                            <LinkIcon ref="/large-data-processing" />
+                        </summary>
+                        <div
+                            class="mt-2 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-open:mt-4 group-open:max-h-[1000px]"
+                        >
+                            <div class="flex flex-wrap gap-4">
+                                <BenchmarkIndexCard
+                                    title="Carga y transformación de datos"
+                                    versions={[
+                                        'Estructuras de Datos nativas con implementaciones no optimizadas',
+                                        'Estructuras de Datos Optimizadas con implementaciones optimizadas',
+                                    ]}
+                                />
+                                <BenchmarkIndexCard
+                                    title="Análisis estadístico y Paralelización"
+                                    versions={[
+                                        'Estructuras nativas',
+                                        'Estructuras optimizadas con paralelismo',
+                                    ]}
+                                />
+                                <BenchmarkIndexCard
+                                    title="Pandas vs Danfo.js"
+                                    versions={[
+                                        'Mismas tareas de la anterior version, pero utilizando Pandas y Danfo.js',
+                                    ]}
+                                />
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Ámbitos 3 -->
+                    <details
+                        class="group rounded-lg border border-gray-700 bg-gray-800 p-4"
+                    >
+                        <summary
+                            class="flex items-start justify-between text-lg font-medium text-white transition-all duration-300 ease-in-out group-open:text-purple-400 hover:cursor-pointer"
+                        >
+                            <div class="flex items-start gap-2">
+                                <ArrowIcon />
+                                <span>
+                                    Carga y representación de gráficos complejos
+                                </span>
+                            </div>
+                            <LinkIcon ref="/rendering-complex-graphs" />
+                        </summary>
+                        <div
+                            class="mt-2 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-open:mt-4 group-open:max-h-[1000px]"
+                        >
+                            <div class="flex flex-wrap gap-4">
+                                <BenchmarkIndexCard
+                                    title="Renderizado de gráficos de dispersión masivos"
+                                    versions={[
+                                        'Una unica version, la cual consiste en evaluar la capacidad de renderizar un grafico de dispersion con logica optimizada',
+                                    ]}
+                                />
+                                <BenchmarkIndexCard
+                                    title="Visualización Interactiva de Series Temporales Complejas"
+                                    versions={[
+                                        'Una unica version, la cual consiste en evaluar la capacidad de visualizar una serie temporal compleja con logica optimizada, la cual a diferencia de la anterior, permite interactividad y no es unicamente una visualización de una imagen.',
+                                    ]}
+                                />
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Ámbitos 4 -->
+                    <details
+                        class="group rounded-lg border border-gray-700 bg-gray-800 p-4"
+                    >
+                        <summary
+                            class="flex items-start justify-between text-lg font-medium text-white transition-all duration-300 ease-in-out group-open:text-purple-400 hover:cursor-pointer"
+                        >
+                            <div class="flex items-start gap-2">
+                                <ArrowIcon />
+                                <span>
+                                    Manejo múltiples solicitudes concurrentes
+                                </span>
+                            </div>
+                            <LinkIcon ref="/multiple-concurrent-requests" />
+                        </summary>
+                        <div
+                            class="mt-2 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-open:mt-4 group-open:max-h-[1000px]"
+                        >
+                            <div class="flex flex-wrap gap-4">
+                                <BenchmarkIndexCard
+                                    title="Solicitudes concurrentes con Fetch/Promise.all (JavaScript) vs Asyncio/Fetch (PyScript)"
+                                    versions={[
+                                        'Una unica version, que consiste en observar como es el rendimiento de las peticiones HTTP con Fetch/Promise.all (JavaScript) y Asyncio/Fetch (PyScript)',
+                                    ]}
+                                />
+                                <BenchmarkIndexCard
+                                    title="Manejo de WebSockets para solicitudes concurrentes en JavaScript vs PyScript"
+                                    versions={[
+                                        'Una unica version, que consiste en evaluar la capacidad de manejar WebSockets con JavaScript y PyScript',
+                                    ]}
+                                />
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Ámbitos 5 -->
+                    <details
+                        class="group rounded-lg border border-gray-700 bg-gray-800 p-4"
+                    >
+                        <summary
+                            class="flex items-start justify-between text-lg font-medium text-white transition-all duration-300 ease-in-out group-open:text-purple-400 hover:cursor-pointer"
+                        >
+                            <div class="flex items-start gap-2">
+                                <ArrowIcon />
+                                <span>
+                                    Cálculo y verificación de integridad en
+                                    datos sensibles
+                                </span>
+                            </div>
+                            <LinkIcon ref="/data-integrity" />
+                        </summary>
+                        <div
+                            class="mt-2 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-open:mt-4 group-open:max-h-[1000px]"
+                        >
+                            <div class="flex flex-wrap gap-4">
+                                <BenchmarkIndexCard
+                                    title="Generación y Verificación de Hashes Criptográficos SHA-256"
+                                    versions={[
+                                        'Una unica version, que consiste en evaluar la capacidad de generar y verificar hashes criptográficos SHA-256 con JavaScript y PyScript',
+                                    ]}
+                                />
+                                <BenchmarkIndexCard
+                                    title="Cifrado y Descifrado Simétrico con AES-GCM (128 bits)"
+                                    versions={[
+                                        'Una unica version, que consiste en evaluar la capacidad de cifrar y descifrar datos con AES-GCM (128 bits) con JavaScript y PyScript',
+                                    ]}
+                                />
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Ámbitos 6 -->
+                    <details
+                        class="group rounded-lg border border-gray-700 bg-gray-800 p-4"
+                    >
+                        <summary
+                            class="flex items-start justify-between text-lg font-medium text-white transition-all duration-300 ease-in-out group-open:text-purple-400 hover:cursor-pointer"
+                        >
+                            <div class="flex items-start gap-2">
+                                <ArrowIcon />
+                                <span>
+                                    Reconocimiento de patrones y clasificación
+                                    de datos
+                                </span>
+                            </div>
+                            <LinkIcon ref="/pattern-recognition" />
+                        </summary>
+                        <div
+                            class="mt-2 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-open:mt-4 group-open:max-h-[1000px]"
+                        >
+                            <div class="flex flex-wrap gap-4">
+                                <BenchmarkIndexCard
+                                    title="Clasificación del dataset Iris"
+                                    versions={[
+                                        'Una unica versión, que consiste en evaluar la capacidad de clasificar el dataset Iris con JavaScript y PyScript',
+                                    ]}
+                                />
+                                <BenchmarkIndexCard
+                                    title="Clasificación del dataset Digits"
+                                    versions={[
+                                        'Una unica versión, que consiste en evaluar la capacidad de clasificar el dataset Digits con JavaScript y PyScript',
+                                    ]}
+                                />
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </HeaderCard>
+
+            <HeaderCard id="results" title="Resultados">
+                <div
+                    class="grid grid-cols-1 gap-4 overflow-x-hidden sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3"
+                >
+                    <!-- 1. Cálculos matemáticos intensivos -->
+                    <ResultsCard title="1. Cálculos matemáticos intensivos">
+                        <ol class="break-words">
+                            <li>
+                                <strong>JavaScript (navegador)</strong> JavaScript
+                                es el rey en el navegador para operaciones numéricas,
+                                pero a costa de RAM
+                            </li>
+                            <li>
+                                <strong>JavaScript (Servidor)</strong> En algunas
+                                pruebas, el tiempo de ejecución fue menor que en
+                                el navegador, pero en otras era demasiado lento.
+                                Respecto a su consumo de memoria, era mucho menor
+                                que en el navegador.
+                            </li>
+                            <li>
+                                <strong>Python servidor</strong> Python lidera en
+                                el servidor para matemática avanzada, gracias a sus
+                                librerías optimizadas es capaz de obtener el mismo
+                                rendimiento de velocidad y mantener su muy bajo consumo
+                                de RAM
+                            </li>
+                            <li>
+                                <strong>PyScript</strong> PyScript es viable solo
+                                si el bajo consumo de memoria es prioritario sobre
+                                el rendimiento, ya que en términos de velocidad,
+                                JavaScript es una opción mucho mejor que PyScript.
+                            </li>
+                        </ol>
+                    </ResultsCard>
+                    <!-- 2. Procesamiento de grandes volúmenes de datos -->
+                    <ResultsCard
+                        title="2. Procesamiento de grandes volúmenes de datos"
+                    >
+                        <ol class="break-words">
+                            <li>
+                                <strong>JavaScript</strong>
+                                De forma nativa, JS destaca en la mayoria de operaciones
+                                de procesamiento de datos, pero a costa de RAM, pero
+                                por otro lado, al implicar librerias y estructuras
+                                optimizadas, se vuelve mas lento en operaciones como
+                                ordenar y filtrar datos.
+                            </li>
+                            <li>
+                                <strong>PyScript</strong> PyScript de forma nativa,
+                                solamente destaca en el poco uso de memoria RAM,
+                                pero usando librerias, se vuelve mucho mas rapido
+                                en operaciones como borrar, filtrar, ordenar y crear
+                                estructuras de datos. y teniendo en cuenta todas
+                                las operaciones juntas, PyScript logro un rendimiento
+                                superior que JS.
+                            </li>
+                            <li>
+                                Por otro lado, al incluir workers, con
+                                unicamente 1, ambos tienen un rendimiento
+                                similar. Pero al aumentar el numero en 10, se
+                                observo una mejora en rendimiento superior en
+                                PyScript que en JS. Por lo tanto
+                            </li>
+                        </ol>
+                    </ResultsCard>
+                    <!-- 3. Carga y representación de gráficos complejos -->
+                    <ResultsCard
+                        title="3. Carga y representación de gráficos complejos"
+                    >
+                        <ol class="overflow-hidden break-words">
+                            <li>
+                                <strong>JavaScript</strong>
+                                En la primera prueba logro tener un rendimiento similar
+                                a PyScript tanto en tiempo de ejecucion y renderizado
+                                como en uso de memoria. En la segunda prueba, se
+                                observo queen general, supero en todos los aspectos
+                                de PyScript.
+                            </li>
+                            <li>
+                                <strong>PyScript</strong> Logro obtener un rendimiento
+                                similar a JS intentando renderizar una imagen, pero
+                                tardaba mas en general en el paso de "generar la
+                                imagen". Al renderizar el grafico interactivo, tardo
+                                un poco mas que JS, sin embargo la duracion de la
+                                generacion del worker fue extremandamente alta. Con
+                                base a esto, JavaScript es la opcion mas adecuada
+                                para graficos complejos.
+                            </li>
+                        </ol>
+                    </ResultsCard>
+                    <!-- 4. Manejo múltiples solicitudes concurrentes -->
+                    <ResultsCard
+                        title="4. Manejo múltiples solicitudes concurrentes"
+                    >
+                        <ol>
+                            <li>
+                                <strong>JavaScript</strong>
+                                En la primera prubea JS sin duda gano en tiempo de
+                                ejecucion y uso de memoria al usar las peticiones
+                                HTTP, y por otro lado, tambien logro ser mucho mejor
+                                que PyScript usando los WebSockets para las peticiones.
+                            </li>
+                            <li>
+                                <strong>PyScript</strong> Sin duda Pyscript no pudo
+                                logro tener un rendimiento similar a JS en ningun
+                                aspecto, unicamente se puede considerar que puto
+                                tener un rendimiento "cercano" a JS en el uso de
+                                WebSockets.
+                            </li>
+                        </ol>
+                    </ResultsCard>
+                    <!-- 5. Cálculo y verificación de integridad en datos sensibles -->
+                    <ResultsCard
+                        title="5. Cálculo y verificación de integridad en datos sensibles"
+                    >
+                        <span>
+                            Al igual que en el caso anterior, PyScript no logro
+                            lograr un rendimiento similar a JS en ningun
+                            aspecto, ya sea entre la metrica de encriptar,
+                            desencriptar, o el total de tiempo de ejecucion o
+                            uso de memoria. En todos JS tuvo la capacidad de ser
+                            superior a PyScript.
+                        </span>
+                    </ResultsCard>
+                    <!-- 6. Reconocimiento de patrones y clasificación de datos -->
+                    <ResultsCard
+                        title="6. Reconocimiento de patrones y clasificación de datos"
+                    >
+                        <ol>
+                            <li>
+                                <strong>JavaScript</strong>
+                                Durante la primera prueba, JS logro superar en tiempo
+                                de entrenamiento, tamaño del modelo y tiempo en total
+                                de ejecucion respecto a PyScript, aunque esto le
+                                costo reducir la precision del modelo. En la siguiente
+                                prueba, tuvo un rendimiento peor a PyScript en los
+                                mismos anteriores mencionados, aunque su uso de memoria
+                                fue hasta mas de 100 veces menor que PyScript.
+                            </li>
+                            <li>
+                                <strong>PyScript</strong>
+                                PyScript unicamente durante la primera prueba se
+                                observo un mejor tamaño de modelo y precision a costa
+                                de los otros parametros. Y en la segunda prueba,
+                                logro superar a JS excepto en el uso de memoria.
+                            </li>
+                            <li>
+                                En resumen, el rendimiento dependera de cual
+                                modelo se utilizara, y la memoria que se use,
+                                por lo que es posible que en algunos casos,
+                                PyScript sea mas eficiente que JS o al revés.
+                            </li>
+                        </ol>
+                    </ResultsCard>
+                    <!-- 7. Rendimiento en dispositivos móviles -->
+                    <!-- Espacio para rendimiento en móvil (4.7) -->
+                    <div
+                        class="col-span-1 mt-2 sm:col-span-2 md:col-span-3 lg:col-span-3"
+                    >
+                        <ResultsCard
+                            title="7. Rendimiento en dispositivos móviles"
+                        >
+                            <ol>
+                                <li>
+                                    <strong>JavaScript</strong>
+                                    Durante la primera prueba, JS logro superar en
+                                    tiempo de entrenamiento, tamaño del modelo y
+                                    tiempo en total de ejecucion respecto a PyScript,
+                                    aunque esto le costo reducir la precision del
+                                    modelo. En la siguiente prueba, tuvo un rendimiento
+                                    peor a PyScript en los mismos anteriores mencionados,
+                                    aunque su uso de memoria fue hasta mas de 100
+                                    veces menor que PyScript.
+                                </li>
+                                <li>
+                                    <strong>PyScript</strong>
+                                    PyScript unicamente durante la primera prueba
+                                    se observo un mejor tamaño de modelo y precision
+                                    a costa de los otros parametros. Y en la segunda
+                                    prueba, logro superar a JS excepto en el uso
+                                    de memoria.
+                                </li>
+                                <li>
+                                    En resumen, el rendimiento dependera de cual
+                                    modelo se utilizara, y la memoria que se
+                                    use, por lo que es posible que en algunos
+                                    casos, PyScript sea mas eficiente que JS o
+                                    al revés.
+                                </li>
+                            </ol>
+                        </ResultsCard>
+                    </div>
+
+                    <div
+                        class="col-span-1 mt-2 text-gray-300 sm:col-span-2 md:col-span-3 lg:col-span-3"
+                    >
+                        Finalmente, en conclusiones generales, la gran mayoria
+                        de pruebas realizadas, JavaScript tuvo un rendimiento
+                        bastante superior a PyScript, aunque en algunos casos,
+                        PyScript tuvo un rendimiento superior a JS. Sin embargo,
+                        esto no es del todo positivo, ya que PyScript en esencia
+                        al ser un "puente" entre Python y el Navegador usando
+                        WebAssembly y Pyodide, se lleva a cabo una serie de
+                        pasos que son costosos en total de tiempo de ejecucion y
+                        uso de memoria. Entre ellos podemos destacar el incluir
+                        el archivo .wasm, la compilacion del navegador de ese
+                        mismo archivo y montar el interprete de CPython, etc.
+                        Todo esto lleva un tiempo el cual se debe esperar el
+                        navegador a que se termine.
+                        <br /><br />
+                        Por otro lado, a la hora de emplear el uso de WebWorkers,
+                        la creación de estos mismos es extremandamente aun más costosa
+                        que en el propio JavaScript. Por ello, aunque en algunas
+                        pruebas el PyScript supere a JS. Se debe tener en cuenta
+                        ese tiempo y el tiempo anterior mencionado (PLT=Page Load
+                        Time).
+                    </div>
+                </div>
+            </HeaderCard>
+        </main>
+        <Footer />
+    </body>
+</html>
+
+<style>
+    html {
+        font-family:
+            system-ui,
+            -apple-system,
+            BlinkMacSystemFont,
+            'Segoe UI',
+            Roboto,
+            Oxygen,
+            Ubuntu,
+            Cantarell,
+            'Open Sans',
+            'Helvetica Neue',
+            sans-serif;
+        background: #13151a;
+        background-size: 224px;
+        color-scheme: dark light;
+        font-size: 0.75rem;
+    }
+</style>
