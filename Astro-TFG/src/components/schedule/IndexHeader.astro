@@ -1,5 +1,5 @@
 ---
-import HeaderButton from './HeaderButton.astro';
+import NavegationButton from './NavegationButton.astro';
 ---
 
 <header
@@ -32,7 +32,7 @@ import HeaderButton from './HeaderButton.astro';
         <nav
             class="flex flex-col justify-center gap-4 sm:flex-row sm:items-center sm:gap-6"
         >
-            <HeaderButton ref="#introduction">
+            <NavegationButton ref="#introduction">
                 <svg
                     slot="before"
                     viewBox="0 0 24 24"
@@ -49,8 +49,8 @@ import HeaderButton from './HeaderButton.astro';
                     <path d="M11 12h1v4h1"></path>
                 </svg>
                 Introducción
-            </HeaderButton>
-            <HeaderButton ref="#about">
+            </NavegationButton>
+            <NavegationButton ref="#about">
                 <svg
                     slot="before"
                     viewBox="0 0 24 24"
@@ -69,8 +69,8 @@ import HeaderButton from './HeaderButton.astro';
                     <path d="M21 6l0 13"></path>
                 </svg>
                 Sobre el proyecto
-            </HeaderButton>
-            <HeaderButton ref="#benchmarks">
+            </NavegationButton>
+            <NavegationButton ref="#benchmarks">
                 <svg
                     slot="before"
                     viewBox="0 0 24 24"
@@ -90,8 +90,8 @@ import HeaderButton from './HeaderButton.astro';
                     <path d="M5 18l0 .01"></path>
                 </svg>
                 Benchmarks
-            </HeaderButton>
-            <HeaderButton ref="#results">
+            </NavegationButton>
+            <NavegationButton ref="#results">
                 <svg
                     slot="before"
                     viewBox="0 0 24 24"
@@ -117,7 +117,7 @@ import HeaderButton from './HeaderButton.astro';
                     <path d="M18.5 19.5l2.5 2.5"></path>
                 </svg>
                 Resultados
-            </HeaderButton>
+            </NavegationButton>
         </nav>
     </div>
     <div class="flex h-auto w-40 items-center">

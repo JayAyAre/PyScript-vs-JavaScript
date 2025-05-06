@@ -1,0 +1,41 @@
+---
+import '../../styles/global.css';
+import Layout from '../../layouts/BenchmarkLayout.astro';
+
+const benchmark = {
+    title: '5. Cálculo y verificación de integridad en datos sensibles',
+    link: '/4.5-criptografia',
+    description:
+        'Este apartado analizara las librerias disponibles para la cifrado y descifrado de datos, así como su eficiencia en el procesamiento de datos sensibles.',
+    warning:
+        'En estos escenarios se emplean WebWorkers, por lo que no se bloquearan las pruebas mientras se ejecutan. Sin embargo, siempre que se use PyScript, seguira existiendo el PLT.',
+    tests: [
+        {
+            title: 'Generación y Verificación de Hashes Criptográficos SHA-256',
+            description:
+                'Compararemos el rendimiento de PyCryptodome y Web Crypto API al generar y verificar hashes SHA-256 para archivos grandes, evaluando su eficiencia en la validación de integridad de datos sensibles.',
+            versions: [
+                {
+                    title: 'Version optimizada',
+                    description:
+                        'Esta prueba incluye una única versión optimizada para simular un escenario del mundo real. El usuario puede especificar el tamaño de un archivo simulado con contenido aleatorio, sobre el cual se calculará su hash mediante el algoritmo SHA-256 y se verificará su integridad. Se medirán métricas de rendimiento como el tiempo promedio de generación y verificación del hash, así como el tiempo total de ejecución.',
+                },
+            ],
+        },
+        {
+            title: 'Cifrado y Descifrado Simétrico con AES-GCM (128 bits)',
+            description:
+                'Evaluaremos la eficiencia de ambos entornos en tareas de cifrado/descifrado simétrico con datos sensibles, utilizando AES-GCM con clave de 128 bits, verificando además la integridad del mensaje.',
+            versions: [
+                {
+                    title: 'Version optimizada',
+                    description:
+                        'Esta prueba cifra y descifra un mensaje de tamaño configurable utilizando el algoritmo AES en modo GCM. Se simulan operaciones criptográficas del mundo real, incluyendo el uso de un nonce y una etiqueta de autenticación. Se mide el rendimiento en términos de tiempo promedio de cifrado y descifrado, así como la integridad de los datos. Esta versión está optimizada para evaluar el rendimiento criptográfico en condiciones realistas.',
+                },
+            ],
+        },
+    ],
+};
+---
+
+<Layout {...benchmark} />

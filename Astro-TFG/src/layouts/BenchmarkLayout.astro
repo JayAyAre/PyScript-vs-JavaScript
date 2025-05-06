@@ -1,0 +1,108 @@
+---
+import Footer from '../components/schedule/Footer.astro';
+import Header from '../components/schedule/BenchmarkHeader.astro';
+import NavegationButton from '../components/schedule/NavegationButton.astro';
+import Card from '../components/cards/HeaderCard.astro';
+import BenchmarkListCard from '../components/cards/BenchmarkListCard.astro';
+
+const { title, description, warning, tests, link } = Astro.props;
+---
+
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+        <title>{title} - Benchmark</title>
+    </head>
+    <body class="min-h-screen bg-gray-900 pb-32 text-white">
+        <Header title={title} description={description} warning={warning} />
+
+        <main
+            class="mx-auto mt-14 flex max-w-7xl flex-col items-center justify-center space-y-12 px-4 sm:px-8"
+        >
+            {
+                Array.isArray(tests) && tests.length > 0 ? (
+                    tests.map((test: any, testIndex: number) => (
+                        <Card title={test?.title} id={`test-${testIndex}`}>
+                            {test?.description && (
+                                <p class="mb-6">{test.description}</p>
+                            )}
+
+                            {Array.isArray(test?.versions) && (
+                                <div class="space-y-4">
+                                    {test.versions.map(
+                                        (
+                                            version: any,
+                                            versionIndex: number
+                                        ) => {
+                                            const testId = testIndex + 1;
+                                            const versionId = versionIndex + 1;
+                                            const versionLink = `${link}/test-${testId}-version-${versionId}`;
+                                            return (
+                                                <article class="flex flex-col gap-4 rounded-lg border border-gray-700 p-4 text-purple-400 sm:flex-row sm:justify-between">
+                                                    <div class="flex flex-col gap-4 sm:w-1/2">
+                                                        {version?.title && (
+                                                            <h3 class="text-xl font-bold">
+                                                                {version.title}
+                                                            </h3>
+                                                        )}
+                                                        <div>
+                                                            <NavegationButton
+                                                                ref={
+                                                                    versionLink
+                                                                }
+                                                            >
+                                                                <slot name="run">
+                                                                    Ir a la
+                                                                    versión
+                                                                </slot>
+                                                            </NavegationButton>
+                                                        </div>
+                                                    </div>
+                                                    {version?.description && (
+                                                        <div class="text-gray-300 sm:w-1/2 sm:pl-6">
+                                                            {
+                                                                version.description
+                                                            }
+                                                        </div>
+                                                    )}
+                                                </article>
+                                            );
+                                        }
+                                    )}
+                                </div>
+                            )}
+                        </Card>
+                    ))
+                ) : (
+                    <BenchmarkListCard />
+                )
+            }
+        </main>
+
+        <Footer />
+    </body>
+</html>
+
+<style>
+    html {
+        font-family:
+            system-ui,
+            -apple-system,
+            BlinkMacSystemFont,
+            'Segoe UI',
+            Roboto,
+            Oxygen,
+            Ubuntu,
+            Cantarell,
+            'Open Sans',
+            'Helvetica Neue',
+            sans-serif;
+        background: #13151a;
+        background-size: 224px;
+        color-scheme: dark light;
+        font-size: 0.75rem;
+    }
+</style>

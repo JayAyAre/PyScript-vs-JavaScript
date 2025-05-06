@@ -3,58 +3,46 @@ import tracemalloc
 import gc
 import js  # type: ignore
 from pyscript import display  # type: ignore
-import numpy as np
+import random
 
 
 def create_data_structure(size):
-    return np.random.randint(0, 1001, size=size)
+    return [random.randint(0, 1000) for _ in range(size)]
 
 
-def transform_data_structure(arr):
-    return (arr**2 + np.log(arr + 1)) / np.sqrt(arr + 1)
+def calculate_sum(data):
+    return sum(data)
 
 
-def sort_data_structure(arr):
-    return np.sort(arr)
+def calculate_mean(data):
+    return sum(data) / len(data)
 
 
-def search_in_data_structure(arr, value):
-    data_set = set(arr)
-    return value in data_set
+def calculate_std(data):
+    mean = calculate_mean(data)
+    return (sum((x - mean) ** 2 for x in data) / len(data)) ** 0.5
 
 
-def filter_data_structure(arr, threshold):
-    return arr[arr > threshold]
-
-
-def delete_from_data_structure(arr, value):
-    return arr[arr != value]
-
-
-def do_operations(size):
+def do_statistical_analysis(size):
     metrics = {}
     start_total = time.time()
     tracemalloc.start()
     max_memory = 0
 
     start_op = time.time()
-    my_array = create_data_structure(size)
+    data = create_data_structure(size)
     current_mem = tracemalloc.get_traced_memory()
     metrics['create'] = {
         'time': (time.time() - start_op) * 1000,
-        'memory': current_mem[1] / (1024 * 1024)
+        'memory': abs(current_mem[1] / (1024 * 1024))
     }
     max_memory = max(max_memory, current_mem[1] / (1024 * 1024))
     tracemalloc.stop()
 
     operations = [
-        ('transform', transform_data_structure, (my_array,)),
-        ('sort', sort_data_structure, (my_array,)),
-        ('search', search_in_data_structure,
-         (my_array, np.random.choice(my_array))),
-        ('filter', filter_data_structure, (my_array, 500)),
-        ('delete', delete_from_data_structure,
-         (my_array, np.random.choice(my_array)))
+        ('sum', calculate_sum, (data,)),
+        ('mean', calculate_mean, (data,)),
+        ('std', calculate_std, (data,))
     ]
 
     for op_name, op_func, args in operations:
@@ -95,4 +83,4 @@ def do_operations(size):
 
 def run_py_benchmark(event):
     js.clearCell('pyscript')
-    do_operations(10_000_000)
+    do_statistical_analysis(10_000_000)

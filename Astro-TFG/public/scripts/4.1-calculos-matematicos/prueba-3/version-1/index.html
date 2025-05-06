@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmarking: JavaScript vs PyScript</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    <script src="javascript/main.js" defer></script>
+    <script type="py" src="python/main.py"></script>
+    <script>
+        let startTime = performance.now();
+
+        document.addEventListener('py:ready', () => {
+            let endTime = performance.now();
+            let loadTime = endTime - startTime;
+            document.getElementById("output").innerText += `PLT: ${loadTime.toFixed(2)} ms`;
+        });
+
+        var startTimerWebAssembly;
+
+        function runPyBenchmark() {
+            startTimerWebAssembly = performance.now();
+        }
+
+        function endTimerWebAssembly() {
+            var endTime = performance.now();
+            var totalElapsedTime = endTime - startTimerWebAssembly;
+            var resultDiv = document.createElement("div");
+            resultDiv.textContent = `ET (Py + WA): ${totalElapsedTime.toFixed(2)} ms`;
+            document.getElementById("pyscript-output").appendChild(resultDiv);
+        }
+
+        function clearCell(elementId) {
+            document.getElementById(elementId).textContent = "";
+        }
+
+        function runPyBackendBenchmark() {
+            clearCell("pythonBackend-output");
+            fetch("http://localhost:5000/")
+                .then(response => response.json())
+                .then(data => {
+                    let outputDiv = document.getElementById("pythonBackend-output");
+
+                    let timeDiv = document.createElement("div");
+                    timeDiv.textContent = `Total ET (1000x): ${data.time} ms`;
+                    outputDiv.appendChild(timeDiv);
+
+                    let avgTimeDiv = document.createElement("div");
+                    avgTimeDiv.textContent = `ET (avg, 1000x): ${data.avg_time} ms`;
+                    outputDiv.appendChild(avgTimeDiv);
+
+                    let cpuDiv = document.createElement("div");
+                    cpuDiv.textContent = `CPU (avg, 1000x): ${data.avg_cpu_usage} %`;
+                    outputDiv.appendChild(cpuDiv);
+
+                    let memoryDiv = document.createElement("div");
+                    memoryDiv.textContent = `RAM (avg, 1000x): ${data.avg_memory_usage} MB`;
+                    outputDiv.appendChild(memoryDiv);
+                })
+                .catch(error => console.error("Error:", error));
+        }
+    </script>
+<body>
+    <h1>PI Digit Calculation (Native Lists/Arrays)</h1>
+
+    <button onclick="runJSBenchmark()">Run in JavaScript</button>
+    <button onclick="runPyBenchmark()" py-click="run_py_benchmark">Run in PyScript</button>
+    <button onclick="runNodeBenchmark()">Run in Node</button>
+    <button onclick="runPyBackendBenchmark()">Run in Python Backend</button>
+
+    <h2>Results</h2>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>JavaScript</th>
+                <th>PyScript</th>
+                <th>Node.js</th>
+                <th>Python Backend</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="javascript-output">Waiting...</td>
+                <td id="pyscript-output">Waiting...</td>
+                <td id="nodeJs-output">Waiting...</td>
+                <td id="pythonBackend-output">Waiting...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <pre id="output"></pre>
+</body>
+</html>

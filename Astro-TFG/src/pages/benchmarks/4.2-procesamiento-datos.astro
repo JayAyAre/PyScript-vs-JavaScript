@@ -1,0 +1,63 @@
+---
+import '../../styles/global.css';
+import Layout from '../../layouts/BenchmarkLayout.astro';
+
+const benchmark = {
+    title: '2. Proceamiento de grandes volúmenes de datos',
+    link: '/4.2-procesamiento-datos',
+    description:
+        'Estas pruebas medirán la capacidad de cada tecnologia para manejar y procesar grandes cantidades de datos. Se analizarán diversos escenarios que involucren manipulación de estructuras de datos a gran escala, carga masiva de información y ejecución de algoritmos de procesamiento intensivo.',
+    warning:
+        'En estos escenarios también se decidió evaluar el rendimiento de las pruebas teniendo en cuenta que se ejecutan en el hilo principal. Es decir, no habrá un worker que ejecute las pruebas para que se pueda interactuar con la página web. Por ello, al ejecutar las pruebas, se congelará el hilo principal hasta que finalice la prueba. Por otro lado, al ser PyScript, habrá un tiempo de carga de la página web que no se puede evitar, por lo que es posible que la prueba tarde un poco antes de estar disponible.',
+    tests: [
+        {
+            title: 'Realizar operaciones de carga, transformación y procesamiento sobre un gran conjunto de datos.',
+            description:
+                'El propósito de esta prueba es principalmente evaluar y comparar el rendimiento del manejo de matrices, tanto manipulación como de operación, de tal manera observar que tan eficiente es el uso de las estructuras nativas de ambas herramientas y de aquellas incluidas en librerías externas. Las operaciones a medir seran; crear, transformar, ordenar, buscar, filtrar y eliminar.',
+            versions: [
+                {
+                    title: 'Estructuras de Datos Nativas',
+                    description:
+                        'Esta version empleara arrays y listas nativas correspondientes a JavaScript y a PyScript. Esta version se encargara de crear y manipular un conjunto de 10 millones de numeros aleatorios entre 1 y 1000. Al ser la primera version, se usaran algoritmos no optimizados, por ejemplo; En la busqueda de un dato sobre el conjunto, se empleara un bucle donde se itera sobre cada elemento hasta encontrarlo.',
+                },
+                {
+                    title: 'Estructuras de Datos Optimizadas con concurrismo y paralelismo',
+                    description:
+                        'Esta version adicionalmente usara paralelismo y concurrencia para ejecutar las operaciones, de tal manera que ambas tecnologias usaran web workers para ejecutar las operaciones en paralelo, pero se mandaran a ejecutar de forma concurrente.',
+                },
+            ],
+        },
+        {
+            title: 'Análisis Estadístico y Paralelización en Grandes Volúmenes de Datos',
+            description:
+                'Este experimento evaluará la capacidad de cada tecnología para procesar y analizar grandes conjuntos de datos mediante operaciones de cálculo estadístico. Se generará un conjunto de 10 millones de números aleatorios entre 1 y 1000. Las nuevas operaciones a medir seran la suma, creacion, media, y la desviacion estandar de los datos.',
+            versions: [
+                {
+                    title: 'Estructuras de Datos Nativas',
+                    description:
+                        'La primera version se elimino la restriccion de la anterior prueba de usar estructuras basicas como bucles for, aquello conlleva, que ambos lenguajes usen funciones disponibles nativamente como sum() en Python y otros metodos equivalentes en JavaScript.',
+                },
+                {
+                    title: 'Algoritmos Optimizados con Librerías Especializadas',
+                    description:
+                        'Esta version empleara librerias optimizadas para la deteccion de los numeros, para ello, se usara el algoritmo de la criba de Eratosthenes. El rango maximo sera hasta 10^4 y se ejecutara 1000 veces para tener un numero de medicion estadistico.',
+                },
+            ],
+        },
+        {
+            title: 'Pandas vs Danfo.js',
+            description:
+                'Esta prueba tendrá el objetivo de comparar el rendimiento de Pandas (Python) y Danfo.js (JavaScript) en operaciones estadísticas sobre datasets de 100.000 elementos, utilizando paralelización con workers para optimizar el procesamiento. Esta prueba emplea las mismas operaciones que el apartado anterior, sin embargo se usarán librerías especializadas en análisis estadístico diferentes a las anteriores, esto nos proporciona una visión más amplia de las opciones de crear algoritmos.',
+            versions: [
+                {
+                    title: 'Version optimizada',
+                    description:
+                        'Esta prueba contiene una unica version que representa un codigo de la forma mas optimizada posible para simular un codigo del mundo real. Se usaran en PyScript Pandas y Numpy y en JavaScript Danfo.js y Arrays.',
+                },
+            ],
+        },
+    ],
+};
+---
+
+<Layout {...benchmark} />

@@ -1,0 +1,86 @@
+---
+// Importación de componentes y declaración de variables
+const { title, description, warning } = Astro.props;
+const benchmarks = [
+    ['Calculos matemáticos', '4.1-calculos-matematicos'],
+    ['Procesamiento de grandes volúmenes de datos', '4.2-procesamiento-datos'],
+    [
+        'Carga y representación de gráficos complejos',
+        '4.3-carga-graficos-complejos',
+    ],
+    ['Manejo de peticiones', '4.4-manejo-peticiones'],
+    ['Criptografía', '4.5-criptografia'],
+    ['Patrones', '4.6-patrones'],
+];
+const isOnBenchmarksPage =
+    Astro.url.pathname.startsWith('/benchmarks') ||
+    location.pathname.startsWith('/benchmarks');
+
+import NavegationButton from '../schedule/NavegationButton.astro';
+---
+
+<header class="bg-gray-900 px-4 pt-11 text-white sm:px-6">
+    <div class="mx-auto flex max-w-7xl flex-col items-center gap-8">
+        <div class="flex flex-col gap-4 text-center lg:max-w-6xl">
+            <h1
+                class="text-justify text-3xl font-bold tracking-tight text-white md:text-4xl"
+            >
+                {title}
+            </h1>
+            <p class="text-justify text-lg text-gray-300">{description}</p>
+
+            {
+                warning && (
+                    <div class="mt-2 rounded-lg border border-gray-700 bg-gray-800 p-2 p-4 text-justify text-yellow-300">
+                        <small>{warning}</small>
+                    </div>
+                )
+            }
+        </div>
+
+        <!-- Fila de botones -->
+        <div class="flex flex-row gap-2">
+            <NavegationButton ref="/"
+                ><slot name="home">Inicio</slot></NavegationButton
+            >
+            <div class="group relative w-full sm:w-auto">
+                <button
+                    class="ease-in-outgroup-hover:bg-slate-700 flex w-full items-center justify-center gap-2 rounded-lg px-5 py-2 text-white opacity-70 transition-all duration-200 group-hover:text-purple-400 group-hover:opacity-100 hover:shadow-lg"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        class="h-5 w-5"
+                    >
+                        <path d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                    <slot name="menu">Menú</slot>
+                </button>
+                <ul
+                    class="absolute right-0 z-10 hidden max-h-80 w-90 grid-cols-1 gap-2 rounded-lg bg-gray-800 p-2 shadow-xl group-hover:grid sm:grid-cols-2 lg:grid-cols-3"
+                >
+                    {
+                        benchmarks.map((benchmark, index) => {
+                            const link = isOnBenchmarksPage
+                                ? `/benchmarks/${benchmark[1].toLowerCase().replace(/\s+/g, '-')}`
+                                : benchmark[1] ||
+                                  `/benchmarks/${benchmark[1].toLowerCase().replace(/\s+/g, '-')}`;
+                            return (
+                                <li class="round rounded-lg">
+                                    <a
+                                        href={link}
+                                        class="flex items-center gap-2 px-4 py-2 opacity-70 transition-all duration-200 ease-in-out hover:cursor-pointer hover:rounded-lg hover:bg-slate-700 hover:text-purple-400 hover:opacity-100 hover:shadow-lg focus:ring focus:ring-purple-400"
+                                    >
+                                        {index + 1}. {benchmark[0]}
+                                    </a>
+                                </li>
+                            );
+                        })
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,34 @@
+---
+const { title, linkRef, benchmarkItems } = Astro.props;
+import ArrowIcon from '../icons/ArrowIcon.astro';
+import LinkIcon from '../icons/LinkIcon.astro';
+import BenchmarkIndexCard from '../cards/BenchmarkIndexCard.astro';
+---
+
+<details class="group rounded-lg border border-gray-700 bg-gray-800 p-4">
+    <summary
+        class="flex items-start justify-between text-lg font-medium text-white transition-all duration-300 ease-in-out group-open:text-purple-400 hover:cursor-pointer"
+    >
+        <div class="flex items-start gap-2">
+            <ArrowIcon />
+            <span>{title}</span>
+        </div>
+        <LinkIcon ref={linkRef} />
+    </summary>
+    <div
+        class="mt-2 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-open:mt-4 group-open:max-h-[1000px]"
+    >
+        <div
+            class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3"
+        >
+            {
+                benchmarkItems.map((item: any) => (
+                    <BenchmarkIndexCard
+                        title={item.title}
+                        versions={item.versions}
+                    />
+                ))
+            }
+        </div>
+    </div>
+</details>

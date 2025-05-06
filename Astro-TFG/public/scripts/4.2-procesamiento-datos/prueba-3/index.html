@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmarking: JavaScript vs PyScript</title>
+
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.5.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.5.2/core.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/danfojs@1.2.0/lib/bundle.min.js"></script>
+    <script src="javascript/main.js" defer></script>
+
+    <script>
+        document.addEventListener('py:ready', () => {
+            document.getElementById("run-button").disabled = false;
+
+            document.getElementById("run-button").textContent = 'Run in PyScript';
+            console.log('PyScript fully loaded');
+        });
+    </script>
+    <script>
+        let startTime = performance.now();
+
+        document.addEventListener('py:ready', () => {
+            let endTime = performance.now();
+            let loadTime = endTime - startTime;
+            document.getElementById("output").innerText += `PLT: ${loadTime.toFixed(2)} ms`;
+        });
+
+        var startTimerWebAssembly;
+
+        function runPyBenchmark() {
+            startTimerWebAssembly = performance.now();
+        }
+
+        function clearCell(elementId) {
+            const operations = ['create', 'sum', 'mean', 'std', 'output', 'exact'];
+            operations.forEach(op => {
+                const element = document.getElementById(`${elementId}-${op}`);
+                if (element) {
+                    element.innerHTML = "";
+                }
+            });
+        }
+    </script>
+<body>
+    <script type="py" src="python/main.py" config="json/pyscript-main.json" async></script>
+
+    <h1>Statistical analysis (Pandas/Dango.js)</h1>
+
+    <label for="num-executions">Repeticiones:</label>
+    <input type="number" id="num-executions-javascript" value="1" min="1">
+    <input type="number" id="parallel-workers-javascript" value="1" min="1" max="16">
+    <button onclick="runJSBenchmark()">Run in JavaScript</button>
+
+
+    <label for="num-executions">Repeticiones:</label>
+    <input type="number" id="num-executions-pyscript" value="1" min="1">
+    <input type="number" id="parallel-workers-pyscript" value="1" min="1" max="16">
+    <button id="run-button" onclick="runPyBenchmark()" py-click="js_run_py_benchmark">Run in PyScript (Loading...)</button>
+
+    <h2>Results</h2>
+    </button>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Operation</th>
+                <th>JavaScript</th>
+                <th>PyScript</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Create</td>
+                <td id="javascript-create">Waiting...</td>
+                <td id="pyscript-create">Waiting...</td>
+            </tr>
+            <tr>
+                <td>Sum</td>
+                <td id="javascript-sum">Waiting...</td>
+                <td id="pyscript-sum">Waiting...</td>
+            </tr>
+            <tr>
+                <td>Mean</td>
+                <td id="javascript-mean">Waiting...</td>
+                <td id="pyscript-mean">Waiting...</td>
+            </tr>
+            <tr>
+                <td>Std</td>
+                <td id="javascript-std">Waiting...</td>
+                <td id="pyscript-std">Waiting...</td>
+            </tr>
+            <tr>
+                <td>Total (Av.)</td>
+                <td id="javascript-output">Waiting...</td>
+                <td id="pyscript-output">Waiting...</td>
+            </tr>
+            <tr>
+                <td>Total exact</td>
+                <td id="javascript-exact">Waiting...</td>
+                <td id="pyscript-exact">Waiting...</td>
+            </tr>
+        </tbody>
+    </table>
+    <pre id="output"></pre>
+</body>
+</html>

@@ -1,0 +1,148 @@
+---
+// El archivo principal
+import HeaderCard from '../cards/HeaderCard.astro';
+import BenchmarkDetails from '../cards/BenchmarkListElementCard.astro';
+
+const { id = 'benchmarks', title = 'Benchmarks' } = Astro.props;
+---
+
+<HeaderCard id={id} title={title}>
+    <div class="space-y-4">
+        <!-- Ámbito 1 -->
+        <BenchmarkDetails
+            title="Cálculos matemáticos intensivos"
+            linkRef="/benchmarks/4.1-calculos-matematicos"
+            benchmarkItems={[
+                {
+                    title: 'Multiplicación de matrices',
+                    versions: [
+                        'Estructuras de Datos nativas',
+                        'Estructuras de Datos Optimizado',
+                    ],
+                },
+                {
+                    title: 'Detección de números primos',
+                    versions: [
+                        'Algoritmos Convencionales (Estructuras Nativas)',
+                        'Algoritmos Optimizados con Librerías Especializadas',
+                    ],
+                },
+                {
+                    title: 'Cálculo de dígitos de π con aritmética de precisión arbitraria',
+                    versions: [
+                        'Bailey-Borwein-Plouffe (BBP con Estructuras nativas)',
+                        'Gauss-Legendre (Estructuras optimizadas)',
+                    ],
+                },
+            ]}
+        />
+
+        <!-- Ámbito 2 -->
+        <BenchmarkDetails
+            title="Procesamiento de grandes volúmenes de datos"
+            linkRef="/benchmarks/4.2-procesamiento-datos"
+            benchmarkItems={[
+                {
+                    title: 'Carga y transformación de datos',
+                    versions: [
+                        'Estructuras de Datos nativas con implementaciones no optimizadas',
+                        'Estructuras de Datos Optimizadas con implementaciones optimizadas',
+                    ],
+                },
+                {
+                    title: 'Análisis estadístico y Paralelización',
+                    versions: [
+                        'Estructuras nativas',
+                        'Estructuras optimizadas con paralelismo',
+                    ],
+                },
+                {
+                    title: 'Pandas vs Danfo.js',
+                    versions: [
+                        'Mismas tareas de la versión anterior, pero utilizando Pandas y Danfo.js',
+                    ],
+                },
+            ]}
+        />
+
+        <!-- Ámbito 3 -->
+        <BenchmarkDetails
+            title="Carga y representación de gráficos complejos"
+            linkRef="/benchmarks/4.3-carga-graficos-complejos"
+            benchmarkItems={[
+                {
+                    title: 'Renderizado de gráficos de dispersión masivos',
+                    versions: [
+                        'Una única versión, que consiste en evaluar la capacidad de renderizar un gráfico de dispersión con lógica optimizada',
+                    ],
+                },
+                {
+                    title: 'Visualización Interactiva de Series Temporales Complejas',
+                    versions: [
+                        'Una única versión, que consiste en evaluar la capacidad de visualizar una serie temporal compleja con lógica optimizada, la cual a diferencia de la anterior, permite interactividad y no es únicamente una visualización de una imagen.',
+                    ],
+                },
+            ]}
+        />
+
+        <!-- Ámbito 4 -->
+        <BenchmarkDetails
+            title="Manejo de múltiples solicitudes concurrentes"
+            linkRef="/benchmarks/4.4-manejo-peticiones"
+            benchmarkItems={[
+                {
+                    title: 'Solicitudes concurrentes con Fetch/Promise.all (JavaScript) vs Asyncio/Fetch (PyScript)',
+                    versions: [
+                        'Una única versión, que consiste en observar cómo es el rendimiento de las peticiones HTTP con Fetch/Promise.all (JavaScript) y Asyncio/Fetch (PyScript)',
+                    ],
+                },
+                {
+                    title: 'Manejo de WebSockets para solicitudes concurrentes en JavaScript vs PyScript',
+                    versions: [
+                        'Una única versión, que consiste en evaluar la capacidad de manejar WebSockets con JavaScript y PyScript',
+                    ],
+                },
+            ]}
+        />
+
+        <!-- Ámbito 5 -->
+        <BenchmarkDetails
+            title="Cálculo y verificación de integridad en datos sensibles"
+            linkRef="/benchmarks/4.5-criptografia"
+            benchmarkItems={[
+                {
+                    title: 'Generación y Verificación de Hashes Criptográficos SHA-256',
+                    versions: [
+                        'Una única versión, que consiste en evaluar la capacidad de generar y verificar hashes criptográficos SHA-256 con JavaScript y PyScript',
+                    ],
+                },
+                {
+                    title: 'Cifrado y Descifrado Simétrico con AES-GCM (128 bits)',
+                    versions: [
+                        'Una única versión, que consiste en evaluar la capacidad de cifrar y descifrar datos con AES-GCM (128 bits) con JavaScript y PyScript',
+                    ],
+                },
+            ]}
+        />
+
+        <!-- Ámbito 6 -->
+        <BenchmarkDetails
+            title="Reconocimiento de patrones y clasificación de datos"
+            linkRef="/benchmarks/4.6-patrones"
+            benchmarkItems={[
+                {
+                    title: 'Clasificación del dataset Iris',
+                    versions: [
+                        'Una única versión, que consiste en evaluar la capacidad de clasificar el dataset Iris con JavaScript y PyScript',
+                    ],
+                },
+                {
+                    title: 'Clasificación del dataset Digits',
+                    versions: [
+                        'Una única versión, que consiste en evaluar la capacidad de clasificar el dataset Digits con JavaScript y PyScript',
+                    ],
+                },
+            ]}
+        />
+    </div>
+</HeaderCard>

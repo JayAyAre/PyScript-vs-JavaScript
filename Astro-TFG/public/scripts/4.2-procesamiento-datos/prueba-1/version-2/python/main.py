@@ -19,8 +19,7 @@ def sort_data_structure(arr):
 
 
 def search_in_data_structure(arr, value):
-    data_set = set(arr)
-    return value in data_set
+    return np.any(arr == value)
 
 
 def filter_data_structure(arr, threshold):

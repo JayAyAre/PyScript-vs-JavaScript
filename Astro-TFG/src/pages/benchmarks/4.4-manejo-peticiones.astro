@@ -1,0 +1,41 @@
+---
+import '../../styles/global.css';
+import Layout from '../../layouts/BenchmarkLayout.astro';
+
+const benchmark = {
+    title: '4. Manejo múltiples solicitudes concurrentes',
+    link: '/4.4-manejo-peticiones',
+    description:
+        'Este apartado permitira evaluar el funcionamiento de ambas tecnologias en el manejo de peticiones HTTP, que permiten realizar operaciones concurrentes en diferentes partes del mismo servidor. Tambien por otro lado, podremos observar su funcionamiento utilizando peticiones mediante WebSockets.',
+    warning:
+        'En estos escenarios se emplean WebWorkers, por lo que no se bloquearan las pruebas mientras se ejecutan. Sin embargo, siempre que se use PyScript, seguira existiendo el PLT.',
+    tests: [
+        {
+            title: 'Solicitudes concurrentes con Fetch/Promise.all (JavaScript) vs Asyncio/Fetch (PyScript)',
+            description:
+                'Esta prueba comparara el tiempo total y la capacidad de concurrencia al hacer multiples solicitudes a un servidor',
+            versions: [
+                {
+                    title: 'Version optimizada',
+                    description:
+                        'Esta prueba unicamente incluye una version, una version la cual seria la mas optimizada para simular un codigo del mundo real. Esta prueba permitira cambiar el numero de peticiones y el tiempo de espera entre ellas, siendo ejecutados por un unico worker, esto ultimo nos permite simular un delay que representa tiempo de trabajo del servidor en el mundo real.',
+                },
+            ],
+        },
+        {
+            title: 'Manejo de WebSockets para solicitudes concurrentes en JavaScript vs PyScript',
+            description:
+                'Esta prueba permitira evaluar el funcionamiento de ambas tecnologias en el manejo de peticiones mediante WebSockets a un servidor.',
+            versions: [
+                {
+                    title: 'Version optimizada',
+                    description:
+                        'Esta prueba contiene una unica version que representa un codigo de la forma mas optimizada posible para simular un codigo del mundo real. Igual que en la version anterior, se mediran las mismas metricas ademas de tener en cuenta que seran peticiones mediante WebSockets.',
+                },
+            ],
+        },
+    ],
+};
+---
+
+<Layout {...benchmark} />
