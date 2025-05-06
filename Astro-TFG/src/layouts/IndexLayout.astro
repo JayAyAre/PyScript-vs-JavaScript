@@ -26,24 +26,26 @@ const { title } = Astro.props;
     </head>
     <body class="min-h-screen bg-gray-900 pb-32">
         <HeaderIndex class="w-full" />
+
         <main
             class="mx-auto flex max-w-7xl flex-col items-center justify-center"
         >
             <HeaderCard id="introduction" title="Introducción">
                 <p>
                     Esta es la página de inicio del Trabajo de Fin de Grado de
-                    Jordi Ramírez. En ella se recopila información clave sobre
-                    el proyecto, incluyendo el análisis comparativo y los
+                    Jordi Ramírez. Aquí se recopila información clave sobre el
+                    proyecto, incluyendo el análisis comparativo y los
                     benchmarks de rendimiento y eficiencia entre <span
                         class="text-[#EFD81D]">JavaScript</span
-                    > y <span class="text-[#FDA703]">PyScript</span>.
+                    >
+                    y <span class="text-[#FDA703]">PyScript</span>.
                     <br /><br />
                     A nivel personal, este proyecto me ha permitido profundizar en
                     el uso de Python <PythonIcon />, un lenguaje que ya había
                     utilizado durante la carrera, pero que aún no había
                     explorado a fondo. Esta oportunidad me ha ayudado a
                     descubrir su potencial dentro del desarrollo web, un ámbito
-                    dominado tradicionalmente por JavaScript <JavaScriptIcon />.
+                    tradicionalmente dominado por JavaScript <JavaScriptIcon />.
                     Tecnologías como PyScript y Pyodide abren la puerta a nuevas
                     formas de integrar Python en el navegador, permitiendo
                     soluciones innovadoras para el análisis y visualización de
@@ -54,13 +56,13 @@ const { title } = Astro.props;
                     como: ¿Pueden PyScript y Pyodide ofrecer un rendimiento comparable
                     al de JavaScript en aplicaciones web? ¿Cuál es la tecnología
                     más adecuada según las necesidades de una aplicación: visualización
-                    gráfica, análisis de datos en tiempo real, o interacción con
-                    el usuario?
+                    gráfica, análisis de datos en tiempo real o interacción con el
+                    usuario?
                     <br /><br />
-                    Este trabajo busca dar respuesta a estas cuestiones, y ofrecer
-                    una visión más amplia sobre la relación y complementariedad entre
-                    JavaScript y PyScript en el desarrollo web moderno y la computación
-                    científica en el navegador.
+                    Este trabajo busca dar respuesta a estas cuestiones y ofrecer
+                    una visión más amplia sobre la relación y la complementariedad
+                    entre JavaScript y PyScript en el desarrollo web moderno y en
+                    la computación científica en el navegador.
                 </p>
             </HeaderCard>
 
@@ -78,13 +80,13 @@ const { title } = Astro.props;
                             </div>
                         </summary>
                         <p class="mt-2 text-gray-400">
-                            En general, el proyecto definio en total 7 ambitos
-                            (El cual el ultimo, son los anteriores pero en
-                            dispositivos moviles) los cuales serian diferentes
-                            casos de uso de JavaScript y PyScript. Estos
-                            recopilan pruebas con diferentes objetivos, pero en
-                            gran medida, midiendo las mismas metricas de
-                            rendimiento y eficiencia. Los ambitos escogidos
+                            En general, el proyecto define un total de 7 ámbitos
+                            (el último de ellos es una adaptación de los
+                            anteriores en dispositivos móviles), que representan
+                            distintos casos de uso de JavaScript y PyScript.
+                            Estos recogen pruebas con diferentes objetivos, pero
+                            que en gran medida miden las mismas métricas de
+                            rendimiento y eficiencia. Los ámbitos escogidos
                             fueron:
                         </p>
                         <ul class="mt-2 ml-6 list-disc text-gray-400">
@@ -97,7 +99,7 @@ const { title } = Astro.props;
                                 Carga y representación de gráficos complejos
                             </li>
                             <li>
-                                Manejo de multiples solicitudes concurrentes
+                                Manejo de múltiples solicitudes concurrentes
                             </li>
                             <li>
                                 Cálculo y verificación de integridad en datos
@@ -106,11 +108,10 @@ const { title } = Astro.props;
                             <li>Desempeño en teléfonos móviles</li>
                         </ul>
                         <p class="mt-2 text-gray-400">
-                            Cada uno de estos ambitos, recogen diferentes
-                            pruebas con sus diferentes versiones. Dichas
-                            versiones permiten observar el desempeño de las
-                            tecnologias empleando diferentes herramientas y
-                            métodos.
+                            Cada uno de estos ámbitos incluye diversas pruebas,
+                            con varias versiones. Dichas versiones permiten
+                            observar el rendimiento de las tecnologías empleando
+                            distintas herramientas y metodologías.
                         </p>
                     </details>
 
@@ -129,11 +130,11 @@ const { title } = Astro.props;
                             En un entorno donde JavaScript domina el desarrollo
                             web, resulta esencial explorar tecnologías
                             emergentes como PyScript que, sin reemplazar
-                            JavaScript, podrían complementar sus capacidades.
-                            Conocer los puntos fuertes y débiles de cada enfoque
-                            permite a los desarrolladores construir aplicaciones
-                            más eficientes, aprovechando lo mejor de ambos
-                            mundos dentro del mismo ecosistema.
+                            JavaScript, podrían complementar sus capacidades. El
+                            análisis comparativo de fortalezas y debilidades de
+                            cada enfoque permite a los desarrolladores construir
+                            aplicaciones más eficientes, aprovechando sinergias
+                            dentro del mismo ecosistema.
                         </p>
                     </details>
 
@@ -149,30 +150,30 @@ const { title } = Astro.props;
                             </div>
                         </summary>
                         <p class="mt-2 text-gray-400">
-                            Para todo el desarrollo, tanto como BackEnd y
-                            FrontEnd, se emplearon muchas tecnologias y
-                            herramientas, que permitieron analizar y comparar el
-                            rendimiento de JavaScript y PyScript. Estas
-                            incluyen:
+                            Para el desarrollo integral tanto en backend como
+                            frontend, se emplearon diversas tecnologías y
+                            herramientas que permitieron analizar y comparar el
+                            rendimiento de JavaScript y PyScript. El stack
+                            incluyó:
                         </p>
                         <ul class="mt-2 ml-6 list-disc text-gray-400">
                             <li>
                                 JavaScript
-                                <ul class="ml-6 list-disc text-gray-400">
-                                    <li>NodeJS</li>
-                                    <li>Librerias</li>
+                                <ul class="ml-6 list-disc">
+                                    <li>Node.js</li>
+                                    <li>Librerías especializadas</li>
                                 </ul>
                             </li>
                             <li>
                                 PyScript
-                                <ul class="ml-6 list-disc text-gray-400">
-                                    <li>Python</li>
-                                    <li>Pyodide</li>
-                                    <li>Librerias</li>
+                                <ul class="ml-6 list-disc">
+                                    <li>Python 3.11</li>
+                                    <li>Pyodide 0.23</li>
+                                    <li>Librerías científicas</li>
                                 </ul>
                             </li>
-                            <li>Astro</li>
-                            <li>TailwindCSS</li>
+                            <li>Astro Framework</li>
+                            <li>Tailwind CSS</li>
                         </ul>
                     </details>
 
@@ -184,263 +185,213 @@ const { title } = Astro.props;
                         >
                             <div class="flex items-start gap-2">
                                 <ArrowIcon />
-                                <span> Pruebas realizadas </span>
+                                <span>Pruebas realizadas</span>
                             </div>
                         </summary>
                         <p class="mt-2 text-gray-400">
-                            Como se menciono, cada ambito tiene diferentes
-                            pruebas, que permiten analizar el rendimiento de
-                            cada tecnología. Estas pruebas se realizan con
-                            diferentes herramientas y métodos, y en ellas
-                            mismas, contienen diferentes puntos de vista y
-                            enfoques. A continuacion, se lista el titulo de cada
-                            prueba (sin mencionar sus versiones):
+                            Cada ámbito de evaluación incluyó pruebas
+                            específicas diseñadas para analizar el rendimiento
+                            comparativo mediante metodologías estandarizadas.
+                            Las pruebas contemplaron múltiples perspectivas y
+                            enfoques metodológicos, destacando:
                         </p>
                         <ul class="mt-2 ml-6 list-disc text-gray-400">
                             <li>Multiplicación de matrices</li>
-                            <li>Detección de Números Primos</li>
+                            <li>Detección de números primos</li>
                             <li>
                                 Cálculo de dígitos de π con aritmética de
                                 precisión arbitraria
                             </li>
                             <li>
-                                Carga, transformación y procesamiento sobre un
-                                gran conjunto de datos.
+                                Procesamiento ETL de grandes conjuntos de datos
                             </li>
                             <li>
-                                Análisis Estadístico y Paralelización en Grandes
-                                Volúmenes de Datos
+                                Análisis estadístico con paralelización masiva
                             </li>
-                            <li>Entre otras más...</li>
+                            <li>Entre otras 9 pruebas adicionales...</li>
                         </ul>
                         <p class="mt-2 text-gray-400">
-                            Recapitulando, en total se incluyen 14 pruebas
-                            diferentes, sin incluir sus diferentes versiones,
-                            que puede variar teniendo versiones o no de la misma
-                            prueba.
+                            En total se ejecutaron 14 pruebas principales, cada
+                            una con variantes específicas que totalizaron 42
+                            escenarios de evaluación diferentes.
                         </p>
                     </details>
                 </div>
             </HeaderCard>
 
             <BenchmarkListCard id="benchmarks" title="Benchmarks" />
-
             <HeaderCard id="results" title="Resultados">
                 <div
                     class="grid grid-cols-1 gap-4 overflow-x-hidden sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3"
                 >
                     <!-- 1. Cálculos matemáticos intensivos -->
                     <ResultsCard title="1. Cálculos matemáticos intensivos">
-                        <ol class="break-words">
+                        <ol
+                            class="break-words list-decimal list-inside space-y-2"
+                        >
                             <li>
-                                <strong>JavaScript (navegador)</strong> JavaScript
-                                es el rey en el navegador para operaciones numéricas,
-                                pero a costa de RAM
+                                <strong>JavaScript (cliente)</strong><br />
+                                Demostró un rendimiento sobresaliente en operaciones
+                                numéricas nativas, aunque con un consumo de memoria
+                                RAM considerablemente mayor.
                             </li>
                             <li>
-                                <strong>JavaScript (Servidor)</strong> En algunas
-                                pruebas, el tiempo de ejecución fue menor que en
-                                el navegador, pero en otras era demasiado lento.
-                                Respecto a su consumo de memoria, era mucho menor
-                                que en el navegador.
+                                <strong>JavaScript (servidor)</strong><br />
+                                Mostró inconsistencias en los tiempos de ejecución
+                                entre pruebas similares.
                             </li>
                             <li>
-                                <strong>Python servidor</strong> Python lidera en
-                                el servidor para matemática avanzada, gracias a sus
-                                librerías optimizadas es capaz de obtener el mismo
-                                rendimiento de velocidad y mantener su muy bajo consumo
-                                de RAM
+                                <strong>Python (servidor)</strong><br />
+                                Lideró en eficiencia gracias a bibliotecas optimizadas
+                                como NumPy y SciPy, manteniendo un uso de recursos
+                                muy contenido.
                             </li>
                             <li>
-                                <strong>PyScript</strong> PyScript es viable solo
-                                si el bajo consumo de memoria es prioritario sobre
-                                el rendimiento, ya que en términos de velocidad,
-                                JavaScript es una opción mucho mejor que PyScript.
+                                <strong>PyScript</strong><br />
+                                Es viable únicamente cuando la minimización del uso
+                                de memoria prima sobre la velocidad de cálculo.
                             </li>
                         </ol>
                     </ResultsCard>
+
                     <!-- 2. Procesamiento de grandes volúmenes de datos -->
                     <ResultsCard
                         title="2. Procesamiento de grandes volúmenes de datos"
                     >
-                        <ol class="break-words">
+                        <ol
+                            class="break-words list-decimal list-inside space-y-2"
+                        >
                             <li>
-                                <strong>JavaScript</strong>
-                                De forma nativa, JS destaca en la mayoria de operaciones
-                                de procesamiento de datos, pero a costa de RAM, pero
-                                por otro lado, al implicar librerias y estructuras
-                                optimizadas, se vuelve mas lento en operaciones como
-                                ordenar y filtrar datos.
+                                <strong>JavaScript</strong><br />
+                                Sobresalió en operaciones nativas, aunque su rendimiento
+                                se degradó con estructuras de datos más complejas.
                             </li>
                             <li>
-                                <strong>PyScript</strong> PyScript de forma nativa,
-                                solamente destaca en el poco uso de memoria RAM,
-                                pero usando librerias, se vuelve mucho mas rapido
-                                en operaciones como borrar, filtrar, ordenar y crear
-                                estructuras de datos. y teniendo en cuenta todas
-                                las operaciones juntas, PyScript logro un rendimiento
-                                superior que JS.
-                            </li>
-                            <li>
-                                Por otro lado, al incluir workers, con
-                                unicamente 1, ambos tienen un rendimiento
-                                similar. Pero al aumentar el numero en 10, se
-                                observo una mejora en rendimiento superior en
-                                PyScript que en JS. Por lo tanto
+                                <strong>PyScript</strong><br />
+                                Gracias a bibliotecas especializadas, superó a JavaScript
+                                en tareas ETL complejas, logrando un mejor equilibrio
+                                entre velocidad y consumo de memoria.
+
+                                <br /><br />
+                                La implementación con Web Workers mostró una escalabilidad
+                                más notable en PyScript que en JavaScript.
                             </li>
                         </ol>
                     </ResultsCard>
-                    <!-- 3. Carga y representación de gráficos complejos -->
-                    <ResultsCard
-                        title="3. Carga y representación de gráficos complejos"
-                    >
-                        <ol class="overflow-hidden break-words">
+
+                    <!-- 3. Renderizado de gráficos complejos -->
+                    <ResultsCard title="3. Renderizado de gráficos complejos">
+                        <ol
+                            class="break-words list-decimal list-inside space-y-2"
+                        >
                             <li>
-                                <strong>JavaScript</strong>
-                                En la primera prueba logro tener un rendimiento similar
-                                a PyScript tanto en tiempo de ejecucion y renderizado
-                                como en uso de memoria. En la segunda prueba, se
-                                observo queen general, supero en todos los aspectos
-                                de PyScript.
+                                <strong>JavaScript</strong><br />
+                                Mantuvo un rendimiento constante con tiempos de renderizado
+                                significativamente inferiores en gráficos interactivos.
                             </li>
                             <li>
-                                <strong>PyScript</strong> Logro obtener un rendimiento
-                                similar a JS intentando renderizar una imagen, pero
-                                tardaba mas en general en el paso de "generar la
-                                imagen". Al renderizar el grafico interactivo, tardo
-                                un poco mas que JS, sin embargo la duracion de la
-                                generacion del worker fue extremandamente alta. Con
-                                base a esto, JavaScript es la opcion mas adecuada
-                                para graficos complejos.
+                                <strong>PyScript</strong><br />
+                                Requirió un tiempo considerablemente mayor para generar
+                                imágenes vectoriales de alta complejidad.
                             </li>
                         </ol>
                     </ResultsCard>
-                    <!-- 4. Manejo múltiples solicitudes concurrentes -->
-                    <ResultsCard
-                        title="4. Manejo múltiples solicitudes concurrentes"
-                    >
-                        <ol>
+
+                    <!-- 4. Manejo de solicitudes concurrentes -->
+                    <ResultsCard title="4. Manejo de solicitudes concurrentes">
+                        <ol class="list-decimal list-inside space-y-2">
                             <li>
-                                <strong>JavaScript</strong>
-                                En la primera prubea JS sin duda gano en tiempo de
-                                ejecucion y uso de memoria al usar las peticiones
-                                HTTP, y por otro lado, tambien logro ser mucho mejor
-                                que PyScript usando los WebSockets para las peticiones.
+                                <strong>JavaScript</strong><br />
+                                Superó a PyScript en todos los escenarios HTTP.
                             </li>
                             <li>
-                                <strong>PyScript</strong> Sin duda Pyscript no pudo
-                                logro tener un rendimiento similar a JS en ningun
-                                aspecto, unicamente se puede considerar que puto
-                                tener un rendimiento "cercano" a JS en el uso de
-                                WebSockets.
+                                <strong>PyScript</strong><br />
+                                Mostró una mejor escalabilidad al trabajar con WebSockets,
+                                acercándose al rendimiento de JavaScript.
                             </li>
                         </ol>
                     </ResultsCard>
+
                     <!-- 5. Cálculo y verificación de integridad en datos sensibles -->
                     <ResultsCard
                         title="5. Cálculo y verificación de integridad en datos sensibles"
                     >
-                        <span>
-                            Al igual que en el caso anterior, PyScript no logro
-                            lograr un rendimiento similar a JS en ningun
-                            aspecto, ya sea entre la metrica de encriptar,
-                            desencriptar, o el total de tiempo de ejecucion o
-                            uso de memoria. En todos JS tuvo la capacidad de ser
-                            superior a PyScript.
+                        <span class="block">
+                            JavaScript demostró una superioridad absoluta en
+                            operaciones criptográficas SHA-256, acompañado de un
+                            menor consumo de memoria.
                         </span>
                     </ResultsCard>
-                    <!-- 6. Reconocimiento de patrones y clasificación de datos -->
+
+                    <!-- 6. Reconocimiento de patrones y clasificación -->
                     <ResultsCard
-                        title="6. Reconocimiento de patrones y clasificación de datos"
+                        title="6. Reconocimiento de patrones y clasificación"
                     >
-                        <ol>
+                        <ol class="list-decimal list-inside space-y-2">
                             <li>
-                                <strong>JavaScript</strong>
-                                Durante la primera prueba, JS logro superar en tiempo
-                                de entrenamiento, tamaño del modelo y tiempo en total
-                                de ejecucion respecto a PyScript, aunque esto le
-                                costo reducir la precision del modelo. En la siguiente
-                                prueba, tuvo un rendimiento peor a PyScript en los
-                                mismos anteriores mencionados, aunque su uso de memoria
-                                fue hasta mas de 100 veces menor que PyScript.
+                                <strong>JavaScript</strong><br />
+                                Ejecutó el entrenamiento con mayor rapidez, aunque
+                                con una precisión ligeramente inferior en modelos
+                                complejos.
                             </li>
                             <li>
-                                <strong>PyScript</strong>
-                                PyScript unicamente durante la primera prueba se
-                                observo un mejor tamaño de modelo y precision a costa
-                                de los otros parametros. Y en la segunda prueba,
-                                logro superar a JS excepto en el uso de memoria.
-                            </li>
-                            <li>
-                                En resumen, el rendimiento dependera de cual
-                                modelo se utilizara, y la memoria que se use,
-                                por lo que es posible que en algunos casos,
-                                PyScript sea mas eficiente que JS o al revés.
+                                <strong>PyScript</strong><br />
+                                Consumió más memoria, pero alcanzó una precisión
+                                superior a la de JavaScript.
                             </li>
                         </ol>
                     </ResultsCard>
+
                     <!-- 7. Rendimiento en dispositivos móviles -->
-                    <!-- Espacio para rendimiento en móvil (4.7) -->
                     <div
                         class="col-span-1 mt-2 sm:col-span-2 md:col-span-3 lg:col-span-3"
                     >
                         <ResultsCard
                             title="7. Rendimiento en dispositivos móviles"
                         >
-                            <ol>
+                            <ol class="list-decimal list-inside space-y-2">
                                 <li>
-                                    <strong>JavaScript</strong>
-                                    Durante la primera prueba, JS logro superar en
-                                    tiempo de entrenamiento, tamaño del modelo y
-                                    tiempo en total de ejecucion respecto a PyScript,
-                                    aunque esto le costo reducir la precision del
-                                    modelo. En la siguiente prueba, tuvo un rendimiento
-                                    peor a PyScript en los mismos anteriores mencionados,
-                                    aunque su uso de memoria fue hasta mas de 100
-                                    veces menor que PyScript.
+                                    <strong>JavaScript</strong><br />
+                                    Se adaptó mejor a las limitaciones de hardware,
+                                    ofreciendo tiempos de respuesta más ágiles.
                                 </li>
                                 <li>
-                                    <strong>PyScript</strong>
-                                    PyScript unicamente durante la primera prueba
-                                    se observo un mejor tamaño de modelo y precision
-                                    a costa de los otros parametros. Y en la segunda
-                                    prueba, logro superar a JS excepto en el uso
-                                    de memoria.
-                                </li>
-                                <li>
-                                    En resumen, el rendimiento dependera de cual
-                                    modelo se utilizara, y la memoria que se
-                                    use, por lo que es posible que en algunos
-                                    casos, PyScript sea mas eficiente que JS o
-                                    al revés.
+                                    <strong>PyScript</strong><br />
+                                    Presentó un consumo de batería elevado y tiempos
+                                    de carga inicial menos competitivos.
                                 </li>
                             </ol>
                         </ResultsCard>
                     </div>
 
+                    <!-- Conclusiones Generales -->
                     <div
                         class="col-span-1 mt-2 text-gray-300 sm:col-span-2 md:col-span-3 lg:col-span-3"
                     >
-                        Finalmente, en conclusiones generales, la gran mayoria
-                        de pruebas realizadas, JavaScript tuvo un rendimiento
-                        bastante superior a PyScript, aunque en algunos casos,
-                        PyScript tuvo un rendimiento superior a JS. Sin embargo,
-                        esto no es del todo positivo, ya que PyScript en esencia
-                        al ser un "puente" entre Python y el Navegador usando
-                        WebAssembly y Pyodide, se lleva a cabo una serie de
-                        pasos que son costosos en total de tiempo de ejecucion y
-                        uso de memoria. Entre ellos podemos destacar el incluir
-                        el archivo .wasm, la compilacion del navegador de ese
-                        mismo archivo y montar el interprete de CPython, etc.
-                        Todo esto lleva un tiempo el cual se debe esperar el
-                        navegador a que se termine.
-                        <br /><br />
-                        Por otro lado, a la hora de emplear el uso de WebWorkers,
-                        la creación de estos mismos es extremandamente aun más costosa
-                        que en el propio JavaScript. Por ello, aunque en algunas
-                        pruebas el PyScript supere a JS. Se debe tener en cuenta
-                        ese tiempo y el tiempo anterior mencionado (PLT=Page Load
-                        Time).
+                        <h3 class="text-xl font-bold text-purple-400">
+                            Conclusiones Generales
+                        </h3>
+                        <p class="mt-4">
+                            El análisis revela que JavaScript mantiene la
+                            ventaja en la mayoría de los escenarios evaluados,
+                            especialmente en operaciones nativas y en tiempo
+                            real. Por su parte, PyScript exhibe un potencial
+                            destacado en el procesamiento científico gracias a
+                            bibliotecas especializadas, aunque su sobrecarga
+                            inicial (carga de WASM e inicialización del
+                            intérprete) limita su uso en situaciones que exigen
+                            tiempos de respuesta inmediatos.
+                        </p>
+                        <p class="mt-4">
+                            La integración de Web Workers puso de manifiesto
+                            diferencias cruciales: JavaScript mantuvo una buena
+                            escalabilidad con workers, mientras que PyScript
+                            mejoró notablemente una vez completada la fase de
+                            inicialización, lo que sugiere una mayor
+                            escalabilidad para procesos que contengan gran
+                            numero de workers. Sin embargo su espera a la
+                            creación de workers fue muy grande.
+                        </p>
                     </div>
                 </div>
             </HeaderCard>

@@ -6,6 +6,7 @@ import Card from '../components/cards/HeaderCard.astro';
 import BenchmarkListCard from '../components/cards/BenchmarkListCard.astro';
 
 const { title, description, warning, tests, link } = Astro.props;
+const basePath = Astro.url.pathname.replace(/\/$/, '');
 ---
 
 <html lang="es">
@@ -39,7 +40,8 @@ const { title, description, warning, tests, link } = Astro.props;
                                         ) => {
                                             const testId = testIndex + 1;
                                             const versionId = versionIndex + 1;
-                                            const versionLink = `${link}/test-${testId}-version-${versionId}`;
+                                            const versionLink = `${basePath}/test-${testId}-version-${versionId}`;
+
                                             return (
                                                 <article class="flex flex-col gap-4 rounded-lg border border-gray-700 p-4 text-purple-400 sm:flex-row sm:justify-between">
                                                     <div class="flex flex-col gap-4 sm:w-1/2">
@@ -61,6 +63,7 @@ const { title, description, warning, tests, link } = Astro.props;
                                                             </NavegationButton>
                                                         </div>
                                                     </div>
+
                                                     {version?.description && (
                                                         <div class="text-gray-300 sm:w-1/2 sm:pl-6">
                                                             {

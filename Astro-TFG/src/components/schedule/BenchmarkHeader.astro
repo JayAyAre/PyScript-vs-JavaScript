@@ -2,7 +2,7 @@
 // Importación de componentes y declaración de variables
 const { title, description, warning } = Astro.props;
 const benchmarks = [
-    ['Calculos matemáticos', '4.1-calculos-matematicos'],
+    ['Cálculos matemáticos', '4.1-calculos-matematicos'],
     ['Procesamiento de grandes volúmenes de datos', '4.2-procesamiento-datos'],
     [
         'Carga y representación de gráficos complejos',
@@ -12,6 +12,7 @@ const benchmarks = [
     ['Criptografía', '4.5-criptografia'],
     ['Patrones', '4.6-patrones'],
 ];
+
 const isOnBenchmarksPage =
     Astro.url.pathname.startsWith('/benchmarks') ||
     location.pathname.startsWith('/benchmarks');
@@ -31,7 +32,7 @@ import NavegationButton from '../schedule/NavegationButton.astro';
 
             {
                 warning && (
-                    <div class="mt-2 rounded-lg border border-gray-700 bg-gray-800 p-2 p-4 text-justify text-yellow-300">
+                    <div class="mt-2 rounded-lg border border-gray-700 bg-gray-800 p-4 text-justify text-yellow-300">
                         <small>{warning}</small>
                     </div>
                 )
@@ -40,12 +41,12 @@ import NavegationButton from '../schedule/NavegationButton.astro';
 
         <!-- Fila de botones -->
         <div class="flex flex-row gap-2">
-            <NavegationButton ref="/"
-                ><slot name="home">Inicio</slot></NavegationButton
-            >
+            <NavegationButton ref="/">
+                <slot name="home">Inicio</slot>
+            </NavegationButton>
             <div class="group relative w-full sm:w-auto">
                 <button
-                    class="ease-in-outgroup-hover:bg-slate-700 flex w-full items-center justify-center gap-2 rounded-lg px-5 py-2 text-white opacity-70 transition-all duration-200 group-hover:text-purple-400 group-hover:opacity-100 hover:shadow-lg"
+                    class="ease-in-out group-hover:bg-slate-700 flex w-full items-center justify-center gap-2 rounded-lg px-5 py-2 text-white opacity-70 transition-all duration-200 group-hover:text-purple-400 group-hover:opacity-100 hover:shadow-lg"
                 >
                     <svg
                         viewBox="0 0 24 24"
@@ -68,7 +69,7 @@ import NavegationButton from '../schedule/NavegationButton.astro';
                                 : benchmark[1] ||
                                   `/benchmarks/${benchmark[1].toLowerCase().replace(/\s+/g, '-')}`;
                             return (
-                                <li class="round rounded-lg">
+                                <li class="rounded-lg">
                                     <a
                                         href={link}
                                         class="flex items-center gap-2 px-4 py-2 opacity-70 transition-all duration-200 ease-in-out hover:cursor-pointer hover:rounded-lg hover:bg-slate-700 hover:text-purple-400 hover:opacity-100 hover:shadow-lg focus:ring focus:ring-purple-400"

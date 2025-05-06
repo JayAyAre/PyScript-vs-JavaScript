@@ -1,0 +1,20 @@
+---
+import { tests as testData } from '../../../data/tests';
+import BenchmarkLayout from '../../../layouts/BenchmarkLayout.astro';
+import '../../../styles/global.css';
+
+export async function getStaticPaths() {
+    return testData.map((benchmark) => ({
+        params: { test: benchmark.link },
+    }));
+}
+
+const { params } = Astro;
+const currentBenchmark = testData.find((b) => b.link === params.test);
+
+if (!currentBenchmark) {
+    throw new Error(`Benchmark no encontrado para ${params.test}`);
+}
+---
+
+<BenchmarkLayout {...currentBenchmark} />
