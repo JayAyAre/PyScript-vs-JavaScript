@@ -1,0 +1,64 @@
+---
+// src/pages/benchmarks/[test]/[version]/index.astro
+import { tests as testData } from '../../../../data/tests';
+import VersionLayout from '../../../../layouts/VersionLayout.astro';
+import '../../../../styles/global.css';
+
+export async function getStaticPaths() {
+    const paths: { params: { test: string; version: string } }[] = [];
+
+    for (const benchmark of testData) {
+        const testName = benchmark.link;
+
+        benchmark.tests.forEach((test, testIndex) => {
+            test.versions.forEach((_, versionIndex) => {
+                const versionId = `test-${testIndex + 1}-version-${versionIndex + 1}`;
+                paths.push({ params: { test: testName, version: versionId } });
+            });
+        });
+    }
+
+    return paths;
+}
+
+const params = Astro.params as { test: string; version: string };
+
+// Buscar benchmark por su `link`
+const currentBenchmark = testData.find((b) => b.link === params.test);
+
+if (!currentBenchmark) {
+    throw new Error(`Benchmark no encontrado para ${params.test}`);
+}
+
+// Extraer índices de la versión a partir de "test-1-version-1"
+const [_, testNumStr, __, versionNumStr] = params.version.split('-');
+
+// Extraemos el número de prueba y la versión:
+const testIndex = parseInt(testNumStr, 10) - 1;
+const versionIndex = parseInt(versionNumStr, 10) - 1;
+const versionDir = `version-${versionNumStr}`; // "version-1"
+const pruebaDir = `prueba-${testIndex + 1}`;
+
+// Base pública:
+const basePublic = `/scripts/${params.test}/${pruebaDir}/${versionDir}`;
+
+// Rutas finales:
+const jsPath = `${basePublic}/javascript/`;
+const pyPath = `${basePublic}/python/`;
+
+const test = currentBenchmark.tests[testIndex];
+const version = test?.versions?.[versionIndex];
+
+if (!test || !version) {
+    throw new Error(`Versión de prueba no encontrada para ${params.version}`);
+}
+---
+
+<VersionLayout
+    benchmarkTitle={currentBenchmark.title}
+    testTitle={test.title}
+    versionTitle={version.title}
+    versionDescription={version.description}
+    jsPath={jsPath}
+    pyPath={pyPath}
+/>

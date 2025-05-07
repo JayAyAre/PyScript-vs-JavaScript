@@ -61,7 +61,7 @@ export const tests = [
         ],
     },
     {
-        title: '2. Proceamiento de grandes volúmenes de datos',
+        title: '2. Procesamiento de grandes volúmenes de datos',
         link: '4.2-procesamiento-datos',
         description:
             'Estas pruebas medirán la capacidad de cada tecnologia para manejar y procesar grandes cantidades de datos. Se analizarán diversos escenarios que involucren manipulación de estructuras de datos a gran escala, carga masiva de información y ejecución de algoritmos de procesamiento intensivo.',

@@ -47,3 +47,6 @@ def multiply_matrices(size):
 def run_py_benchmark(event):
     js.clearCell('pyscript-output')
     multiply_matrices(300)
+
+
+js.window.run_py_benchmark = run_py_benchmark

@@ -56,9 +56,10 @@ function multiplyMatrices(size) {
     let resultDiv = document.createElement("div");
     resultDiv.textContent = result;
     document.getElementById("javascript-output").appendChild(resultDiv);
+    document.getElementById('loading-message').style.display = 'none';
 }
 
-function runJSBenchmark() {
+window.runJSBenchmark = function () {
     clearCell("javascript-output");
     document.getElementById("javascript-output").textContent = ""
     multiplyMatrices(300);

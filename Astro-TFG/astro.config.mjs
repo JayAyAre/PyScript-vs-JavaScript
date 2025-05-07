@@ -7,4 +7,5 @@ export default defineConfig({
     vite: {
         plugins: [tailwindcss()],
     },
+    output: 'server',  // Añadir esta línea para habilitar la renderización en el servidor
 });
