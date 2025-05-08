@@ -1,12 +1,5 @@
-const express = require("express");
-const cors = require("cors");
-const os = require("os");
-const osu = require("node-os-utils");
-
-const app = express();
-const port = 3000;
-
-app.use(cors());
+import osu from 'node-os-utils';
+import { performance } from 'perf_hooks';
 
 const cpu = osu.cpu;
 
@@ -27,10 +20,8 @@ async function multiplyMatrices(size) {
     let C = new Array(size).fill(0).map(() => new Array(size).fill(0));
 
     const startMemory = process.memoryUsage().heapUsed;
-
-    let startReal = performance.now();
-
-    let cpuAvg = await cpu.usage();
+    const cpuAvg = await cpu.usage();
+    const startReal = performance.now();
 
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
@@ -42,33 +33,25 @@ async function multiplyMatrices(size) {
         }
     }
 
-    let endReal = performance.now();
-
-    // ET (Execution Time)
-
-    let executionTime = (endReal - startReal).toFixed(2);
-
-    // CPU
-
-    let cpuUsage = cpuAvg.toFixed(2);
-
-    // RAM
-
+    const endReal = performance.now();
     const endMemory = process.memoryUsage().heapUsed;
-    const memoryUsage = ((endMemory - startMemory) / (1024 * 1024)).toFixed(2);
+
+    const time = (endReal - startReal).toFixed(2);
+    const cpu_usage = ((endMemory - startMemory) / (1024 * 1024)).toFixed(2);
+    const memory_usage = cpuAvg.toFixed(2);
 
     return {
-        executionTime: executionTime,
-        cpuUsage: cpuUsage,
-        memoryUsage: memoryUsage
+        time: time,
+        cpu_usage: cpu_usage,
+        memory_usage: memory_usage
     };
 }
 
-app.get("/", async (req, res) => {
-    let result = await multiplyMatrices(300);
-    res.json(result);
-});
-
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+(async () => {
+    const result = await multiplyMatrices(300);
+    const results = {
+        type: null,
+        data: result
+    };
+    console.log(JSON.stringify(results));
+})();

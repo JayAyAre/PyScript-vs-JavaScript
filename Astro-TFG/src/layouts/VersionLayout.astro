@@ -1,4 +1,6 @@
 ---
+import ft from 'fs';
+import path from 'path';
 import Header from '../components/schedule/BenchmarkHeader.astro';
 import Footer from '../components/schedule/Footer.astro';
 
@@ -9,6 +11,8 @@ const {
     versionDescription,
     jsPath,
     pyPath,
+    jsLibs,
+    pyConfig,
 } = Astro.props;
 ---
 
@@ -24,13 +28,26 @@ const {
         <script
             type="module"
             src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+        {jsLibs.map((src: string) => <script src={src} />)}
+
         <script type="module" src={`${jsPath}main.js`} defer></script>
-        <script type="py" src={`${pyPath}main.py`}></script>
+        {
+            pyConfig ? (
+                <script
+                    type="py"
+                    src={`${pyPath}main.py`}
+                    config={`${pyPath}${pyConfig}`}
+                />
+            ) : (
+                <script type="py" src={`${pyPath}main.py`} />
+            )
+        }
     </head>
     <body
         class="min-h-screen bg-gray-900 text-white"
         data-js-path={jsPath}
         data-py-path={pyPath}
+        data-py-config={pyConfig}
     >
         <Header
             title={testTitle}
@@ -48,7 +65,7 @@ const {
         </div>
         <div
             id="loading-message"
-            class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-900 bg-opacity-90 text-white"
+            class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-900/80 bg-opacity-90 text-white"
             style="display: none;"
         >
             <div
@@ -160,9 +177,14 @@ const {
     <script>
         let jsPath = document.body.dataset.jsPath;
         let pyPath = document.body.dataset.pyPath;
+        let pyConfig = document.body.dataset.pyConfig;
+        console.log('script:', { pyPath, pyConfig });
 
         jsPath = jsPath?.concat('server.js');
         pyPath = pyPath?.concat('server.py');
+
+        console.log('jsPath:', { jsPath });
+        console.log('pyPath:', { pyPath });
 
         let startTime = performance.now();
         document.addEventListener('py:ready', () => {
@@ -182,10 +204,14 @@ const {
 
         let startTimerWebAssembly: number = 0;
         function showExecutionLoader() {
-            document.getElementById('loading-message').style.display = 'flex';
+            let loadingMessage = document.getElementById('loading-message');
+            if (!loadingMessage) return;
+            loadingMessage.style.display = 'flex';
         }
         function hideExecutionLoader() {
-            document.getElementById('loading-message').style.display = 'none';
+            let loadingMessage = document.getElementById('loading-message');
+            if (!loadingMessage) return;
+            loadingMessage.style.display = 'none';
         }
 
         window.runPy = function () {
@@ -221,86 +247,78 @@ const {
             element.textContent = '';
         };
 
-        // window.runPyBackendBenchmark = function () {
-        //     clearCell('pythonBackend-output');
-        //     fetch('http://localhost:5000/')
-        //         .then((response) => response.json())
-        //         .then((data) => {
-        //             const outputDiv = document.getElementById(
-        //                 'pythonBackend-output'
-        //             );
-
-        //             if (!outputDiv) return;
-
-        //             const timeDiv = document.createElement('div');
-        //             timeDiv.textContent = `ET: ${data.time} ms`;
-        //             outputDiv.appendChild(timeDiv);
-
-        //             const cpuDiv = document.createElement('div');
-        //             cpuDiv.textContent = `CPU: ${data.cpu_usage} %`;
-        //             outputDiv.appendChild(cpuDiv);
-
-        //             const memoryDiv = document.createElement('div');
-        //             memoryDiv.textContent = `RAM: ${data.memory_usage} MB`;
-        //             outputDiv.appendChild(memoryDiv);
-        //         })
-        //         .catch((error) => console.error('Error:', error));
-        // };
-        console.log('jsPath:', { jsPath });
-        console.log('pyPath:', { pyPath });
-
         window.runNodeBenchmark = function () {
             clearCell('nodeJs-output');
             const cleanedPath = encodeURIComponent(jsPath.replace(/^\/+/, ''));
-            const url = `/api/run-backend?type=node&path=${cleanedPath}`;
-            console.log('[Client] GET →', url);
 
-            fetch('http://localhost:4321/api/run-backend', {
+            fetch('/api/run-backend', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: 'Juan' }),
+                body: JSON.stringify({
+                    type: 'node',
+                    path: cleanedPath.toString(),
+                }),
             })
                 .then((response) => response.json())
-                .then((data) => console.log(data.message))
+                .then((data) => {
+                    const type = data.type; // Leemos el tipo de la respuesta
+                    console.log('Received type:', type); // Esto te ayudará a verificar
+                    if (type === 'matrix') {
+                        import('../scripts/MatrixDisplay.js')
+                            .then((module) => {
+                                module.display(data, 'nodeJs-output');
+                            })
+                            .catch((error) => {
+                                console.error('Error loading module:', error);
+                            });
+                    } else {
+                        import('../scripts/GenericDisplay.js')
+                            .then((module) => {
+                                module.display(data, 'nodeJs-output');
+                            })
+                            .catch((error) => {
+                                console.error('Error loading module:', error);
+                            });
+                    }
+                })
                 .catch((error) => console.error('Error:', error));
-            // fetch(url)
-            //     .then((res) => {
-            //         if (!res.ok) {
-            //             // Si no es 2xx, parseamos el JSON de error
-            //             return res.json().then((err) => {
-            //                 throw new Error(err.error || `HTTP ${res.status}`);
-            //             });
-            //         }
-            //         return res.json();
-            //     })
-            //     .then((data) => {
-            //         console.log('[Client] Response:', data);
-            //         document.getElementById('nodeJs-output').innerText =
-            //             `ET: ${data.time} ms\n\n${data.output}`;
-            //     })
-            //     .catch((err) => {
-            //         console.error('[Client] Fetch error:', err);
-            //         document.getElementById('nodeJs-output').innerText =
-            //             `Error: ${err.message}`;
-            //     });
         };
 
         window.runPyBackendBenchmark = function () {
-            const cleanedPath = pyPath.replace(/^\/+/, '');
             clearCell('pythonBackend-output');
-            console.log(
-                'URL generada:',
-                `/api/run-backend?type=node&path=${cleanedPath}`
-            );
+            const cleanedPath = encodeURIComponent(pyPath.replace(/^\/+/, ''));
 
-            fetch(`/api/run-backend?type=python&path=${cleanedPath}`)
-                .then((res) => res.json())
+            fetch('/api/run-backend', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'python',
+                    path: cleanedPath.toString(),
+                }),
+            })
+                .then((response) => response.json())
                 .then((data) => {
-                    const output = document.getElementById(
-                        'pythonBackend-output'
-                    );
-                    output.innerText = `ET: ${data.time} ms\n\n${data.output}`;
-                });
+                    const type = data.type; // Leemos el tipo de la respuesta
+
+                    if (type === 'matrix') {
+                        import('../scripts/MatrixDisplay.js')
+                            .then((module) => {
+                                module.display(data, 'pythonBackend-output');
+                            })
+                            .catch((error) => {
+                                console.error('Error loading module:', error);
+                            });
+                    } else {
+                        import('../scripts/GenericDisplay.js')
+                            .then((module) => {
+                                module.display(data, 'pythonBackend-output');
+                            })
+                            .catch((error) => {
+                                console.error('Error loading module:', error);
+                            });
+                    }
+                })
+                .catch((error) => console.error('Error:', error));
         };
     </script>
 </html>

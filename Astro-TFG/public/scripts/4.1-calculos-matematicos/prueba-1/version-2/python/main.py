@@ -49,3 +49,6 @@ def run_py_benchmark(event):
     multiply_matrices(500)
     multiply_matrices(1000)
     multiply_matrices(2000)
+
+
+js.window.run_py_benchmark = run_py_benchmark

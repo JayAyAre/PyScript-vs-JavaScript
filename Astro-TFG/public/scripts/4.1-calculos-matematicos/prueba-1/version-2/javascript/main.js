@@ -56,11 +56,9 @@ async function multiplyMatrices(size) {
     let memoryDiv = document.createElement("div");
     memoryDiv.textContent = getMemoryUsageJS();
     outputDiv.appendChild(memoryDiv);
-
-    outputDiv.appendChild(document.createElement("hr"));
 }
 
-async function runJSBenchmark() {
+window.runJSBenchmark = async function () {
     clearCell("javascript-output");
 
     await multiplyMatrices(500);

@@ -1,15 +1,16 @@
 ---
-// src/pages/benchmarks/[test]/[version]/index.astro
+import fs from 'fs';
+import path from 'path';
 import { tests as testData } from '../../../../data/tests';
 import VersionLayout from '../../../../layouts/VersionLayout.astro';
 import '../../../../styles/global.css';
 
+export const prerender = true; // para que getStaticPaths tenga efecto
+
 export async function getStaticPaths() {
     const paths: { params: { test: string; version: string } }[] = [];
-
     for (const benchmark of testData) {
         const testName = benchmark.link;
-
         benchmark.tests.forEach((test, testIndex) => {
             test.versions.forEach((_, versionIndex) => {
                 const versionId = `test-${testIndex + 1}-version-${versionIndex + 1}`;
@@ -17,41 +18,54 @@ export async function getStaticPaths() {
             });
         });
     }
-
     return paths;
 }
 
-const params = Astro.params as { test: string; version: string };
+const { test: testParam, version: versionParam } = Astro.params as {
+    test: string;
+    version: string;
+};
 
-// Buscar benchmark por su `link`
-const currentBenchmark = testData.find((b) => b.link === params.test);
-
+// Busca tu benchmark y descompón índices
+const currentBenchmark = testData.find((b) => b.link === testParam);
 if (!currentBenchmark) {
-    throw new Error(`Benchmark no encontrado para ${params.test}`);
+    throw new Error(`Benchmark no encontrado para ${testParam}`);
 }
-
-// Extraer índices de la versión a partir de "test-1-version-1"
-const [_, testNumStr, __, versionNumStr] = params.version.split('-');
-
-// Extraemos el número de prueba y la versión:
+const [_, testNumStr, __, versionNumStr] = versionParam.split('-');
 const testIndex = parseInt(testNumStr, 10) - 1;
 const versionIndex = parseInt(versionNumStr, 10) - 1;
-const versionDir = `version-${versionNumStr}`; // "version-1"
+
+const test = currentBenchmark.tests[testIndex];
+const rawVersion = test.versions[versionIndex];
+if (!test || !rawVersion) {
+    throw new Error(`Versión no encontrada para ${versionParam}`);
+}
+
+// Desempaqueta posible capa extra
+const version =
+    typeof rawVersion === 'object' && 'version' in rawVersion
+        ? (rawVersion as any).version
+        : rawVersion;
+
+// Construye rutas públicas
+const versionDir = `version-${versionNumStr}`;
 const pruebaDir = `prueba-${testIndex + 1}`;
-
-// Base pública:
-const basePublic = `/scripts/${params.test}/${pruebaDir}/${versionDir}`;
-
-// Rutas finales:
+const basePublic = `/scripts/${testParam}/${pruebaDir}/${versionDir}`;
 const jsPath = `${basePublic}/javascript/`;
 const pyPath = `${basePublic}/python/`;
 
-const test = currentBenchmark.tests[testIndex];
-const version = test?.versions?.[versionIndex];
-
-if (!test || !version) {
-    throw new Error(`Versión de prueba no encontrada para ${params.version}`);
+// Comprueba si existe pyscript.toml
+let pyConfig: string | undefined = undefined;
+if (version.pyConfig) {
+    const tomlPath = path.resolve(`./public${pyPath}${version.pyConfig}`);
+    if (fs.existsSync(tomlPath)) {
+        pyConfig = version.pyConfig;
+    }
 }
+
+console.log('version:', { version });
+// Asegura que jsLibs sea array
+const jsLibs = Array.isArray(version.jsLibs) ? version.jsLibs : [];
 ---
 
 <VersionLayout
@@ -61,4 +75,6 @@ if (!test || !version) {
     versionDescription={version.description}
     jsPath={jsPath}
     pyPath={pyPath}
+    jsLibs={jsLibs}
+    pyConfig={pyConfig}
 />
