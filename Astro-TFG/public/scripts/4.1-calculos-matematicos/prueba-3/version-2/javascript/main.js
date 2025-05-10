@@ -1,38 +1,3 @@
-function runNodeBenchmark() {
-    const outputDiv = document.getElementById("nodeJs-output");
-    clearCell("nodeJs-output");
-    fetch("http://localhost:3000/")
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (!data || typeof data.avgExecutionTime === 'undefined') {
-                throw new Error("Invalid server response");
-            }
-
-            outputDiv.innerHTML = '';
-
-            const metrics = [
-                { label: 'Total ET (10x)', value: data.totalExecutionTime, unit: 'ms' },
-                { label: 'ET (avg, 10x)', value: data.avgExecutionTime, unit: 'ms' },
-                { label: 'CPU (avg, 10x)', value: data.avgCPUUsage, unit: '%' },
-                { label: 'RAM (avg, 10x)', value: data.avgMemoryUsage, unit: 'MB' }
-            ];
-
-            metrics.forEach(metric => {
-                const div = document.createElement("div");
-                div.textContent = `${metric.label}: ${metric.value} ${metric.unit}`;
-                outputDiv.appendChild(div);
-            });
-        })
-        .catch((error) => {
-            console.error("Fetch error:", error);
-        });
-}
-
 let highPrecisionMath;
 
 function initHighPrecisionMath() {
@@ -113,7 +78,7 @@ async function n_digits_pi(repetitions, digits) {
     `;
 }
 
-function runJSBenchmark() {
+window.runJSBenchmark = async function () {
     clearCell("javascript-output");
     n_digits_pi(10, 10_000);
 }

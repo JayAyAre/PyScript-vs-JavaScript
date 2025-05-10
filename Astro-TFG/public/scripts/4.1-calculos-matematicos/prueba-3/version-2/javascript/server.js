@@ -1,16 +1,16 @@
-const express = require("express");
-const cors = require("cors");
-const { create, all } = require('mathjs');
-const osu = require('node-os-utils');
+import express from 'express';
+import cors from 'cors';
+import { create, all } from 'mathjs';
+import osu from 'node-os-utils';
 
 const math = create(all);
 const app = express();
 const port = 3000;
 
 app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type']
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type']
 }));
 
 const cpu = osu.cpu;
@@ -99,23 +99,19 @@ async function runBenchmark(repetitions, digits) {
     const totalExecTimeMs = (endTotal[0] * 1000) + (endTotal[1] / 1000000);
 
     return {
-        totalExecutionTime: totalExecTimeMs.toFixed(2),
-        avgExecutionTime: (results.totalTime / repetitions).toFixed(2),
-        avgMemoryUsage: (results.totalMemory / repetitions).toFixed(2),
-        avgCPUUsage: (results.totalCPU / repetitions).toFixed(2)
+        totalExecutionTime: `Total ET (1000x): ${totalExecTimeMs.toFixed(2)} ms`,
+        avgExecutionTime: `ET (avg, 1000x): ${(results.totalTime / repetitions).toFixed(2)} ms`,
+        avgMemoryUsage: `RAM (avg, 1000x): ${(results.totalMemory / repetitions).toFixed(2)} MB`,
+        avgCPUUsage: `CPU (avg, 1000x): ${(results.totalCPU / repetitions).toFixed(2)} %`
     };
 }
 
-app.get("/", async (req, res) => {
-    try {
-        const result = await runBenchmark(10, 10_000);
-        res.status(200).json(result);
-    } catch (error) {
-        console.error("Server error:", error);
-        res.status(500).json({ error: error.message });
-    }
-});
+(async () => {
+    const result = await runBenchmark(10, 10_000);
+    const results = {
+        type: null,
+        data: result
+    };
 
-app.listen(port, '0.0.0.0', () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+    console.log(JSON.stringify(results));
+})();

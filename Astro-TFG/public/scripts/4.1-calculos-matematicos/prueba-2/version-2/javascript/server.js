@@ -1,9 +1,8 @@
-const express = require("express");
-const cors = require("cors");
-const osu = require("node-os-utils");
+import osu from 'node-os-utils';
+import express from 'express';
+import cors from 'cors';
 
 const app = express();
-const port = 3000;
 
 app.use(cors());
 const cpu = osu.cpu;
@@ -62,18 +61,19 @@ async function benchmarkPrimesJS(repetitions, n) {
     let avgCPU = (totalCPU / repetitions).toFixed(2);
 
     return {
-        totalExecutionTime: totalExecTime,
-        avgExecutionTime: avgTime,
-        avgMemoryUsage: avgMemory,
-        avgCPUUsage: avgCPU
+        totalExecutionTime: `Total ET (1000x): ${totalExecTime} ms`,
+        avgExecutionTime: `ET (avg, 1000x): ${avgTime} ms`,
+        avgMemoryUsage: `RAM (avg, 1000x): ${avgMemory} MB`,
+        avgCPUUsage: `CPU (avg, 1000x): ${avgCPU} %`
     };
 }
 
-app.get("/", async (req, res) => {
+(async () => {
     let result = await benchmarkPrimesJS(50, 10_000);
-    res.json(result);
-});
+    const results = {
+        type: null,
+        data: result
+    };
 
-app.listen(port, () => {
-    console.log(`Servidor corriendo en http://localhost:${port}`);
-});
+    console.log(JSON.stringify(results));
+})();

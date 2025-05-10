@@ -32,15 +32,19 @@ def multiply_matrices(size):
     tracemalloc.stop()
 
     output_element = js.document.getElementById("pyscript-output")
+
     output_element.innerHTML += f"""
-        <div style="font-weight: bold;">Matriz {size}x{size}</div>
+        <div">{size}x{size}</div>
         <div>ET: {round(execution_time, 2)} ms</div>
         <div>RAM: {round(memory_usage, 2)} MB</div>
     """
 
-    # PLT
-
     js.endTimerWebAssembly()
+    output_element.innerHTML += f"""
+        <br>
+    """
+
+    # PLT
 
 
 def run_py_benchmark(event):

@@ -51,8 +51,12 @@ def n_digits_pi(repetitions, digits):
             target="pyscript-output")
     display(f"ET (avg, 1000x): {avg_time} ms", target="pyscript-output")
     display(f"RAM (avg, 1000x): {avg_memory} MB", target="pyscript-output")
+    js.endTimerWebAssembly()
 
 
 def run_py_benchmark(event):
     js.clearCell('pyscript-output')
     n_digits_pi(1_000, 1_000)
+
+
+js.window.run_py_benchmark = run_py_benchmark

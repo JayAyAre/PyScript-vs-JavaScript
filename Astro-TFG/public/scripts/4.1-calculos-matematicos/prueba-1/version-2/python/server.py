@@ -37,10 +37,10 @@ def multiply_matrices(size):
     cpu_usage = round(end_cpu - start_cpu, 2)
 
     return {
-        'size': f'{size}x{size}',
-        'time': execution_time,
-        'cpu_usage': cpu_usage,
-        'memory_usage': memory_used
+        'size': f"{size}x{size}",
+        'time': f"ET: {execution_time} ms",
+        'cpu_usage': f"CPU: {cpu_usage} %",
+        'memory_usage': f"RAM: {memory_used} MB"
     }
 
 

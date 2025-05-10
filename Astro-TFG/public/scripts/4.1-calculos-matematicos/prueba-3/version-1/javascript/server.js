@@ -1,10 +1,8 @@
-const express = require("express");
-const cors = require("cors");
-const os = require("os");
-const osu = require("node-os-utils");
+import osu from 'node-os-utils';
+import cors from 'cors';
+import express from 'express';
 
 const app = express();
-const port = 3000;
 
 app.use(cors());
 
@@ -65,18 +63,19 @@ async function computePi(digits, repetitions) {
     let avgCpu = (totalCpu / repetitions).toFixed(2);
 
     return {
-        totalExecutionTime: totalExecTime,
-        avgExecutionTime: avgTime,
-        avgMemoryUsage: avgMemory,
-        avgCPUUsage: avgCpu
+        totalExecutionTime: `Total ET (1000x): ${totalExecTime} ms`,
+        avgExecutionTime: `ET (avg, 1000x): ${avgTime} ms`,
+        avgMemoryUsage: `RAM (avg, 1000x): ${avgMemory} MB`,
+        avgCPUUsage: `CPU (avg, 1000x): ${avgCpu} %`
     };
 }
 
-app.get("/", async (req, res) => {
+(async () => {
     let result = await computePi(1000, 1000);
-    res.json(result);
-});
+    const results = {
+        type: null,
+        data: result
+    };
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+    console.log(JSON.stringify(results));
+})();

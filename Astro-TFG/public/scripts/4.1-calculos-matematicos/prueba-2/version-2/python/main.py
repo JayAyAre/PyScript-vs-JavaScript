@@ -49,3 +49,6 @@ def benchmark_primes_py(repetitions, n):
 def run_py_benchmark(event):
     js.clearCell('pyscript-output')
     benchmark_primes_py(1000, 10_000)
+
+
+js.window.run_py_benchmark = run_py_benchmark

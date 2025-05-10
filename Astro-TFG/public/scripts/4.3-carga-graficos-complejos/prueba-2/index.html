@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmarking: JavaScript vs PyScript</title>
+
+
+    <script type="module" src="https://pyscript.net/releases/2024.8.1/core.js"></script>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.1/core.css">
+    
+    <script src="javascript/main.js" defer></script>
+    <script src="https://cdn.plot.ly/plotly-3.0.1.min.js" charset="utf-8"></script>
+    
+    <script>
+        if (!crypto.randomUUID) {
+            crypto.randomUUID = function() {
+                // Genera un UUID v4
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+                });
+            }
+        }
+        document.addEventListener('py:ready', () => {
+            document.getElementById("run-button-py").disabled = false;
+
+            document.getElementById("run-button-py").textContent = 'Run in PyScript';
+            console.log('PyScript fully loaded');
+        });
+    </script>
+    <script>
+        let pyTimer = null;
+        let pyStartTime = 0;
+
+        function startPyTimer() {
+            pyStartTime = performance.now();
+            const timerElement = document.getElementById("py-timer-display");
+            
+            function updateTimer() {
+                if (!pyTimer) return;
+                
+                const elapsedMs = performance.now() - pyStartTime;
+                const elapsed = (elapsedMs / 1000).toFixed(3);
+                timerElement.textContent = `PyScript Timer: ${elapsed} s`;
+                
+                pyTimer = requestAnimationFrame(updateTimer);
+            }
+            
+            cancelAnimationFrame(pyTimer);
+            pyTimer = requestAnimationFrame(updateTimer);
+        }
+
+        function stopPyTimer() {
+            cancelAnimationFrame(pyTimer);
+            pyTimer = null;
+            
+            const elapsedMs = performance.now() - pyStartTime;
+            const elapsed = (elapsedMs / 1000).toFixed(3);
+            document.getElementById("py-timer-display").textContent = `PyScript Timer: ${elapsed} s`;
+        }
+    </script>
+    <script>
+        let startTime = performance.now();
+
+        document.addEventListener('py:ready', () => {
+            let endTime = performance.now();
+            let loadTime = endTime - startTime;
+            document.getElementById("output").innerText += `PLT: ${loadTime.toFixed(2)} ms`;
+        });
+
+        function clearCell(elementId) {
+            const operations = ['output', 'exact'];
+            operations.forEach(op => {
+                const element = document.getElementById(`${elementId}-${op}`);
+                if (element) {
+                    element.innerHTML = "";
+                }
+            });
+        }
+    </script>
+    <script>
+        let memoryMeasurements = {};
+
+        function measureMemory(phase) {
+            if (performance.memory) {
+                memoryMeasurements[phase] = {
+                    usedJSHeapSize: performance.memory.usedJSHeapSize,
+                    totalJSHeapSize: performance.memory.totalJSHeapSize,
+                    jsHeapSizeLimit: performance.memory.jsHeapSizeLimit,
+                    timestamp: performance.now()
+                };
+
+                if (Object.keys(memoryMeasurements).length > 1) {
+                    const phases = Object.keys(memoryMeasurements);
+                    const prevPhase = phases[phases.length - 2];
+                    const diff = memoryMeasurements[phase].usedJSHeapSize -
+                                memoryMeasurements[prevPhase].usedJSHeapSize;
+
+                    if (phase === 'final') {
+                        const outputDiv = document.getElementById("pyscript-output");
+                        const memoryInMB = Math.round((diff / 1024) / 1024);
+                        outputDiv.innerHTML += `<div>Memory: ~${memoryInMB} MB</div>`;
+                    }
+                }
+            } else {
+                console.warn("performance.memory API not available");
+            }
+        }
+    </script>
+    <script>
+        let relayoutEvents = 0;
+        let fpsMeasurements = [];
+        let fpsInterval = null;
+
+        function startFPSMeasurement(duration = 3000, id) {
+            let start = performance.now();
+            let frames = 0;
+            fpsMeasurements = [];
+
+            function measure() {
+                frames++;
+                let now = performance.now();
+                fpsMeasurements.push(1000 / (now - start));
+                start = now;
+                if (now - pyStartTime < duration) {
+                    requestAnimationFrame(measure);
+                } else {
+                    const avgFPS = fpsMeasurements.reduce((a, b) => a + b, 0) / fpsMeasurements.length;
+                    document.getElementById(id).innerHTML += `<div>Average FPS: ${avgFPS.toFixed(2)}</div>`;
+                }
+            }
+            requestAnimationFrame(measure);
+        }
+
+        function attachRelayoutListener(id,id_output) {
+            const container = document.getElementById(id);
+            container.on('plotly_relayout', function() {
+                startFPSMeasurement(3000, id_output);
+                relayoutEvents++;
+            });
+        }
+
+        function clearGraphContainer(id) {
+            const container = document.getElementById(id);
+            if (container.data) Plotly.purge(container);
+            container.innerHTML = "";
+        }
+
+        function estimateMemoryUsedByData(numSeries, numPoints) {
+            const totalBytes = numSeries * numPoints * 8;
+            const memoryMB = (totalBytes / 1024 / 1024).toFixed(2);
+            return memoryMB;
+        }
+
+    </script>
+<body>
+    <script type="py" src="python/main.py" config="json/pyscript-main.json"></script>
+    <h1>Generation of time series graphs (Plotly.py/Plotly.js)</h1>
+
+    <h2 id="js-timer-display">JS Timer: 0.00 s</h2>
+    <h2 id="py-timer-display">PyScript Timer: 0.00 s</h2>
+
+    <label for="num-series">N° Series:</label>
+    <input type="number" id="num-series-js" value="5" min="1" max="100">
+    <label for="num-points">N° Puntos:</label>
+    <input type="number" id="num-points-js" value="10000" min="1000" step="1000">
+
+    <button id="run-button-js" onclick="runJSBenchmark()">Run in JavaScript</button>
+
+
+    <label for="num-series">N° Series:</label>
+    <input type="number" id="num-series-py" value="5" min="1" max="100">
+    <label for="num-points">N° Puntos:</label>
+    <input type="number" id="num-points-py" value="10000" min="1000" step="1000">
+    <button id="run-button-py" onclick="startPyTimer()" py-click="launch_worker">
+        Run in PyScript (Loading...)</button>
+
+    <pre id="output"></pre>
+    <div id="graph-containers" style="display: flex; flex-direction: row;">
+        <div id="graph-container-js"></div>
+        <div id="graph-container-py"></div>
+        <div id="graph-container-py"></div>
+    </div>
+
+    <table id="metrics-container">
+        <thead>
+            <tr>
+                <th>Metric</th>
+                <th>JavaScript</th>
+                <th>PyScript</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Times</td>
+                <td id="javascript-output"></td>
+                <td id="pyscript-output"></td>
+            </tr>
+            <tr>
+                <td>Total</td>
+                <td id="javascript-exact"></td>
+                <td id="pyscript-exact"></td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

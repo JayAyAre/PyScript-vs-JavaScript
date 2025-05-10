@@ -41,9 +41,9 @@ async function multiplyMatrices(size) {
     const memory_usage = cpuAvg.toFixed(2);
 
     return {
-        time: time,
-        cpu_usage: cpu_usage,
-        memory_usage: memory_usage
+        time: `ET: ${time} ms`,
+        cpu_usage: `CPU: ${cpu_usage} %`,
+        memory_usage: `RAM: ${memory_usage} MB`
     };
 }
 

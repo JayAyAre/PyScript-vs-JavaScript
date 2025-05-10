@@ -47,7 +47,7 @@ export const tests = [
                         description:
                             'Esta versión empleará librerías optimizadas para la detección de números, usando el algoritmo de la criba de Eratóstenes. El rango máximo será hasta 10⁴ y se ejecutará 1000 veces para obtener una medición estadística.',
                         jsLibs: null,
-                        pyConfig: null,
+                        pyConfig: 'pyscript.toml',
                     },
                 ],
             },
@@ -67,8 +67,8 @@ export const tests = [
                         title: 'Gauss–Legendre (Estructuras optimizadas) con precisión arbitraria',
                         description:
                             'Se calcularán N=10⁴ dígitos de π con la implementación de Gauss–Legendre usando estructuras optimizadas. Esta simulación se ejecutará 10 veces para obtener una medición estadística mínima.',
-                        jsLibs: null,
-                        pyConfig: null,
+                        jsLibs: ["https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.js"],
+                        pyConfig: 'pyscript.toml',
                     },
                 ],
             },

@@ -54,3 +54,6 @@ def run_py_benchmark(event):
     js.clearCell('pyscript-output')
     tracemalloc.start()
     primes_to_n(1_000_000)
+
+
+js.window.run_py_benchmark = run_py_benchmark

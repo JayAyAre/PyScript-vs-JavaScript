@@ -1,34 +1,3 @@
-function runNodeBenchmark() {
-    clearCell("nodeJs-output");
-    fetch("http://localhost:3000/")
-        .then(response => response.json())
-        .then(data => {
-            let outputDiv = document.getElementById("nodeJs-output");
-
-            Object.values(data).forEach((result) => {
-                let titleDiv = document.createElement("div");
-                titleDiv.textContent = `Matrix ${result.size}`;
-                titleDiv.style.fontWeight = "bold";
-                outputDiv.appendChild(titleDiv);
-
-                let timeDiv = document.createElement("div");
-                timeDiv.textContent = `ET: ${result.executionTime} ms`;
-                outputDiv.appendChild(timeDiv);
-
-                let cpuDiv = document.createElement("div");
-                cpuDiv.textContent = `CPU: ${result.cpuUsage} %`;
-                outputDiv.appendChild(cpuDiv);
-
-                let memoryDiv = document.createElement("div");
-                memoryDiv.textContent = `RAM: ${result.memoryUsage} MB`;
-                outputDiv.appendChild(memoryDiv);
-
-                outputDiv.appendChild(document.createElement("hr"));
-            });
-        })
-        .catch(error => console.error("Error:", error));
-}
-
 async function multiplyMatrices(size) {
     let A = tf.randomNormal([size, size]);
     let B = tf.randomNormal([size, size]);
@@ -41,8 +10,7 @@ async function multiplyMatrices(size) {
     let outputDiv = document.getElementById("javascript-output");
 
     let titleDiv = document.createElement("div");
-    titleDiv.textContent = `Matriz ${size}x${size}`;
-    titleDiv.style.fontWeight = "bold";
+    titleDiv.textContent = `${size}x${size}`;
     outputDiv.appendChild(titleDiv);
 
     // ET (Execution Time)
@@ -56,6 +24,9 @@ async function multiplyMatrices(size) {
     let memoryDiv = document.createElement("div");
     memoryDiv.textContent = getMemoryUsageJS();
     outputDiv.appendChild(memoryDiv);
+
+    let br = document.createElement("br");
+    outputDiv.appendChild(br);
 }
 
 window.runJSBenchmark = async function () {

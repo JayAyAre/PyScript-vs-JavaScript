@@ -236,7 +236,9 @@ const {
             const resultDiv = document.createElement('div');
             resultDiv.textContent = `ET (Py + WA): ${totalElapsedTime.toFixed(2)} ms`;
             const pyscriptOutput = document.getElementById('pyscript-output');
+
             if (!pyscriptOutput) return;
+
             pyscriptOutput.appendChild(resultDiv);
             hideExecutionLoader();
         };
@@ -261,8 +263,8 @@ const {
             })
                 .then((response) => response.json())
                 .then((data) => {
-                    const type = data.type; // Leemos el tipo de la respuesta
-                    console.log('Received type:', type); // Esto te ayudará a verificar
+                    const type = data.type;
+                    console.log('Received type:', type);
                     if (type === 'matrix') {
                         import('../scripts/MatrixDisplay.js')
                             .then((module) => {

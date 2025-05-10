@@ -26,7 +26,6 @@ const { test: testParam, version: versionParam } = Astro.params as {
     version: string;
 };
 
-// Busca tu benchmark y descompón índices
 const currentBenchmark = testData.find((b) => b.link === testParam);
 if (!currentBenchmark) {
     throw new Error(`Benchmark no encontrado para ${testParam}`);
@@ -41,20 +40,17 @@ if (!test || !rawVersion) {
     throw new Error(`Versión no encontrada para ${versionParam}`);
 }
 
-// Desempaqueta posible capa extra
 const version =
     typeof rawVersion === 'object' && 'version' in rawVersion
         ? (rawVersion as any).version
         : rawVersion;
 
-// Construye rutas públicas
 const versionDir = `version-${versionNumStr}`;
 const pruebaDir = `prueba-${testIndex + 1}`;
 const basePublic = `/scripts/${testParam}/${pruebaDir}/${versionDir}`;
 const jsPath = `${basePublic}/javascript/`;
 const pyPath = `${basePublic}/python/`;
 
-// Comprueba si existe pyscript.toml
 let pyConfig: string | undefined = undefined;
 if (version.pyConfig) {
     const tomlPath = path.resolve(`./public${pyPath}${version.pyConfig}`);
@@ -63,8 +59,6 @@ if (version.pyConfig) {
     }
 }
 
-console.log('version:', { version });
-// Asegura que jsLibs sea array
 const jsLibs = Array.isArray(version.jsLibs) ? version.jsLibs : [];
 ---
 

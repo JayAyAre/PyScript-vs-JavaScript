@@ -1,12 +1,4 @@
-const express = require("express");
-const cors = require("cors");
-const os = require("os");
-const osu = require("node-os-utils");
-
-const app = express();
-const port = 3000;
-
-app.use(cors());
+import osu from 'node-os-utils';
 
 const cpu = osu.cpu;
 
@@ -33,6 +25,7 @@ async function primes_to_n(size) {
 
     let startReal = performance.now();
 
+    await cpu.usage(); // warm-up
     let cpuAvg = await cpu.usage();
 
     let primes = [];
@@ -50,30 +43,28 @@ async function primes_to_n(size) {
     let endReal = performance.now();
 
     // ET (Execution Time)
-
     let executionTime = (endReal - startReal).toFixed(2);
 
     // CPU
-
     let cpuUsage = cpuAvg.toFixed(2);
 
     // RAM
-
     const endMemory = process.memoryUsage().heapUsed;
     const memoryUsage = ((endMemory - startMemory) / (1024 * 1024)).toFixed(2);
 
     return {
-        executionTime: executionTime,
-        cpuUsage: cpuUsage,
-        memoryUsage: memoryUsage
+        time: `ET: ${executionTime} ms`,
+        cpu_usage: `CPU: ${cpuUsage} %`,
+        memory_usage: `RAM: ${memoryUsage} MB`
     };
 }
 
-app.get("/", async (req, res) => {
-    let result = await primes_to_n(1000000);
-    res.json(result);
-});
+(async () => {
+    const result = await primes_to_n(1000000);
+    const results = {
+        type: null,
+        data: result
+    };
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+    console.log(JSON.stringify(results));
+})();

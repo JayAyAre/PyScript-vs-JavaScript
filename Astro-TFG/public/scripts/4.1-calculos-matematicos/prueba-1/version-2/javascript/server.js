@@ -4,7 +4,6 @@ import express from 'express';
 import tf from '@tensorflow/tfjs';
 
 const app = express();
-const port = 3000;
 
 app.use(cors());
 
@@ -32,9 +31,9 @@ async function multiplyMatrices(size) {
 
     return {
         size: `${size}x${size}`,
-        time: executionTime,
-        cpu_usage: cpuUsage,
-        memory_usage: memoryUsage
+        time: `ET: ${executionTime} ms`,
+        cpu_usage: `CPU: ${cpuUsage} %`,
+        memory_usage: `RAM: ${endMemory} MB`
     };
 }
 (async () => {

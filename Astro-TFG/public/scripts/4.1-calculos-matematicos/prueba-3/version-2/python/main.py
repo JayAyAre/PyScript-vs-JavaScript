@@ -67,3 +67,6 @@ def n_digits_pi(repetitions, digits):
 def run_py_benchmark(event):
     js.clearCell('pyscript-output')
     n_digits_pi(10, 10_000)
+
+
+js.window.run_py_benchmark = run_py_benchmark

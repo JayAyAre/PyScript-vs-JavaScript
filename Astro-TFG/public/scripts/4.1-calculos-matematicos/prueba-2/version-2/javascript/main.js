@@ -1,29 +1,3 @@
-function runNodeBenchmark() {
-    clearCell("nodeJs-output");
-    fetch("http://localhost:3000/")
-        .then(response => response.json())
-        .then(data => {
-            let outputDiv = document.getElementById("nodeJs-output");
-
-            let timeDiv = document.createElement("div");
-            timeDiv.textContent = `Total ET (50x): ${data.totalExecutionTime} ms`;
-            outputDiv.appendChild(timeDiv);
-
-            let avgTimeDiv = document.createElement("div");
-            avgTimeDiv.textContent = `ET (avg, 50x): ${data.avgExecutionTime} ms`;
-            outputDiv.appendChild(avgTimeDiv);
-
-            let cpuDiv = document.createElement("div");
-            cpuDiv.textContent = `CPU (avg, 50x): ${data.avgCPUUsage} %`;
-            outputDiv.appendChild(cpuDiv);
-
-            let memoryDiv = document.createElement("div");
-            memoryDiv.textContent = `RAM (avg, 50x): ${data.avgMemoryUsage} MB`;
-            outputDiv.appendChild(memoryDiv);
-        })
-        .catch(error => console.error("Error:", error));
-}
-
 function sieveOfEratosthenes(n) {
     let primes = new Uint8Array(n + 1).fill(1);
     primes[0] = primes[1] = 0;
@@ -74,7 +48,7 @@ function benchmarkPrimesJS(repetitions, n) {
     `;
 }
 
-function runJSBenchmark() {
+window.runJSBenchmark = async function () {
     document.getElementById("javascript-output").textContent = "";
     benchmarkPrimesJS(1000, 10_000);
 }

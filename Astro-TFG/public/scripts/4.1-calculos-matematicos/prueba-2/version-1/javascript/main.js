@@ -1,26 +1,3 @@
-function runNodeBenchmark() {
-    clearCell("nodeJs-output");
-    fetch("http://localhost:3000/")
-        .then(response => response.json())
-        .then(data => {
-            let outputDiv = document.getElementById("nodeJs-output");
-
-            let timeDiv = document.createElement("div");
-            timeDiv.textContent = `ET: ${data.executionTime} ms`;
-            outputDiv.appendChild(timeDiv);
-
-            let cpuDiv = document.createElement("div");
-            cpuDiv.textContent = `CPU: ${data.cpuUsage} %`;
-            outputDiv.appendChild(cpuDiv);
-
-            let memoryDiv = document.createElement("div");
-            memoryDiv.textContent = `RAM: ${data.memoryUsage} MB`;
-            outputDiv.appendChild(memoryDiv);
-
-        })
-        .catch(error => console.error("Error:", error));
-}
-
 function is_prime(size) {
     if (size < 2) {
         return false;
@@ -67,7 +44,7 @@ function primes_to_n(size) {
     document.getElementById("javascript-output").appendChild(resultDiv);
 }
 
-function runJSBenchmark() {
+window.runJSBenchmark = async function () {
     clearCell("javascript-output");
     document.getElementById("javascript-output").textContent = ""
     primes_to_n(1_000_000);

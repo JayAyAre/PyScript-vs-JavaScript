@@ -15,7 +15,7 @@ def get_memory_usage():
     return round(process.memory_info().rss / (1024 * 1024), 2)
 
 
-def get_cpu_usage(interval=1.0):
+def get_cpu_usage(interval=None):
     return psutil.cpu_percent(interval=interval)
 
 
@@ -46,9 +46,9 @@ def multiply_matrices(size):
     cpu_usage = round(end_cpu - start_cpu, 2)
 
     return {
-        'time': execution_time,
-        'cpu_usage': cpu_usage,
-        'memory_usage': memory_used
+        'time': f"ET: {execution_time} ms",
+        'cpu_usage': f"CPU: {cpu_usage} %",
+        'memory_usage': f"RAM: {memory_used} MB"
     }
 
 

@@ -1,4 +1,3 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import time
 import psutil
@@ -69,35 +68,21 @@ def n_digits_pi(repetitions, digits):
     avg_cpu = round(total_cpu / repetitions, 2)
 
     return {
-        'time': total_exec_time,
-        'avg_time': avg_time,
-        'avg_memory_usage': avg_memory,
-        'avg_cpu_usage': avg_cpu
+        'total_time': f"Total ET (10x): {total_exec_time} ms",
+        'av_time': f"ET av (10x): {avg_time} ms",
+        'cpu_usage': f"CPU av (10x): {avg_cpu} %",
+        'memory_usage': f"RAM av (10x): {avg_memory} MB"
     }
 
 
-class RequestHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == "/":
-            self.send_response(200)
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-            self.send_header('Access-Control-Allow-Methods', 'GET')
-            self.send_header("User-Agent", "Anything")
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-
-            results = n_digits_pi(10, 10_000)
-            response = json.dumps(results)
-            self.wfile.write(response.encode())
-
-
-def run_server():
-    server_address = ('', 5000)
-    httpd = HTTPServer(server_address, RequestHandler)
-    print("Server running at http://localhost:5000")
-    httpd.serve_forever()
+def main():
+    results = n_digits_pi(10, 10_000)
+    response = {
+        'type': None,
+        'data': results
+    }
+    print(json.dumps(response))
 
 
 if __name__ == '__main__':
-    run_server()
+    main()
