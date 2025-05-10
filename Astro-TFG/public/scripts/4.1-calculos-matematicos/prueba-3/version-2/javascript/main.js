@@ -78,9 +78,17 @@ async function n_digits_pi(repetitions, digits) {
     `;
 }
 
-window.runJSBenchmark = async function () {
+window.runJSBenchmark = function () {
     clearCell("javascript-output");
-    n_digits_pi(10, 10_000);
+    window.showExecutionLoader();
+
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            n_digits_pi(10, 10_000);
+            window.hideExecutionLoader();
+        }, 0);
+    });
+
 }
 
 function clearCell(elementId) {

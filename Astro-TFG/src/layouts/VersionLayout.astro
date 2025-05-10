@@ -13,6 +13,8 @@ const {
     pyPath,
     jsLibs,
     pyConfig,
+    useNode, // ← nuevo
+    useBackend,
 } = Astro.props;
 ---
 
@@ -48,6 +50,8 @@ const {
         data-js-path={jsPath}
         data-py-path={pyPath}
         data-py-config={pyConfig}
+        data-use-node={useNode}
+        data-use-backend={useBackend}
     >
         <Header
             title={testTitle}
@@ -99,18 +103,27 @@ const {
                     >
                         Ejecutar PyScript
                     </button>
-                    <button
-                        onclick="runNodeBenchmark()"
-                        class="rounded-lg bg-gray-800 px-4 py-2 transition-all focus:ring focus:ring-purple-400 hover:scale-105 hover:bg-gray-700 hover:text-purple-400 cursor-pointer"
-                    >
-                        Ejecutar Node.js
-                    </button>
-                    <button
-                        onclick="runPyBackendBenchmark()"
-                        class="rounded-lg bg-gray-800 px-4 py-2 transition-all focus:ring focus:ring-purple-400 hover:scale-105 hover:bg-gray-700 hover:text-purple-400 cursor-pointer"
-                    >
-                        Ejecutar Backend Python
-                    </button>
+                    {
+                        useNode && (
+                            <button
+                                onclick="runNodeBenchmark()"
+                                class="rounded-lg bg-gray-800 px-4 py-2 transition-all focus:ring focus:ring-purple-400 hover:scale-105 hover:bg-gray-700 hover:text-purple-400 cursor-pointer"
+                            >
+                                Ejecutar Node.js
+                            </button>
+                        )
+                    }
+
+                    {
+                        useBackend && (
+                            <button
+                                onclick="runPyBackendBenchmark()"
+                                class="rounded-lg bg-gray-800 px-4 py-2 transition-all focus:ring focus:ring-purple-400 hover:scale-105 hover:bg-gray-700 hover:text-purple-400 cursor-pointer"
+                            >
+                                Ejecutar Backend Python
+                            </button>
+                        )
+                    }
                 </div>
             </section>
 
@@ -132,12 +145,20 @@ const {
                                 <th class="border border-gray-700 px-4 py-2"
                                     >PyScript</th
                                 >
-                                <th class="border border-gray-700 px-4 py-2"
-                                    >Node.js</th
-                                >
-                                <th class="border border-gray-700 px-4 py-2"
-                                    >Python Backend</th
-                                >
+                                {
+                                    useNode && (
+                                        <th class="border border-gray-700 px-4 py-2">
+                                            Node.js
+                                        </th>
+                                    )
+                                }
+                                {
+                                    useBackend && (
+                                        <th class="border border-gray-700 px-4 py-2">
+                                            Python Backend
+                                        </th>
+                                    )
+                                }
                             </tr>
                         </thead>
                         <tbody class="text-gray-300">
@@ -152,16 +173,26 @@ const {
                                     class="border border-gray-700 px-4 py-2"
                                     >Esperando...</td
                                 >
-                                <td
-                                    id="nodeJs-output"
-                                    class="border border-gray-700 px-4 py-2"
-                                    >Esperando...</td
-                                >
-                                <td
-                                    id="pythonBackend-output"
-                                    class="border border-gray-700 px-4 py-2"
-                                    >Esperando...</td
-                                >
+                                {
+                                    useNode && (
+                                        <td
+                                            id="nodeJs-output"
+                                            class="border border-gray-700 px-4 py-2"
+                                        >
+                                            Esperando...
+                                        </td>
+                                    )
+                                }
+                                {
+                                    useBackend && (
+                                        <td
+                                            id="pythonBackend-output"
+                                            class="border border-gray-700 px-4 py-2"
+                                        >
+                                            Esperando...
+                                        </td>
+                                    )
+                                }
                             </tr>
                         </tbody>
                     </table>
@@ -178,6 +209,42 @@ const {
         let jsPath = document.body.dataset.jsPath;
         let pyPath = document.body.dataset.pyPath;
         let pyConfig = document.body.dataset.pyConfig;
+        let useNode = document.body.dataset.useNode === 'true';
+        let useBackend = document.body.dataset.useBackend === 'true';
+
+        window.runNodeBenchmark = async function () {
+            if (!useNode) return;
+            window.clearCell('nodeJs-output');
+            try {
+                import('../scripts/RunNodeServer.js')
+                    .then((module) => {
+                        module.runNodeBenchmark(jsPath);
+                    })
+                    .catch((error) => {
+                        console.error('Error loading module:', error);
+                    });
+            } catch (err) {
+                console.error('Error al ejecutar Node benchmark:', err);
+            }
+        };
+
+        // Button handler para Python Backend
+        window.runPyBackendBenchmark = async function () {
+            if (!useBackend) return;
+            window.clearCell('pythonBackend-output');
+            try {
+                import('../scripts/RunPythonServer.js')
+                    .then((module) => {
+                        module.runPyBackendBenchmark(pyPath);
+                    })
+                    .catch((error) => {
+                        console.error('Error loading module:', error);
+                    });
+            } catch (err) {
+                console.error('Error al ejecutar Python backend:', err);
+            }
+        };
+
         console.log('script:', { pyPath, pyConfig });
 
         jsPath = jsPath?.concat('server.js');
@@ -203,19 +270,21 @@ const {
         });
 
         let startTimerWebAssembly: number = 0;
-        function showExecutionLoader() {
+
+        window.showExecutionLoader = function () {
             let loadingMessage = document.getElementById('loading-message');
             if (!loadingMessage) return;
             loadingMessage.style.display = 'flex';
-        }
-        function hideExecutionLoader() {
+        };
+
+        window.hideExecutionLoader = function () {
             let loadingMessage = document.getElementById('loading-message');
             if (!loadingMessage) return;
             loadingMessage.style.display = 'none';
-        }
+        };
 
         window.runPy = function () {
-            showExecutionLoader();
+            window.showExecutionLoader();
 
             requestAnimationFrame(() => {
                 setTimeout(() => {
@@ -224,7 +293,7 @@ const {
                         window.run_py_benchmark(event);
                     } else {
                         console.error('run_py_benchmark no está definido');
-                        hideExecutionLoader();
+                        window.hideExecutionLoader();
                     }
                 }, 0);
             });
@@ -240,87 +309,13 @@ const {
             if (!pyscriptOutput) return;
 
             pyscriptOutput.appendChild(resultDiv);
-            hideExecutionLoader();
+            window.hideExecutionLoader();
         };
 
         window.clearCell = function (elementId: string) {
             const element = document.getElementById(elementId);
             if (!element) return;
             element.textContent = '';
-        };
-
-        window.runNodeBenchmark = function () {
-            clearCell('nodeJs-output');
-            const cleanedPath = encodeURIComponent(jsPath.replace(/^\/+/, ''));
-
-            fetch('/api/run-backend', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    type: 'node',
-                    path: cleanedPath.toString(),
-                }),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    const type = data.type;
-                    console.log('Received type:', type);
-                    if (type === 'matrix') {
-                        import('../scripts/MatrixDisplay.js')
-                            .then((module) => {
-                                module.display(data, 'nodeJs-output');
-                            })
-                            .catch((error) => {
-                                console.error('Error loading module:', error);
-                            });
-                    } else {
-                        import('../scripts/GenericDisplay.js')
-                            .then((module) => {
-                                module.display(data, 'nodeJs-output');
-                            })
-                            .catch((error) => {
-                                console.error('Error loading module:', error);
-                            });
-                    }
-                })
-                .catch((error) => console.error('Error:', error));
-        };
-
-        window.runPyBackendBenchmark = function () {
-            clearCell('pythonBackend-output');
-            const cleanedPath = encodeURIComponent(pyPath.replace(/^\/+/, ''));
-
-            fetch('/api/run-backend', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    type: 'python',
-                    path: cleanedPath.toString(),
-                }),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    const type = data.type; // Leemos el tipo de la respuesta
-
-                    if (type === 'matrix') {
-                        import('../scripts/MatrixDisplay.js')
-                            .then((module) => {
-                                module.display(data, 'pythonBackend-output');
-                            })
-                            .catch((error) => {
-                                console.error('Error loading module:', error);
-                            });
-                    } else {
-                        import('../scripts/GenericDisplay.js')
-                            .then((module) => {
-                                module.display(data, 'pythonBackend-output');
-                            })
-                            .catch((error) => {
-                                console.error('Error loading module:', error);
-                            });
-                    }
-                })
-                .catch((error) => console.error('Error:', error));
         };
     </script>
 </html>

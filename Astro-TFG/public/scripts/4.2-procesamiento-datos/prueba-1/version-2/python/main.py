@@ -1,3 +1,4 @@
+from calendar import c
 import time
 import tracemalloc
 import gc
@@ -72,26 +73,33 @@ def do_operations(size):
         tracemalloc.stop()
 
     end_total = time.time()
-    metrics['output'] = {
-        'total_time': (end_total - start_total) * 1000,
-        'memory_peak': max_memory
-    }
     tracemalloc.stop()
 
-    for op, data in metrics.items():
-        if op != 'output':
-            display(
-                f"{op.upper()} - Time: {data['time']:.2f} ms | RAM: {data['memory']:.2f} MB",
-                target=f"pyscript-{op}"
-            )
+    metrics['TOTAL'] = {
+        'time': (end_total - start_total) * 1000,
+        'memory': max(m['memory'] for m in metrics.values())
+    }
 
-    display(
-        f"TOTAL - Time: {metrics['output']['total_time']:.2f} ms | "
-        f"RAM Peak: {metrics['output']['memory_peak']:.2f} MB",
-        target="pyscript-output"
-    )
+    display("", target="pyscript-output")
+    output_element = js.document.getElementById("pyscript-output")
+
+    for op, data in metrics.items():
+        if op == 'TOTAL':
+            continue
+        line = f"{op.upper()} - Time av. : {data['time']:.2f} ms | RAM: {data['memory']:.2f} MB"
+        display(line, target="pyscript-output")
+
+    output_element.innerHTML += f"""
+        <br>
+    """
+    line = f"TOTAL - Time: {metrics['TOTAL']['time']:.2f} ms | RAM Peak: {metrics['TOTAL']['memory']:.2f} MB"
+    display(line, target="pyscript-output")
+    js.window.hideExecutionLoader()
 
 
 def run_py_benchmark(event):
-    js.clearCell('pyscript')
+    js.clearCell('pyscript-output')
     do_operations(10_000_000)
+
+
+js.window.run_py_benchmark = run_py_benchmark

@@ -56,15 +56,15 @@ function doOperations(size) {
 
     const measureMemory = () => {
         const current = performance.memory.usedJSHeapSize / (1024 * 1024);
-        max_memory = Math.abs(Math.max(max_memory, current));
+        max_memory = Math.max(max_memory, current);
         return current;
     };
 
     let start_op = performance.now();
     createDataStructure(my_list, size);
     metrics['create'] = {
-        'time': performance.now() - start_op,
-        'memory': measureMemory()
+        time: performance.now() - start_op,
+        memory: measureMemory()
     };
 
     const operations = [
@@ -77,43 +77,47 @@ function doOperations(size) {
 
     for (const [op_name, op_func, args] of operations) {
         start_op = performance.now();
-
         if (window.gc) window.gc();
-
 
         const mem_before = measureMemory();
         op_func(...args);
         const mem_after = measureMemory();
 
         metrics[op_name] = {
-            'time': performance.now() - start_op,
-            'memory':  Math.abs(mem_after - mem_before)
+            time: performance.now() - start_op,
+            memory: Math.abs(mem_after - mem_before)
         };
     }
 
     metrics['output'] = {
-        'total_time': performance.now() - start_total,
-        'memory_peak': max_memory
+        total_time: performance.now() - start_total,
+        memory_peak: max_memory
     };
 
-    for (const [op, data] of Object.entries(metrics)) {
-        if (op !== 'output') {
-            let element = document.getElementById(`javascript-${op}`);
-            if (element) {
-                element.innerHTML = `${op.toUpperCase()} - Time: ${data.time.toFixed(2)} ms | RAM: ${data.memory.toFixed(2)} MB`;
-            }
-        }
-    }
-
     const outputElement = document.getElementById("javascript-output");
-    if (outputElement) {
-        outputElement.innerHTML =
-            `TOTAL - Time: ${metrics['output'].total_time.toFixed(2)} ms | ` +
-            `RAM Peak: ${metrics['output'].memory_peak.toFixed(2)} MB`;
+    if (!outputElement) return;
+    outputElement.innerHTML = "";
+
+    for (const [op, data] of Object.entries(metrics)) {
+        if (op === 'output') continue;
+        const line = `${op.toUpperCase()} - Time av. : ${data.time.toFixed(2)} ms | RAM: ${data.memory.toFixed(2)} MB`;
+        outputElement.innerHTML += line + "<br>";
     }
+
+    outputElement.innerHTML += "<br>";
+    const tot = metrics['output'];
+    const totalLine = `TOTAL - Time: ${tot.total_time.toFixed(2)} ms | RAM Peak: ${tot.memory_peak.toFixed(2)} MB`;
+    outputElement.innerHTML += totalLine;
 }
 
-function runJSBenchmark() {
-    clearCell("javascript");
-    doOperations(10_000_000);
-}
+window.runJSBenchmark = function () {
+    clearCell("javascript-output");
+    window.showExecutionLoader();
+
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            doOperations(10_000_000);
+            window.hideExecutionLoader();
+        }, 0);
+    });
+};

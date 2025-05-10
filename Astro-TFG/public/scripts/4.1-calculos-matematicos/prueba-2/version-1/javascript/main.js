@@ -44,13 +44,21 @@ function primes_to_n(size) {
     document.getElementById("javascript-output").appendChild(resultDiv);
 }
 
-window.runJSBenchmark = async function () {
+window.runJSBenchmark = function () {
     clearCell("javascript-output");
-    document.getElementById("javascript-output").textContent = ""
-    primes_to_n(1_000_000);
-    let memoryDiv = document.createElement("div");
-    memoryDiv.textContent = getMemoryUsageJS();
-    document.getElementById("javascript-output").appendChild(memoryDiv);
+    window.showExecutionLoader();
+
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            document.getElementById("javascript-output").textContent = ""
+            primes_to_n(1_000_000);
+            let memoryDiv = document.createElement("div");
+            memoryDiv.textContent = getMemoryUsageJS();
+            document.getElementById("javascript-output").appendChild(memoryDiv);
+            window.hideExecutionLoader();
+        }, 0);
+    });
+
 }
 
 function getMemoryUsageJS() {

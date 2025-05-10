@@ -48,7 +48,13 @@ function benchmarkPrimesJS(repetitions, n) {
     `;
 }
 
-window.runJSBenchmark = async function () {
+window.runJSBenchmark = function () {
     document.getElementById("javascript-output").textContent = "";
-    benchmarkPrimesJS(1000, 10_000);
+    window.showExecutionLoader();
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            benchmarkPrimesJS(1000, 10_000);
+            window.hideExecutionLoader();
+        }, 0);
+    });
 }

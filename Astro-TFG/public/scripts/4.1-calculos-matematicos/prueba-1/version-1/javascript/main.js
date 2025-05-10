@@ -38,12 +38,19 @@ function multiplyMatrices(size) {
 
 window.runJSBenchmark = function () {
     clearCell("javascript-output");
-    document.getElementById("javascript-output").textContent = ""
-    multiplyMatrices(300);
+    window.showExecutionLoader();
 
-    let memoryDiv = document.createElement("div");
-    memoryDiv.textContent = getMemoryUsageJS();
-    document.getElementById("javascript-output").appendChild(memoryDiv);
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            document.getElementById("javascript-output").textContent = ""
+            multiplyMatrices(300);
+            let memoryDiv = document.createElement("div");
+            memoryDiv.textContent = getMemoryUsageJS();
+            document.getElementById("javascript-output").appendChild(memoryDiv);
+            window.hideExecutionLoader();
+        }, 0);
+    });
+
 }
 
 function getMemoryUsageJS() {

@@ -6,7 +6,7 @@ function transform_data_structure(arr) {
     const result = new Float64Array(arr.length);
     for (let i = 0; i < arr.length; i++) {
         const num = arr[i];
-        result[i] = (num**2 + Math.log(num + 1)) / Math.sqrt(num + 1);
+        result[i] = (num ** 2 + Math.log(num + 1)) / Math.sqrt(num + 1);
     }
     return result;
 }
@@ -83,24 +83,31 @@ function do_operations(size) {
         'memory_peak': max_memory
     };
 
-    for (const [op, data] of Object.entries(metrics)) {
-        if (op !== 'output') {
-            let element = document.getElementById(`javascript-${op}`);
-            if (element) {
-                element.innerHTML = `${op.toUpperCase()} - Time: ${data.time.toFixed(2)} ms | RAM: ${data.memory.toFixed(2)} MB`;
-            }
-        }
-    }
-
     const outputElement = document.getElementById("javascript-output");
-    if (outputElement) {
-        outputElement.innerHTML =
-            `TOTAL - Time: ${metrics['output'].total_time.toFixed(2)} ms | ` +
-            `RAM Peak: ${metrics['output'].memory_peak.toFixed(2)} MB`;
+    if (!outputElement) return;
+    outputElement.innerHTML = "";
+
+
+    for (const [op, data] of Object.entries(metrics)) {
+        if (op === 'output') continue;
+        const line = `${op.toUpperCase()} - Time av. : ${data.time.toFixed(2)} ms | RAM: ${data.memory.toFixed(2)} MB`;
+        outputElement.innerHTML += line + "<br>";
     }
+
+    outputElement.innerHTML += "<br>";
+    const tot = metrics['output'];
+    const totalLine = `TOTAL - Time: ${tot.total_time.toFixed(2)} ms | RAM Peak: ${tot.memory_peak.toFixed(2)} MB`;
+    outputElement.innerHTML += totalLine;
 }
 
-function runJSBenchmark() {
-    clearCell("javascript");
-    do_operations(10_000_000);
-}
+window.runJSBenchmark = function () {
+    clearCell("javascript-output");
+    window.showExecutionLoader();
+
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            do_operations(10_000_000);
+            window.hideExecutionLoader();
+        }, 0);
+    });
+};

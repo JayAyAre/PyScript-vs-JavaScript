@@ -18,6 +18,8 @@ export const tests = [
                             'Esta versión usará estructuras de datos nativas sin usar librerías externas. Consistirá en realizar la operación de multiplicación de matrices mediante bucles anidados. La matriz a operar será de 300×300 y con valores entre 0 y 1.',
                         jsLibs: null,
                         pyConfig: null,
+                        useNode: true,
+                        useBackend: true
                     },
                     {
                         title: 'Estructuras de Datos Optimizadas',
@@ -27,6 +29,8 @@ export const tests = [
                             'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.5.2'
                         ],
                         pyConfig: 'pyscript.toml',
+                        useNode: true,
+                        useBackend: true
                     },
                 ],
             },
@@ -41,6 +45,8 @@ export const tests = [
                             'Esta versión usará estructuras de datos nativas y comprobará divisibilidad básica hasta la raíz cuadrada del número. El rango máximo será hasta 10⁶.',
                         jsLibs: null,
                         pyConfig: null,
+                        useNode: true,
+                        useBackend: true
                     },
                     {
                         title: 'Algoritmos Optimizados con Librerías Especializadas',
@@ -48,6 +54,8 @@ export const tests = [
                             'Esta versión empleará librerías optimizadas para la detección de números, usando el algoritmo de la criba de Eratóstenes. El rango máximo será hasta 10⁴ y se ejecutará 1000 veces para obtener una medición estadística.',
                         jsLibs: null,
                         pyConfig: 'pyscript.toml',
+                        useNode: true,
+                        useBackend: true
                     },
                 ],
             },
@@ -62,6 +70,8 @@ export const tests = [
                             'Se calcularán N=10³ dígitos de π con la implementación de la fórmula BBP usando estructuras nativas. Esta simulación se ejecutará 1000 veces para obtener una medición estadística.',
                         jsLibs: null,
                         pyConfig: null,
+                        useNode: true,
+                        useBackend: true
                     },
                     {
                         title: 'Gauss–Legendre (Estructuras optimizadas) con precisión arbitraria',
@@ -69,6 +79,8 @@ export const tests = [
                             'Se calcularán N=10⁴ dígitos de π con la implementación de Gauss–Legendre usando estructuras optimizadas. Esta simulación se ejecutará 10 veces para obtener una medición estadística mínima.',
                         jsLibs: ["https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.js"],
                         pyConfig: 'pyscript.toml',
+                        useNode: true,
+                        useBackend: true
                     },
                 ],
             },
@@ -93,13 +105,17 @@ export const tests = [
                             'Esta version empleara arrays y listas nativas correspondientes a JavaScript y a PyScript. Esta version se encargara de crear y manipular un conjunto de 10 millones de numeros aleatorios entre 1 y 1000. Al ser la primera version, se usaran algoritmos no optimizados, por ejemplo; En la busqueda de un dato sobre el conjunto, se empleara un bucle donde se itera sobre cada elemento hasta encontrarlo.',
                         jsLibs: null,
                         pyConfig: null,
+                        useNode: false,
+                        useBackend: false
                     },
                     {
                         title: 'Estructuras de Datos Optimizadas con concurrismo y paralelismo',
                         description:
                             'Esta version adicionalmente usara paralelismo y concurrencia para ejecutar las operaciones, de tal manera que ambas tecnologias usaran web workers para ejecutar las operaciones en paralelo, pero se mandaran a ejecutar de forma concurrente.',
                         jsLibs: null,
-                        pyConfig: null,
+                        pyConfig: 'pyscript.toml',
+                        useNode: false,
+                        useBackend: false
                     },
                 ],
             },
@@ -114,6 +130,8 @@ export const tests = [
                             'La primera version se elimino la restriccion de la anterior prueba de usar estructuras basicas como bucles for, aquello conlleva, que ambos lenguajes usen funciones disponibles nativamente como sum() en Python y otros metodos equivalentes en JavaScript.',
                         jsLibs: null,
                         pyConfig: null,
+                        useNode: false,
+                        useBackend: false
                     },
                     {
                         title: 'Algoritmos Optimizados con Librerías Especializadas',
@@ -121,6 +139,8 @@ export const tests = [
                             'Esta version empleara librerias optimizadas para la deteccion de los numeros, para ello, se usara el algoritmo de la criba de Eratosthenes. El rango maximo sera hasta 10^4 y se ejecutara 1000 veces para tener un numero de medicion estadistico.',
                         jsLibs: null,
                         pyConfig: null,
+                        useNode: false,
+                        useBackend: false
                     },
                 ],
             },
@@ -135,6 +155,8 @@ export const tests = [
                             'Esta prueba contiene una unica version que representa un codigo de la forma mas optimizada posible para simular un codigo del mundo real. Se usaran en PyScript Pandas y Numpy y en JavaScript Danfo.js y Arrays.',
                         jsLibs: null,
                         pyConfig: null,
+                        useNode: false,
+                        useBackend: false
                     },
                 ],
             },
@@ -158,6 +180,8 @@ export const tests = [
                             'Esta prueba unicamente incluye una version, una version la cual seria la mas optimizada para simular un codigo del mundo real.',
                         jsLibs: null,
                         pyConfig: null,
+                        useNode: false,
+                        useBackend: false
                     },
                 ],
             },
@@ -172,6 +196,8 @@ export const tests = [
                             'Esta prueba contiene una unica version que representa un codigo de la forma mas optimizada posible para simular un codigo del mundo real. Permitira cambiar el numero de puntos y series disponibles, siendo ejecutados por un unico worker.',
                         jsLibs: null,
                         pyConfig: null,
+                        useNode: false,
+                        useBackend: false
                     },
                 ],
             },
@@ -195,6 +221,8 @@ export const tests = [
                             'Esta prueba unicamente incluye una version, una version la cual seria la mas optimizada para simular un codigo del mundo real. Esta prueba permitira cambiar el numero de peticiones y el tiempo de espera entre ellas, siendo ejecutados por un unico worker, esto ultimo nos permite simular un delay que representa tiempo de trabajo del servidor en el mundo real.',
                         jsLibs: null,
                         pyConfig: null,
+                        useNode: false,
+                        useBackend: false
                     },
                 ],
             },
@@ -209,6 +237,8 @@ export const tests = [
                             'Esta prueba contiene una unica version que representa un codigo de la forma mas optimizada posible para simular un codigo del mundo real. Igual que en la version anterior, se mediran las mismas metricas ademas de tener en cuenta que seran peticiones mediante WebSockets.',
                         jsLibs: null,
                         pyConfig: null,
+                        useNode: false,
+                        useBackend: false
                     },
                 ],
             },
@@ -233,6 +263,8 @@ export const tests = [
                             'Esta prueba incluye una única versión optimizada para simular un escenario del mundo real. El usuario puede especificar el tamaño de un archivo simulado con contenido aleatorio, sobre el cual se calculará su hash mediante el algoritmo SHA-256 y se verificará su integridad. Se medirán métricas de rendimiento como el tiempo promedio de generación y verificación del hash, así como el tiempo total de ejecución.',
                         jsLibs: null,
                         pyConfig: null,
+                        useNode: false,
+                        useBackend: false
                     },
                 ],
             },
@@ -247,6 +279,8 @@ export const tests = [
                             'Esta prueba cifra y descifra un mensaje de tamaño configurable utilizando el algoritmo AES en modo GCM. Se simulan operaciones criptográficas del mundo real, incluyendo el uso de un nonce y una etiqueta de autenticación. Se mide el rendimiento en términos de tiempo promedio de cifrado y descifrado, así como la integridad de los datos. Esta versión está optimizada para evaluar el rendimiento criptográfico en condiciones realistas.',
                         jsLibs: null,
                         pyConfig: null,
+                        useNode: false,
+                        useBackend: false
                     },
                 ],
             },
@@ -270,6 +304,8 @@ export const tests = [
                             'Esta prueba implementa una única versión optimizada que simula un escenario de entrenamiento y evaluación de un modelo de Machine Learning del mundo real. Utiliza el dataset Iris para entrenar un clasificador Random Forest durante múltiples repeticiones configurables. En cada repetición se mide el tiempo de entrenamiento, el tiempo de inferencia, y la precisión obtenida. Al finalizar, se calcula el promedio de estas métricas y se estima el tamaño del modelo resultante en memoria.',
                         jsLibs: null,
                         pyConfig: null,
+                        useNode: false,
+                        useBackend: false
                     },
                 ],
             },
@@ -284,6 +320,8 @@ export const tests = [
                             'Esta prueba contiene una única versión optimizada que simula un escenario de clasificación real utilizando el dataset Digits. En cada repetición configurable, se entrena un modelo de vecinos más cercanos (KNN) con los datos de entrenamiento, se realiza interferencia sobre el conjunto de prueba y se calcula la precisión obtenida. Se miden y promedian los tiempos de entrenamiento, interferencia y precisión. Además, se estima el tamaño en memoria del modelo final para reflejar su impacto computacional.',
                         jsLibs: null,
                         pyConfig: null,
+                        useNode: false,
+                        useBackend: false
                     },
                 ],
             },

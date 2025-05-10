@@ -31,10 +31,13 @@ async function multiplyMatrices(size) {
 
 window.runJSBenchmark = async function () {
     clearCell("javascript-output");
+    window.showExecutionLoader();
 
     await multiplyMatrices(500);
     await multiplyMatrices(1000);
     await multiplyMatrices(2000);
+
+    window.hideExecutionLoader();
 }
 
 function getMemoryUsageJS() {
