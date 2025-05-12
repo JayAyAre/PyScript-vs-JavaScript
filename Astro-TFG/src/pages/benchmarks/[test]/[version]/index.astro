@@ -1,11 +1,9 @@
 ---
-import fs from 'fs';
-import path from 'path';
 import { tests as testData } from '../../../../data/tests';
 import VersionLayout from '../../../../layouts/VersionLayout.astro';
 import '../../../../styles/global.css';
 
-export const prerender = true; // para que getStaticPaths tenga efecto
+export const prerender = true;
 
 export async function getStaticPaths() {
     const paths: { params: { test: string; version: string } }[] = [];
@@ -49,15 +47,16 @@ const versionDir = `version-${versionNumStr}`;
 const pruebaDir = `prueba-${testIndex + 1}`;
 const basePublic = `/scripts/${testParam}/${pruebaDir}/${versionDir}`;
 const jsPath = `${basePublic}/javascript/`;
-const pyPath = `${basePublic}/python/`;
+let pyPath = `${basePublic}/python/`;
 
-let pyConfig: string | undefined = undefined;
-if (version.pyConfig) {
-    const tomlPath = path.resolve(`./public${pyPath}${version.pyConfig}`);
-    if (fs.existsSync(tomlPath)) {
-        pyConfig = version.pyConfig;
-    }
-}
+// if (version.pyConfig) {
+//     if (version.pyConfig.endsWith('.json')) {
+//         pyPath = `${basePublic}/json/`;
+//     }else{
+//         pyPath = `${basePublic}/python/`;
+//     }
+//     pyConfig = version.pyConfig;
+// }
 
 const jsLibs = Array.isArray(version.jsLibs) ? version.jsLibs : [];
 ---
@@ -70,7 +69,8 @@ const jsLibs = Array.isArray(version.jsLibs) ? version.jsLibs : [];
     jsPath={jsPath}
     pyPath={pyPath}
     jsLibs={jsLibs}
-    pyConfig={pyConfig}
-    useNode={rawVersion.useNode}
-    useBackend={rawVersion.useBackend}
+    pyConfig={version.pyConfig}
+    useNode={version.useNode}
+    useBackend={version.useBackend}
+    inputs={version.inputs}
 />

@@ -1,6 +1,4 @@
 ---
-import ft from 'fs';
-import path from 'path';
 import Header from '../components/schedule/BenchmarkHeader.astro';
 import Footer from '../components/schedule/Footer.astro';
 
@@ -13,8 +11,9 @@ const {
     pyPath,
     jsLibs,
     pyConfig,
-    useNode, // ← nuevo
+    useNode,
     useBackend,
+    inputs,
 } = Astro.props;
 ---
 
@@ -25,11 +24,11 @@ const {
         <title>{versionTitle} - {benchmarkTitle}</title>
         <link
             rel="stylesheet"
-            href="https://pyscript.net/releases/2024.1.1/core.css"
+            href="https://pyscript.net/releases/2024.5.2/core.css"
         />
         <script
             type="module"
-            src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+            src="https://pyscript.net/releases/2024.5.2/core.js"></script>
         {jsLibs.map((src: string) => <script src={src} />)}
 
         <script type="module" src={`${jsPath}main.js`} defer></script>
@@ -38,7 +37,11 @@ const {
                 <script
                     type="py"
                     src={`${pyPath}main.py`}
-                    config={`${pyPath}${pyConfig}`}
+                    config={
+                        pyConfig.endsWith('.json')
+                            ? `${pyPath.replace(/python\/$/, 'json/')}${pyConfig}`
+                            : `${pyPath}${pyConfig}`
+                    }
                 />
             ) : (
                 <script type="py" src={`${pyPath}main.py`} />
@@ -91,18 +94,90 @@ const {
                 </h2>
 
                 <div class="flex flex-wrap justify-center gap-4">
-                    <button
-                        onclick="runJSBenchmark()"
-                        class="rounded-lg bg-gray-800 px-4 py-2 transition-all focus:ring focus:ring-purple-400 hover:scale-105 hover:bg-gray-700 hover:text-purple-400 cursor-pointer"
+                    <div
+                        class="flex flex-col justify-center gap-4 items-center mt-4"
                     >
-                        Ejecutar JavaScript
-                    </button>
-                    <button
-                        onclick="runPy()"
-                        class="rounded-lg bg-gray-800 px-4 py-2 transition-all focus:ring focus:ring-purple-400 hover:scale-105 hover:bg-gray-700 hover:text-purple-400 cursor-pointer"
+                        {
+                            inputs &&
+                                inputs.map((input: string) => (
+                                    <div class="flex flex-col items-center">
+                                        <label
+                                            for={`${input}-javascript`}
+                                            class="mb-1 text-sm text-purple-300"
+                                        >
+                                            {{
+                                                'num-executions':
+                                                    'Nº de ejecuciones',
+                                                'parallel-workers':
+                                                    'Trabajadores en paralelo',
+                                            }[input] ||
+                                                input
+                                                    .replace(/-/g, ' ')
+                                                    .replace(/\b\w/g, (l) =>
+                                                        l.toUpperCase()
+                                                    )}{' '}
+                                            (JS)
+                                        </label>
+                                        <input
+                                            id={`${input}-javascript`}
+                                            type="number"
+                                            min="1"
+                                            value="1"
+                                            class="w-36 rounded-md bg-gray-800 px-2 py-1 text-white text-center border border-gray-600 focus:outline-none focus:ring focus:ring-purple-400"
+                                        />
+                                    </div>
+                                ))
+                        }
+                        <button
+                            onclick="runJSBenchmark()"
+                            class="rounded-lg bg-gray-800 px-4 py-2 transition-all focus:ring focus:ring-purple-400 hover:scale-105 hover:bg-gray-700 hover:text-purple-400 cursor-pointer"
+                        >
+                            Ejecutar JavaScript
+                        </button>
+                    </div>
+
+                    <div
+                        class="flex flex-col justify-center gap-4 items-center mt-4"
                     >
-                        Ejecutar PyScript
-                    </button>
+                        {
+                            inputs &&
+                                inputs.map((input: string) => (
+                                    <div class="flex flex-col items-center">
+                                        <label
+                                            for={`${input}-pyscript`}
+                                            class="mb-1 text-sm text-purple-300"
+                                        >
+                                            {{
+                                                'num-executions':
+                                                    'Nº de ejecuciones',
+                                                'parallel-workers':
+                                                    'Trabajadores en paralelo',
+                                            }[input] ||
+                                                input
+                                                    .replace(/-/g, ' ')
+                                                    .replace(/\b\w/g, (l) =>
+                                                        l.toUpperCase()
+                                                    )}{' '}
+                                            (PyScript)
+                                        </label>
+                                        <input
+                                            id={`${input}-pyscript`}
+                                            type="number"
+                                            min="1"
+                                            value="1"
+                                            class="w-36 rounded-md bg-gray-800 px-2 py-1 text-white text-center border border-gray-600 focus:outline-none focus:ring focus:ring-purple-400"
+                                        />
+                                    </div>
+                                ))
+                        }
+                        <button
+                            onclick="runPy()"
+                            class="rounded-lg bg-gray-800 px-4 py-2 transition-all focus:ring focus:ring-purple-400 hover:scale-105 hover:bg-gray-700 hover:text-purple-400 cursor-pointer"
+                        >
+                            Ejecutar PyScript
+                        </button>
+                    </div>
+
                     {
                         useNode && (
                             <button
@@ -212,6 +287,11 @@ const {
         let useNode = document.body.dataset.useNode === 'true';
         let useBackend = document.body.dataset.useBackend === 'true';
 
+        console.log('script:', { pyPath, pyConfig });
+        console.log('jsPath:', { jsPath });
+        console.log('pyPath:', { pyPath });
+        console.log('PyConfig:', { pyConfig });
+
         window.runNodeBenchmark = async function () {
             if (!useNode) return;
             window.clearCell('nodeJs-output');
@@ -245,13 +325,8 @@ const {
             }
         };
 
-        console.log('script:', { pyPath, pyConfig });
-
         jsPath = jsPath?.concat('server.js');
         pyPath = pyPath?.concat('server.py');
-
-        console.log('jsPath:', { jsPath });
-        console.log('pyPath:', { pyPath });
 
         let startTime = performance.now();
         document.addEventListener('py:ready', () => {

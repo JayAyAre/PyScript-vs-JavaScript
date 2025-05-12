@@ -10,24 +10,30 @@ workers_ready = False
 
 
 async def initialize_worker():
-    global workers, workers_ready
-    num_workers = int(js.document.querySelector(
-        "#parallel-workers-pyscript").value)
+    global workers
 
-    if len(workers) > num_workers:
-        workers = workers[:num_workers]
-    elif len(workers) < num_workers:
-        additional_workers = num_workers - len(workers)
-        for _ in range(additional_workers):
-            worker = PyWorker(
-                "./python/worker.py",
-                type="pyodide",
-                config="./json/pyscript-worker.json"
-            )
-            await worker.ready
-            workers.append(worker)
+    try:
+        num_workers = int(js.document.querySelector(
+            "#parallel-workers-pyscript").value) or 1
+        if num_workers < 1:
+            num_workers = 1
 
-    workers_ready = True
+        if len(workers) > num_workers:
+            workers = workers[:num_workers]
+        elif len(workers) < num_workers:
+            to_create = num_workers - len(workers)
+            origin = js.window.location.origin
+            py_path = js.window.document.body.dataset.pyPath
+            for _ in range(to_create):
+                worker = PyWorker(
+                    f"{origin}{py_path}worker.py",
+                    type="pyodide",
+                    config=f"{origin}{py_path.replace('python', 'json')}pyscript-worker.json"
+                )
+                await worker.ready
+                workers.append(worker)
+    except Exception as e:
+        display(f"Error al crear workers: {e}", target="pyscript-output")
 
 asyncio.create_task(initialize_worker())
 
@@ -75,6 +81,7 @@ async def run_py_benchmark(event):
             'average_per_execution': accumulated['total_per_execution'] / num_executions,
             'total_time': (time.perf_counter() - start_time) * 1000
         }
+        js.window.hideExecutionLoader()
 
         update_ui(results)
 
@@ -85,20 +92,21 @@ async def run_py_benchmark(event):
 def update_ui(results):
     for operation in ['create', 'sum', 'mean', 'std']:
         display(
-            f"{results[operation]['time']:.2f} ms | {results[operation]['memory']: .2f} MB",
-            target=f"pyscript-{operation}"
-        )
+            f"{operation.upper()} - Time: {results[operation]['time']:.2f} ms | RAM: {results[operation]['memory']:.2f} MB", target=f"pyscript-output")
 
     display(
-        f"{results['total']['average_per_execution']:.2f} ms",
+        f"Av. Time: {results['total']['average_per_execution']:.2f} ms",
         target="pyscript-output"
     )
     display(
-        f"{results['total']['total_time']:.2f} ms",
-        target="pyscript-exact"
+        f"TOTAL - Time: {results['total']['total_time']:.2f} ms",
+        target="pyscript-output"
     )
 
 
 def js_run_py_benchmark(event):
-    js.clearCell("pyscript")
+    js.clearCell('pyscript-output')
     asyncio.ensure_future(run_py_benchmark(None))
+
+
+js.window.run_py_benchmark = js_run_py_benchmark

@@ -65,26 +65,31 @@ function doStatisticalAnalysis(size) {
         memoryPeak: maxMemory
     };
 
-    for (const [op, data] of Object.entries(metrics)) {
-        if (op !== 'output') {
-            const element = document.getElementById(`javascript-${op}`);
-            if (element) {
-                element.textContent =
-                    `${op.toUpperCase()} - Time: ${data.time.toFixed(2)} ms | ` +
-                    `RAM: ${data.memory.toFixed(2)} MB`;
-            }
-        }
-    }
-
     const outputElement = document.getElementById("javascript-output");
-    if (outputElement) {
-        outputElement.textContent =
-            `TOTAL - Time: ${metrics['output'].totalTime.toFixed(2)} ms | ` +
-            `RAM Peak: ${metrics['output'].memoryPeak.toFixed(2)} MB`;
+    if (!outputElement) return;
+    outputElement.innerHTML = "";
+
+
+    for (const [op, data] of Object.entries(metrics)) {
+        if (op === 'output') continue;
+        const line = `${op.toUpperCase()} - Time av. : ${data.time.toFixed(2)} ms | RAM: ${data.memory.toFixed(2)} MB`;
+        outputElement.innerHTML += line + "<br>";
     }
+
+    outputElement.innerHTML += "<br>";
+    const tot = metrics['output'];
+    const totalLine = `TOTAL - Time: ${tot.totalTime.toFixed(2)} ms | RAM Peak: ${tot.memoryPeak.toFixed(2)} MB`;
+    outputElement.innerHTML += totalLine;
 }
 
-function runJSBenchmark() {
-    clearCell("javascript");
-    doStatisticalAnalysis(10_000_000);
-}
+window.runJSBenchmark = function () {
+    clearCell("javascript-output");
+    window.showExecutionLoader();
+
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            doStatisticalAnalysis(10_000_000);
+            window.hideExecutionLoader();
+        }, 0);
+    });
+};

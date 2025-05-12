@@ -67,20 +67,29 @@ def do_statistical_analysis(size):
     }
     tracemalloc.stop()
 
-    for op, data in metrics.items():
-        if op != 'output':
-            display(
-                f"{op.upper()} - Time: {data['time']:.2f} ms | RAM: {data['memory']:.2f} MB",
-                target=f"pyscript-{op}"
-            )
+    display("", target="pyscript-output")
+    output_element = js.document.getElementById("pyscript-output")
 
-    display(
-        f"TOTAL - Time: {metrics['output']['total_time']:.2f} ms | "
-        f"RAM Peak: {metrics['output']['memory_peak']:.2f} MB",
-        target="pyscript-output"
-    )
+    for op, data in metrics.items():
+        if op == 'output':
+            continue
+        display(
+            f"{op.upper()} - Time: {data['time']:.2f} ms | RAM: {data['memory']:.2f} MB",
+            target=f"pyscript-output"
+        )
+
+    output_element.innerHTML += f"""
+        <br>
+    """
+
+    line = f"TOTAL - Time: {metrics['output']['total_time']:.2f} ms | RAM Peak: {metrics['output']['memory_peak']:.2f} MB"
+    display(line, target="pyscript-output")
+    js.window.hideExecutionLoader()
 
 
 def run_py_benchmark(event):
-    js.clearCell('pyscript')
+    js.clearCell('pyscript-output')
     do_statistical_analysis(10_000_000)
+
+
+js.window.run_py_benchmark = run_py_benchmark

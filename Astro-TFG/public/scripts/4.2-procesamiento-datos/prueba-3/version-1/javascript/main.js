@@ -19,7 +19,7 @@ function initializeWorkers() {
         let initialized = 0;
 
         for (let i = 0; i < additionalWorkers; i++) {
-            const worker = new Worker("./javascript/worker.js");
+            const worker = new Worker(window.location.origin + window.document.body.dataset.jsPath + "worker.js");
 
             worker.onmessage = (event) => {
                 const { id, results } = event.data;
@@ -114,55 +114,39 @@ async function runJSBenchmark(event) {
 }
 
 function displayResults(results) {
-    displayJSText(
-        "javascript-create",
-        `${results.create.time.toFixed(2)} ms | ${results.create.memory.toFixed(
-            2
-        )} MB`
-    );
-    displayJSText(
-        "javascript-sum",
-        `${results.sum.time.toFixed(2)} ms | ${results.sum.memory.toFixed(
-            2
-        )} MB`
-    );
-    displayJSText(
-        "javascript-mean",
-        `${results.mean.time.toFixed(2)} ms | ${results.mean.memory.toFixed(
-            2
-        )} MB`
-    );
-    displayJSText(
-        "javascript-std",
-        `${results.std.time.toFixed(2)} ms | ${results.std.memory.toFixed(
-            2
-        )} MB`
-    );
-    displayJSText(
-        "javascript-output",
-        `${results.total.average_per_execution.toFixed(2)} ms`
-    );
-    displayJSText(
-        "javascript-exact",
-        `${results.total.total_time.toFixed(2)} ms`
-    );
-}
+    let out = document.getElementById("javascript-output");
+    for (const op of ['create', 'sum', 'mean', 'std']) {
+        const data = results[op];
+        const time = Math.round(data.time * 100) / 100;
+        const mem = Math.round(data.memory * 100) / 100;
+        const line = `${op.toUpperCase()} - Time: ${time.toFixed(2)} ms | RAM: ${mem.toFixed(2)} MB`;
 
-function clearCell(prefix) {
-    const operations = ["create", "sum", "mean", "std", "output", "exact"];
-    operations.forEach((op) => {
-        const element = document.getElementById(`${prefix}-${op}`);
-        if (element) {
-            element.innerHTML = "";
-        }
-    });
-}
-
-function displayJSText(elementId, text) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.textContent += text;
-    } else {
-        console.warn(`Element with ID ${elementId} not found.`);
+        const div = document.createElement('div');
+        div.textContent = line;
+        out.appendChild(div);
     }
+
+    const avg = Math.round(results.total.average_per_execution * 100) / 100;
+    const avgDiv = document.createElement('div');
+    avgDiv.textContent = `Av. Time: ${avg.toFixed(2)} ms`;
+    out.appendChild(avgDiv);
+
+    const tot = Math.round(results.total.total_time * 100) / 100;
+    const totDiv = document.createElement('div');
+    totDiv.textContent = `TOTAL - Time: ${tot.toFixed(2)} ms`;
+    out.appendChild(totDiv);
 }
+
+
+window.runJSBenchmark = async function () {
+    clearCell("javascript-output");
+    window.showExecutionLoader();
+
+    await new Promise(requestAnimationFrame);
+
+    try {
+        await runJSBenchmark();
+    } finally {
+        window.hideExecutionLoader();
+    }
+};

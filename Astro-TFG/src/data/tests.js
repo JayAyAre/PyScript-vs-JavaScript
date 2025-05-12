@@ -19,7 +19,8 @@ export const tests = [
                         jsLibs: null,
                         pyConfig: null,
                         useNode: true,
-                        useBackend: true
+                        useBackend: true,
+                        inputs: null
                     },
                     {
                         title: 'Estructuras de Datos Optimizadas',
@@ -30,7 +31,8 @@ export const tests = [
                         ],
                         pyConfig: 'pyscript.toml',
                         useNode: true,
-                        useBackend: true
+                        useBackend: true,
+                        inputs: null
                     },
                 ],
             },
@@ -46,7 +48,8 @@ export const tests = [
                         jsLibs: null,
                         pyConfig: null,
                         useNode: true,
-                        useBackend: true
+                        useBackend: true,
+                        inputs: null
                     },
                     {
                         title: 'Algoritmos Optimizados con Librerías Especializadas',
@@ -55,7 +58,8 @@ export const tests = [
                         jsLibs: null,
                         pyConfig: 'pyscript.toml',
                         useNode: true,
-                        useBackend: true
+                        useBackend: true,
+                        inputs: ["num-executions", "parallel-workers"]
                     },
                 ],
             },
@@ -71,7 +75,8 @@ export const tests = [
                         jsLibs: null,
                         pyConfig: null,
                         useNode: true,
-                        useBackend: true
+                        useBackend: true,
+                        inputs: null
                     },
                     {
                         title: 'Gauss–Legendre (Estructuras optimizadas) con precisión arbitraria',
@@ -80,7 +85,8 @@ export const tests = [
                         jsLibs: ["https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.js"],
                         pyConfig: 'pyscript.toml',
                         useNode: true,
-                        useBackend: true
+                        useBackend: true,
+                        inputs: null
                     },
                 ],
             },
@@ -106,16 +112,18 @@ export const tests = [
                         jsLibs: null,
                         pyConfig: null,
                         useNode: false,
-                        useBackend: false
+                        useBackend: false,
+                        inputs: null
                     },
                     {
                         title: 'Estructuras de Datos Optimizadas con concurrismo y paralelismo',
                         description:
-                            'Esta version adicionalmente usara paralelismo y concurrencia para ejecutar las operaciones, de tal manera que ambas tecnologias usaran web workers para ejecutar las operaciones en paralelo, pero se mandaran a ejecutar de forma concurrente.',
+                            'Esta version adicionalmente usara paralelismo y concurrencia para ejecutar las operaciones, de tal manera que ambas tecnologias usaran web workers para ejecutar las operaciones en paralelo, pero se mandaran a ejecutar de forma concurrente. Las ejecuciones seran individuales, y el conjunto de datos tendra un tamaño de 10 millones de elementos.',
                         jsLibs: null,
                         pyConfig: 'pyscript.toml',
                         useNode: false,
-                        useBackend: false
+                        useBackend: false,
+                        inputs: null
                     },
                 ],
             },
@@ -127,20 +135,22 @@ export const tests = [
                     {
                         title: 'Estructuras de Datos Nativas',
                         description:
-                            'La primera version se elimino la restriccion de la anterior prueba de usar estructuras basicas como bucles for, aquello conlleva, que ambos lenguajes usen funciones disponibles nativamente como sum() en Python y otros metodos equivalentes en JavaScript.',
+                            'En la primera version se elimino la restriccion de la anterior prueba de usar estructuras basicas como bucles for, aquello conlleva, que ambos lenguajes usen funciones disponibles nativamente como sum() en Python y otros metodos equivalentes en JavaScript. Se genera el conjunto de 10 millones de números aleatorios entre 1 y 1000, y se analizará la suma, creación, media y desviación estandar de los datos.',
                         jsLibs: null,
                         pyConfig: null,
                         useNode: false,
-                        useBackend: false
+                        useBackend: false,
+                        inputs: null
                     },
                     {
                         title: 'Algoritmos Optimizados con Librerías Especializadas',
                         description:
                             'Esta version empleara librerias optimizadas para la deteccion de los numeros, para ello, se usara el algoritmo de la criba de Eratosthenes. El rango maximo sera hasta 10^4 y se ejecutara 1000 veces para tener un numero de medicion estadistico.',
-                        jsLibs: null,
-                        pyConfig: null,
+                        jsLibs: ["https://cdn.jsdelivr.net/npm/danfojs@1.2.0/lib/bundle.min.js"],
+                        pyConfig: "pyscript-main.json",
                         useNode: false,
-                        useBackend: false
+                        useBackend: false,
+                        inputs: ["num-executions", "parallel-workers"]
                     },
                 ],
             },
@@ -152,11 +162,12 @@ export const tests = [
                     {
                         title: 'Version optimizada',
                         description:
-                            'Esta prueba contiene una unica version que representa un codigo de la forma mas optimizada posible para simular un codigo del mundo real. Se usaran en PyScript Pandas y Numpy y en JavaScript Danfo.js y Arrays.',
-                        jsLibs: null,
-                        pyConfig: null,
+                            'Esta prueba contiene una unica version que representa un codigo de la forma mas optimizada posible para simular un codigo del mundo real. Se usara en PyScript Pandas y Numpy, y en JavaScript Danfo.js y Arrays.',
+                        jsLibs: ["https://cdn.jsdelivr.net/npm/danfojs@1.2.0/lib/bundle.min.js"],
+                        pyConfig: "pyscript-main.json",
                         useNode: false,
-                        useBackend: false
+                        useBackend: false,
+                        inputs: ["num-executions", "parallel-workers"]
                     },
                 ],
             },
@@ -181,7 +192,8 @@ export const tests = [
                         jsLibs: null,
                         pyConfig: null,
                         useNode: false,
-                        useBackend: false
+                        useBackend: false,
+                        inputs: null
                     },
                 ],
             },
@@ -197,7 +209,8 @@ export const tests = [
                         jsLibs: null,
                         pyConfig: null,
                         useNode: false,
-                        useBackend: false
+                        useBackend: false,
+                        inputs: null
                     },
                 ],
             },
@@ -222,7 +235,8 @@ export const tests = [
                         jsLibs: null,
                         pyConfig: null,
                         useNode: false,
-                        useBackend: false
+                        useBackend: false,
+                        inputs: null
                     },
                 ],
             },
@@ -238,7 +252,8 @@ export const tests = [
                         jsLibs: null,
                         pyConfig: null,
                         useNode: false,
-                        useBackend: false
+                        useBackend: false,
+                        inputs: null
                     },
                 ],
             },
@@ -264,7 +279,8 @@ export const tests = [
                         jsLibs: null,
                         pyConfig: null,
                         useNode: false,
-                        useBackend: false
+                        useBackend: false,
+                        inputs: null
                     },
                 ],
             },
@@ -280,7 +296,8 @@ export const tests = [
                         jsLibs: null,
                         pyConfig: null,
                         useNode: false,
-                        useBackend: false
+                        useBackend: false,
+                        inputs: null
                     },
                 ],
             },
@@ -305,7 +322,8 @@ export const tests = [
                         jsLibs: null,
                         pyConfig: null,
                         useNode: false,
-                        useBackend: false
+                        useBackend: false,
+                        inputs: null
                     },
                 ],
             },
@@ -321,7 +339,8 @@ export const tests = [
                         jsLibs: null,
                         pyConfig: null,
                         useNode: false,
-                        useBackend: false
+                        useBackend: false,
+                        inputs: null
                     },
                 ],
             },
