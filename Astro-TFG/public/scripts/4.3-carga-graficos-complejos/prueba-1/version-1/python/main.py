@@ -10,8 +10,12 @@ worker = None
 async def initialize_worker():
     global worker
     if worker is None:
-        worker = PyWorker("./python/worker.py", type="pyodide",
-                          config="./json/pyscript-worker.json")
+        origin = js.window.location.origin
+        py_path = js.window.document.body.dataset.pyPath
+        worker = PyWorker(
+            f"{origin}{py_path}worker.py",
+            type="pyodide",
+            config=f"{origin}{py_path.replace('python', 'json')}pyscript-worker.json")
         await worker.ready
 
 
@@ -20,8 +24,7 @@ async def run_py_benchmark(event):
     await initialize_worker()
     worker_time = (time.perf_counter() - start_time) * 1000
     try:
-        js.clearCell("pyscript")
-        js.clearGraphContainer("graph-container-py")
+        js.clearCell("pyscript-output")
         num_executions = int(js.document.querySelector(
             "#num-executions-pyscript").value)
 
@@ -57,9 +60,9 @@ async def run_py_benchmark(event):
             key: accumulated[key] / num_executions for key in accumulated
         }
 
-        js.displayPlotPy(results_list[-1]["image_base64"])
-        js.stopPyTimer()
-
+        js.window.displayPlot(
+            results_list[-1]["image_base64"], "pyscript-output")
+        js.window.hideExecutionLoader()
         update_ui(averaged, total_elapsed, worker_time)
 
     except Exception as e:
@@ -68,17 +71,21 @@ async def run_py_benchmark(event):
 
 def update_ui(metrics, total_time, worker_time):
     display(
-        f"Worker Time: {worker_time:.2f} ms", target="pyscript-output")
+        f"Av. Worker Time: {worker_time:.2f} ms", target="pyscript-output")
     display(
-        f"Data Generation: {metrics['data_gen_time']:.2f} ms", target="pyscript-output")
+        f"Av. Data Generation: {metrics['data_gen_time']:.2f} ms", target="pyscript-output")
     display(
-        f"Rendering: {metrics['render_time']:.2f} ms", target="pyscript-output")
-    display(f"Memory: {metrics['memory']:.2f} MB", target="pyscript-output")
+        f"Av. Rendering: {metrics['render_time']:.2f} ms", target="pyscript-output")
+    display(f"Av. Memory: {metrics['memory']:.2f} MB",
+            target="pyscript-output")
     display(
-        f"Average per Execution: {metrics['total_time']:.2f} ms", target="pyscript-output")
-    display(f"TOTAL TIME: {total_time:.2f} ms", target="pyscript-exact")
+        f"Av. Execution Time: {metrics['total_time']:.2f} ms", target="pyscript-output")
+    display(f"TOTAL TIME: {total_time:.2f} ms", target="pyscript-output")
 
 
 def js_run_py_benchmark(event):
-    js.startPyTimer()
+    js.clearCell('pyscript-output')
     asyncio.ensure_future(run_py_benchmark(None))
+
+
+js.window.run_py_benchmark = js_run_py_benchmark

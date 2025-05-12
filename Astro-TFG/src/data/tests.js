@@ -20,7 +20,8 @@ export const tests = [
                         pyConfig: null,
                         useNode: true,
                         useBackend: true,
-                        inputs: null
+                        inputs: null,
+                        graph: false,
                     },
                     {
                         title: 'Estructuras de Datos Optimizadas',
@@ -32,7 +33,8 @@ export const tests = [
                         pyConfig: 'pyscript.toml',
                         useNode: true,
                         useBackend: true,
-                        inputs: null
+                        inputs: null,
+                        graph: false,
                     },
                 ],
             },
@@ -49,7 +51,8 @@ export const tests = [
                         pyConfig: null,
                         useNode: true,
                         useBackend: true,
-                        inputs: null
+                        inputs: null,
+                        graph: false,
                     },
                     {
                         title: 'Algoritmos Optimizados con Librerías Especializadas',
@@ -59,7 +62,8 @@ export const tests = [
                         pyConfig: 'pyscript.toml',
                         useNode: true,
                         useBackend: true,
-                        inputs: ["num-executions", "parallel-workers"]
+                        inputs: ["num-executions", "parallel-workers"],
+                        graph: false,
                     },
                 ],
             },
@@ -76,7 +80,8 @@ export const tests = [
                         pyConfig: null,
                         useNode: true,
                         useBackend: true,
-                        inputs: null
+                        inputs: null,
+                        graph: false,
                     },
                     {
                         title: 'Gauss–Legendre (Estructuras optimizadas) con precisión arbitraria',
@@ -86,7 +91,8 @@ export const tests = [
                         pyConfig: 'pyscript.toml',
                         useNode: true,
                         useBackend: true,
-                        inputs: null
+                        inputs: null,
+                        graph: false,
                     },
                 ],
             },
@@ -113,7 +119,8 @@ export const tests = [
                         pyConfig: null,
                         useNode: false,
                         useBackend: false,
-                        inputs: null
+                        inputs: null,
+                        graph: false,
                     },
                     {
                         title: 'Estructuras de Datos Optimizadas con concurrismo y paralelismo',
@@ -123,7 +130,8 @@ export const tests = [
                         pyConfig: 'pyscript.toml',
                         useNode: false,
                         useBackend: false,
-                        inputs: null
+                        inputs: null,
+                        graph: false,
                     },
                 ],
             },
@@ -140,7 +148,8 @@ export const tests = [
                         pyConfig: null,
                         useNode: false,
                         useBackend: false,
-                        inputs: null
+                        inputs: null,
+                        graph: false,
                     },
                     {
                         title: 'Algoritmos Optimizados con Librerías Especializadas',
@@ -150,7 +159,8 @@ export const tests = [
                         pyConfig: "pyscript-main.json",
                         useNode: false,
                         useBackend: false,
-                        inputs: ["num-executions", "parallel-workers"]
+                        inputs: ["num-executions", "parallel-workers"],
+                        graph: false,
                     },
                 ],
             },
@@ -167,7 +177,8 @@ export const tests = [
                         pyConfig: "pyscript-main.json",
                         useNode: false,
                         useBackend: false,
-                        inputs: ["num-executions", "parallel-workers"]
+                        inputs: ["num-executions", "parallel-workers"],
+                        graph: false,
                     },
                 ],
             },
@@ -193,7 +204,8 @@ export const tests = [
                         pyConfig: null,
                         useNode: false,
                         useBackend: false,
-                        inputs: null
+                        inputs: ["num-executions"],
+                        graph: true,
                     },
                 ],
             },
@@ -210,7 +222,8 @@ export const tests = [
                         pyConfig: null,
                         useNode: false,
                         useBackend: false,
-                        inputs: null
+                        inputs: null,
+                        graph: true,
                     },
                 ],
             },
@@ -236,7 +249,8 @@ export const tests = [
                         pyConfig: null,
                         useNode: false,
                         useBackend: false,
-                        inputs: null
+                        inputs: null,
+                        graph: false,
                     },
                 ],
             },
@@ -253,7 +267,8 @@ export const tests = [
                         pyConfig: null,
                         useNode: false,
                         useBackend: false,
-                        inputs: null
+                        inputs: null,
+                        graph: false,
                     },
                 ],
             },
@@ -280,7 +295,8 @@ export const tests = [
                         pyConfig: null,
                         useNode: false,
                         useBackend: false,
-                        inputs: null
+                        inputs: null,
+                        graph: false,
                     },
                 ],
             },
@@ -297,7 +313,8 @@ export const tests = [
                         pyConfig: null,
                         useNode: false,
                         useBackend: false,
-                        inputs: null
+                        inputs: null,
+                        graph: false,
                     },
                 ],
             },
@@ -323,7 +340,8 @@ export const tests = [
                         pyConfig: null,
                         useNode: false,
                         useBackend: false,
-                        inputs: null
+                        inputs: null,
+                        graph: false,
                     },
                 ],
             },
@@ -340,7 +358,8 @@ export const tests = [
                         pyConfig: null,
                         useNode: false,
                         useBackend: false,
-                        inputs: null
+                        inputs: null,
+                        graph: false,
                     },
                 ],
             },

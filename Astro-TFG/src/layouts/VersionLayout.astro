@@ -14,6 +14,7 @@ const {
     useNode,
     useBackend,
     inputs,
+    graph,
 } = Astro.props;
 ---
 
@@ -95,7 +96,7 @@ const {
 
                 <div class="flex flex-wrap justify-center gap-4">
                     <div
-                        class="flex flex-col justify-center gap-4 items-center mt-4"
+                        class="flex flex-col justify-center gap-4 items-center"
                     >
                         {
                             inputs &&
@@ -137,7 +138,7 @@ const {
                     </div>
 
                     <div
-                        class="flex flex-col justify-center gap-4 items-center mt-4"
+                        class="flex flex-col justify-center gap-4 items-center"
                     >
                         {
                             inputs &&
@@ -180,23 +181,27 @@ const {
 
                     {
                         useNode && (
-                            <button
-                                onclick="runNodeBenchmark()"
-                                class="rounded-lg bg-gray-800 px-4 py-2 transition-all focus:ring focus:ring-purple-400 hover:scale-105 hover:bg-gray-700 hover:text-purple-400 cursor-pointer"
-                            >
-                                Ejecutar Node.js
-                            </button>
+                            <div class="flex flex-col justify-center gap-4 items-center">
+                                <button
+                                    onclick="runNodeBenchmark()"
+                                    class="rounded-lg bg-gray-800 px-4 py-2 transition-all focus:ring focus:ring-purple-400 hover:scale-105 hover:bg-gray-700 hover:text-purple-400 cursor-pointer"
+                                >
+                                    Ejecutar Node.js
+                                </button>
+                            </div>
                         )
                     }
 
                     {
                         useBackend && (
-                            <button
-                                onclick="runPyBackendBenchmark()"
-                                class="rounded-lg bg-gray-800 px-4 py-2 transition-all focus:ring focus:ring-purple-400 hover:scale-105 hover:bg-gray-700 hover:text-purple-400 cursor-pointer"
-                            >
-                                Ejecutar Backend Python
-                            </button>
+                            <div class="flex flex-col justify-center gap-4 items-center">
+                                <button
+                                    onclick="runPyBackendBenchmark()"
+                                    class="rounded-lg bg-gray-800 px-4 py-2 transition-all focus:ring focus:ring-purple-400 hover:scale-105 hover:bg-gray-700 hover:text-purple-400 cursor-pointer"
+                                >
+                                    Ejecutar Backend Python
+                                </button>
+                            </div>
                         )
                     }
                 </div>
@@ -391,6 +396,16 @@ const {
             const element = document.getElementById(elementId);
             if (!element) return;
             element.textContent = '';
+        };
+
+        window.displayPlot = function (base64Data, elementId) {
+            try {
+                import('../scripts/DisplayPlot.js').then((module) => {
+                    module.display(base64Data, elementId);
+                });
+            } catch (err) {
+                console.error('Error al mostrar gráfico:', err);
+            }
         };
     </script>
 </html>

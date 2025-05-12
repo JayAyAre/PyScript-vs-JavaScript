@@ -68,14 +68,15 @@ async def run_py_benchmark(event):
 
 def update_ui(metrics, total_time, worker_time):
     display(
-        f"Worker Time: {worker_time:.2f} ms", target="pyscript-output")
+        f"Av. Worker Time: {worker_time:.2f} ms", target="pyscript-output")
     display(
-        f"Data Generation: {metrics['data_gen_time']:.2f} ms", target="pyscript-output")
+        f"Av. Data Generation: {metrics['data_gen_time']:.2f} ms", target="pyscript-output")
     display(
-        f"Rendering: {metrics['render_time']:.2f} ms", target="pyscript-output")
-    display(f"Memory: {metrics['memory']:.2f} MB", target="pyscript-output")
+        f"Av. Rendering: {metrics['render_time']:.2f} ms", target="pyscript-output")
+    display(f"Av. Memory: {metrics['memory']:.2f} MB",
+            target="pyscript-output")
     display(
-        f"Average per Execution: {metrics['total_time']:.2f} ms", target="pyscript-output")
+        f"Av. Execution Time: {metrics['total_time']:.2f} ms", target="pyscript-output")
     display(f"TOTAL TIME: {total_time:.2f} ms", target="pyscript-exact")
 
 
