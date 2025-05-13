@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmarking: JavaScript vs PyScript</title>
+
+
+    <script type="module" src="https://pyscript.net/releases/2024.8.1/core.js"></script>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.1/core.css">
+    
+    <script src="javascript/main.js" defer></script>
+    
+    <script>
+        if (!crypto.randomUUID) {
+            crypto.randomUUID = function() {
+                // Genera un UUID v4
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+                });
+            }
+        }
+        document.addEventListener('py:ready', () => {
+            document.getElementById("run-button-py").disabled = false;
+
+            document.getElementById("run-button-py").textContent = 'Run in PyScript';
+            console.log('PyScript fully loaded');
+        });
+        let pyTimer = null;
+        let pyStartTime = 0;
+
+        function startPyTimer() {
+            pyStartTime = performance.now();
+            const timerElement = document.getElementById("py-timer-display");
+            
+            function updateTimer() {
+                if (!pyTimer) return;
+                
+                const elapsedMs = performance.now() - pyStartTime;
+                const elapsed = (elapsedMs / 1000).toFixed(3);
+                timerElement.textContent = `PyScript Timer: ${elapsed} s`;
+                
+                pyTimer = requestAnimationFrame(updateTimer);
+            }
+            
+            cancelAnimationFrame(pyTimer);
+            pyTimer = requestAnimationFrame(updateTimer);
+        }
+
+        function stopPyTimer() {
+            cancelAnimationFrame(pyTimer);
+            pyTimer = null;
+            
+            const elapsedMs = performance.now() - pyStartTime;
+            const elapsed = (elapsedMs / 1000).toFixed(3);
+            document.getElementById("py-timer-display").textContent = `PyScript Timer: ${elapsed} s`;
+        }
+        let startTime = performance.now();
+
+        document.addEventListener('py:ready', () => {
+            let endTime = performance.now();
+            let loadTime = endTime - startTime;
+            document.getElementById("output").innerText += `PLT: ${loadTime.toFixed(2)} ms`;
+        });
+
+        function clearCell(elementId) {
+            const operations = ['output', 'exact'];
+            operations.forEach(op => {
+                const element = document.getElementById(`${elementId}-${op}`);
+                if (element) {
+                    element.innerHTML = "";
+                }
+            });
+        }
+    </script>
+<body>
+    <script type="py" src="python/main.py" config="json/pyscript-main.json"></script>
+
+    <h1>Benchmark: WebSocket Requests</h1>
+    <h2 id="output"></h2>
+
+    <div>
+        <div>
+            <label for="num-requests">Número de solicitudes:</label>
+            <input type="number" id="num-requests-js" value="5" min="1">
+        </div>
+        <div>
+            <label for="request-delay">Retardo por solicitud (ms):</label>
+            <input type="number" id="request-delay-js" value="100" min="0">
+        </div>
+        <button id="run-button-js" onclick="javascriptBenchmark()">Run JavaScript</button>
+    </div>
+
+
+    <div>
+        <div>
+            <label for="num-requests">Número de solicitudes:</label>
+            <input type="number" id="num-requests-py" value="5" min="1">
+        </div>
+        <div>
+            <label for="request-delay">Retardo por solicitud (ms):</label>
+            <input type="number" id="request-delay-py" value="100" min="0">
+        </div>
+        <button id="run-button-py" py-click="launch_worker" disabled>Run PyScript (Loading...)</button>
+    </div>
+
+
+    <h2 id="js-timer-display">JS Timer: 0.00 s</h2>
+    <h2 id="py-timer-display">PyScript Timer: 0.00 s</h2>
+    <div id="debug-console"></div>
+
+
+    <table id="metrics-container">
+        <thead>
+            <tr>
+                <th>Metric</th>
+                <th>JavaScript</th>
+                <th>PyScript</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Times</td>
+                <td id="javascript-output"></td>
+                <td id="pyscript-output"></td>
+            </tr>
+            <tr>
+                <td>Total</td>
+                <td id="javascript-exact"></td>
+                <td id="pyscript-exact"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

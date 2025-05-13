@@ -246,10 +246,10 @@ export const tests = [
                         description:
                             'Esta prueba unicamente incluye una version, una version la cual seria la mas optimizada para simular un codigo del mundo real. Esta prueba permitira cambiar el numero de peticiones y el tiempo de espera entre ellas, siendo ejecutados por un unico worker, esto ultimo nos permite simular un delay que representa tiempo de trabajo del servidor en el mundo real.',
                         jsLibs: null,
-                        pyConfig: null,
+                        pyConfig: "pyscript-main.json",
                         useNode: false,
                         useBackend: false,
-                        inputs: null,
+                        inputs: ["num-requests", "request-delay"],
                         graph: false,
                     },
                 ],

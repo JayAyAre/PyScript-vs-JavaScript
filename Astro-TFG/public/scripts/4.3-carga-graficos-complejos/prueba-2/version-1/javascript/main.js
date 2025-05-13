@@ -97,7 +97,6 @@ async function _runJSBenchmark() {
             layout: graphData.layout
         });
 
-        // window.Plotly.newPlot("javascript-output", graphDataJSON.data, graphDataJSON.layout);
         window.displayPlotFromJSON(graphDataJSON, 'javascript-output');
         updateUI(metrics);
         window.startFPSMeasurement(3000, "javascript-output")
