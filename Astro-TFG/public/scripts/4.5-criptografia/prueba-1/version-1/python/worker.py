@@ -5,12 +5,13 @@ import time
 import json
 
 
-async def js_run_py_benchmark(worker_time):
+async def do_hash(worker_time):
     try:
         await asyncio.sleep(0.1)
         num_repetitions = int(
-            document.getElementById("num-repetitions-py").value)
-        file_size_mb = float(document.getElementById("file-size-py").value)
+            document.getElementById("num-repetitions-pyscript").value)
+        file_size_mb = float(document.getElementById(
+            "file-size-pyscript").value)
 
         start_time = time.perf_counter()
 
@@ -52,4 +53,4 @@ async def js_run_py_benchmark(worker_time):
     except Exception as e:
         display(f"Error: {e}", target="pyscript-output")
 
-sync.js_run_py_benchmark = js_run_py_benchmark
+sync.do_hash = do_hash

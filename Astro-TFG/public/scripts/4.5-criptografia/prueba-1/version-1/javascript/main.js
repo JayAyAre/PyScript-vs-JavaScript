@@ -1,52 +1,25 @@
-// main.js
 let worker = null;
-let jsTimer = null;
-let jsStartTime = 0;
-
-function startJsTimer() {
-    jsStartTime = performance.now();
-    const timerElement = document.getElementById("js-timer-display");
-    function updateTimer() {
-        if (!jsTimer) return;
-        const elapsed = ((performance.now() - jsStartTime) / 1000).toFixed(3);
-        timerElement.textContent = `JS Timer: ${elapsed} s`;
-        jsTimer = requestAnimationFrame(updateTimer);
-    }
-    cancelAnimationFrame(jsTimer);
-    jsTimer = requestAnimationFrame(updateTimer);
-}
-
-function stopJsTimer() {
-    cancelAnimationFrame(jsTimer);
-    jsTimer = null;
-    const elapsed = ((performance.now() - jsStartTime) / 1000).toFixed(3);
-    document.getElementById(
-        "js-timer-display"
-    ).textContent = `JS Timer: ${elapsed} s`;
-}
 
 async function javascriptBenchmark() {
     try {
-        startJsTimer();
+
+        window.clearCell("javascript-output");
+        window.showExecutionLoader();
+
         const startWorkerTime = performance.now();
-        if (!worker) {
-            worker = new Worker("./javascript/worker.js");
-        }
+        await initializeWorker();
         const workerTime = performance.now() - startWorkerTime;
 
-        clearCell("javascript");
-
         const repetitions = parseInt(
-            document.getElementById("num-repetitions-js").value,
+            document.getElementById("num-repetitions-javascript").value,
             10
         );
         const fileSizeMb = parseFloat(
-            document.getElementById("file-size-js").value
+            document.getElementById("file-size-javascript").value
         );
         const id = `js-${Date.now()}`;
 
         const resultJson = await new Promise((resolve, reject) => {
-            // handler que sólo procesa nuestro mensaje
             function onMessage(e) {
                 if (e.data.id !== id) return;
                 worker.removeEventListener("message", onMessage);
@@ -75,20 +48,12 @@ async function javascriptBenchmark() {
         const out = document.getElementById("javascript-output");
         out.textContent = `Error: ${err.message}`;
     } finally {
-        stopJsTimer();
+        window.hideExecutionLoader();
     }
-}
-
-function clearCell(prefix) {
-    ["output", "exact"].forEach((field) => {
-        const el = document.getElementById(`${prefix}-${field}`);
-        if (el) el.textContent = "";
-    });
 }
 
 function displayResult(result, workerTime) {
     const out = document.getElementById("javascript-output");
-    const exact = document.getElementById("javascript-exact");
 
     out.innerHTML = `
       <div>Worker time: ${workerTime.toFixed(2)} ms</div>
@@ -97,12 +62,48 @@ function displayResult(result, workerTime) {
       <div>Avg hash time: ${result.hash_avg_time_ms.toFixed(2)} ms</div>
       <div>Avg verify time: ${result.verify_avg_time_ms.toFixed(2)} ms</div>
       <div>Last hash (shortened): ${result.last_digest.slice(0, 20)}...</div>
-    `;
-    exact.innerHTML = `
       <div>Total op time: ${result.total_time_ms.toFixed(2)} ms</div>
       <div>Total time: ${result.total_time.toFixed(2)} ms</div>
     `;
 }
 
+function initializeWorker() {
+    return new Promise((resolve) => {
+        if (worker) {
+            resolve();
+            return;
+        }
+
+        const workerPath = window.location.origin +
+            window.document.body.dataset.jsPath +
+            "worker.js";
+
+        worker = new Worker(workerPath);
+
+        worker.onmessage = (event) => {
+            const { id, results, error, metrics } = event.data;
+
+            if (error && pendingPromises.has(id)) {
+                pendingPromises.get(id).reject(error);
+                pendingPromises.delete(id);
+                return;
+            }
+
+            if (pendingPromises.has(id)) {
+                pendingPromises.get(id).resolve({
+                    results,
+                    metrics
+                });
+                pendingPromises.delete(id);
+            }
+        };
+
+        resolve();
+    });
+}
+
 // dejar expuesta
-window.javascriptBenchmark = javascriptBenchmark;
+window.runJSBenchmark = javascriptBenchmark;
+
+
+

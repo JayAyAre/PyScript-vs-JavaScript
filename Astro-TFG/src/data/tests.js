@@ -292,10 +292,10 @@ export const tests = [
                         description:
                             'Esta prueba incluye una única versión optimizada para simular un escenario del mundo real. El usuario puede especificar el tamaño de un archivo simulado con contenido aleatorio, sobre el cual se calculará su hash mediante el algoritmo SHA-256 y se verificará su integridad. Se medirán métricas de rendimiento como el tiempo promedio de generación y verificación del hash, así como el tiempo total de ejecución.',
                         jsLibs: null,
-                        pyConfig: null,
+                        pyConfig: "pyscript-main.json",
                         useNode: false,
                         useBackend: false,
-                        inputs: null,
+                        inputs: ["num-repetitions", "file-size"],
                         graph: false,
                     },
                 ],
