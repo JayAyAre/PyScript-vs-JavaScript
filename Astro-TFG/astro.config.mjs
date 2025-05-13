@@ -8,7 +8,6 @@ export default defineConfig({
             cors: true,
         },
         plugins: [
-            // Este plugin inyecta COOP y COEP en el dev server
             {
                 name: 'astro-dev-add-headers',
                 configureServer(server) {

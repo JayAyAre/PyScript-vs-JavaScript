@@ -153,6 +153,8 @@ const {
                                                     'Nº de ejecuciones',
                                                 'parallel-workers':
                                                     'Trabajadores en paralelo',
+                                                'num-series': 'Nº de series',
+                                                'num-points': 'Nº de puntos',
                                             }[input] ||
                                                 input
                                                     .replace(/-/g, ' ')
@@ -213,75 +215,72 @@ const {
                 </h3>
                 <pre id="output" class="text-left text-md text-gray-200 my-8">
                 </pre>
-                <div class="overflow-x-auto">
-                    <table
-                        class="mx-auto w-full max-w-5xl table-auto border-collapse border border-gray-700 text-sm text-left"
-                    >
-                        <thead class="bg-gray-800 text-purple-300">
-                            <tr>
-                                <th class="border border-gray-700 px-4 py-2"
-                                    >JavaScript</th
-                                >
-                                <th class="border border-gray-700 px-4 py-2"
-                                    >PyScript</th
-                                >
-                                {
-                                    useNode && (
-                                        <th class="border border-gray-700 px-4 py-2">
-                                            Node.js
-                                        </th>
-                                    )
-                                }
-                                {
-                                    useBackend && (
-                                        <th class="border border-gray-700 px-4 py-2">
-                                            Python Backend
-                                        </th>
-                                    )
-                                }
-                            </tr>
-                        </thead>
-                        <tbody class="text-gray-300">
-                            <tr>
-                                <td
-                                    id="javascript-output"
-                                    class="border border-gray-700 px-4 py-2"
-                                    >Esperando...</td
-                                >
-                                <td
-                                    id="pyscript-output"
-                                    class="border border-gray-700 px-4 py-2"
-                                    >Esperando...</td
-                                >
-                                {
-                                    useNode && (
-                                        <td
-                                            id="nodeJs-output"
-                                            class="border border-gray-700 px-4 py-2"
-                                        >
-                                            Esperando...
-                                        </td>
-                                    )
-                                }
-                                {
-                                    useBackend && (
-                                        <td
-                                            id="pythonBackend-output"
-                                            class="border border-gray-700 px-4 py-2"
-                                        >
-                                            Esperando...
-                                        </td>
-                                    )
-                                }
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <table
+                    class="table-auto min-w-max border-collapse border border-gray-700 text-sm text-left
+           ml-[50%] transform -translate-x-1/2"
+                >
+                    <thead class="bg-gray-800 text-purple-300">
+                        <tr>
+                            <th class="border border-gray-700 px-4 py-2"
+                                >JavaScript</th
+                            >
+                            <th class="border border-gray-700 px-4 py-2"
+                                >PyScript</th
+                            >
+                            {
+                                useNode && (
+                                    <th class="border border-gray-700 px-4 py-2">
+                                        Node.js
+                                    </th>
+                                )
+                            }
+                            {
+                                useBackend && (
+                                    <th class="border border-gray-700 px-4 py-2">
+                                        Python Backend
+                                    </th>
+                                )
+                            }
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-300">
+                        <tr>
+                            <td
+                                id="javascript-output"
+                                class="border border-gray-700 px-4 py-2"
+                                >Esperando...</td
+                            >
+                            <td
+                                id="pyscript-output"
+                                class="border border-gray-700 px-4 py-2"
+                                >Esperando...</td
+                            >
+                            {
+                                useNode && (
+                                    <td
+                                        id="nodeJs-output"
+                                        class="border border-gray-700 px-4 py-2"
+                                    >
+                                        Esperando...
+                                    </td>
+                                )
+                            }
+                            {
+                                useBackend && (
+                                    <td
+                                        id="pythonBackend-output"
+                                        class="border border-gray-700 px-4 py-2"
+                                    >
+                                        Esperando...
+                                    </td>
+                                )
+                            }
+                        </tr>
+                    </tbody>
+                </table>
             </section>
         </main>
-        <div
-            class="relative bottom-0 left-0 right-0 lg:absolute flex justify-center"
-        >
+        <div class="relative bottom-0 left-0 right-0 flex justify-center">
             <Footer />
         </div>
     </body>
@@ -402,6 +401,26 @@ const {
             try {
                 import('../scripts/DisplayPlot.js').then((module) => {
                     module.display(base64Data, elementId);
+                });
+            } catch (err) {
+                console.error('Error al mostrar gráfico:', err);
+            }
+        };
+
+        window.startFPSMeasurement = function (duration, elementId) {
+            try {
+                import('../scripts/DisplayPlot.js').then((module) => {
+                    module.startFPSMeasurement(duration, elementId);
+                });
+            } catch (err) {
+                console.error('Error al mostrar gráfico:', err);
+            }
+        };
+
+        window.displayPlotFromJSON = function (jsonStr, elementId) {
+            try {
+                import('../scripts/DisplayPlot.js').then((module) => {
+                    module.displayPlotFromJSON(jsonStr, elementId);
                 });
             } catch (err) {
                 console.error('Error al mostrar gráfico:', err);

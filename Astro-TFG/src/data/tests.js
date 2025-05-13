@@ -201,7 +201,7 @@ export const tests = [
                         description:
                             'Esta prueba unicamente incluye una version, una version la cual seria la mas optimizada para simular un codigo del mundo real.',
                         jsLibs: null,
-                        pyConfig: null,
+                        pyConfig: "pyscript-main.json",
                         useNode: false,
                         useBackend: false,
                         inputs: ["num-executions"],
@@ -218,11 +218,11 @@ export const tests = [
                         title: 'Version optimizada',
                         description:
                             'Esta prueba contiene una unica version que representa un codigo de la forma mas optimizada posible para simular un codigo del mundo real. Permitira cambiar el numero de puntos y series disponibles, siendo ejecutados por un unico worker.',
-                        jsLibs: null,
-                        pyConfig: null,
+                        jsLibs: ["https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js"],
+                        pyConfig: "pyscript-main.json",
                         useNode: false,
                         useBackend: false,
-                        inputs: null,
+                        inputs: ["num-series", "num-points"],
                         graph: true,
                     },
                 ],
