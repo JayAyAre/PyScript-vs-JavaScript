@@ -1,20 +1,24 @@
 {
-  "name": "astro-tfg",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
-  },
-  "dependencies": {
-    "@tailwindcss/cli": "^4.1.4",
-    "@tailwindcss/vite": "^4.1.4",
-    "astro": "^5.7.9",
-    "plotly.js-dist-min": "^3.0.1"
-  },
-  "devDependencies": {
-    "tailwindcss": "^4.1.4"
-  }
+    "name": "astro-tfg",
+    "type": "module",
+    "version": "0.0.1",
+    "scripts": {
+        "dev": "concurrently \"astro dev\" \"node server.mjs\"",
+        "build": "astro build",
+        "preview": "astro preview",
+        "astro": "astro"
+    },
+    "dependencies": {
+        "@astrojs/node": "^9.2.1",
+        "@tailwindcss/cli": "^4.1.4",
+        "@tailwindcss/vite": "^4.1.4",
+        "astro": "^5.7.9",
+        "concurrently": "^8.2.2",
+        "plotly.js-dist-min": "^3.0.1",
+        "ws": "^8.18.2"
+    },
+    "devDependencies": {
+        "@types/ws": "^8.18.1",
+        "tailwindcss": "^4.1.4"
+    }
 }

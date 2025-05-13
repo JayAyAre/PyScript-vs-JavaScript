@@ -7,34 +7,6 @@ export function display(base64Data, elementId) {
     outputDiv.appendChild(img);
 }
 
-// export function startFPSMeasurement(duration = 3000, id) {
-//     let start = performance.now();
-//     let frames = 0;
-//     let fpsMeasurements = [];
-
-//     function measure() {
-//         frames++;
-//         let now = performance.now();
-//         fpsMeasurements.push(1000 / (now - start));
-//         start = now;
-//         if (now - < duration) {
-//             requestAnimationFrame(measure);
-//         } else {
-//             const avgFPS = fpsMeasurements.reduce((a, b) => a + b, 0) / fpsMeasurements.length;
-//             document.getElementById(id).innerHTML += `<div>Average FPS: ${avgFPS.toFixed(2)}</div>`;
-//         }
-//     }
-//     requestAnimationFrame(measure);
-// }
-
-// export function attachRelayoutListener(id, id_output) {
-//     const container = document.getElementById(id);
-//     container.on('plotly_relayout', function () {
-//         startFPSMeasurement(3000, id_output);
-//     });
-// }
-
-
 export function displayPlotFromJSON(jsonStr, elementId) {
     try {
         const graphData = JSON.parse(jsonStr);

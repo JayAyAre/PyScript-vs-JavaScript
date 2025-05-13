@@ -1,5 +1,4 @@
-from unittest import result
-from pyscript import fetch, sync, display
+from pyscript import fetch, sync
 import asyncio
 import time
 

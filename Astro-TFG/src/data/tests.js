@@ -264,10 +264,10 @@ export const tests = [
                         description:
                             'Esta prueba contiene una unica version que representa un codigo de la forma mas optimizada posible para simular un codigo del mundo real. Igual que en la version anterior, se mediran las mismas metricas ademas de tener en cuenta que seran peticiones mediante WebSockets.',
                         jsLibs: null,
-                        pyConfig: null,
+                        pyConfig: "pyscript-main.json",
                         useNode: false,
                         useBackend: false,
-                        inputs: null,
+                        inputs: ["num-requests", "request-delay"],
                         graph: false,
                     },
                 ],
