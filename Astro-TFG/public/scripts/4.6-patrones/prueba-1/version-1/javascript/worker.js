@@ -1,7 +1,7 @@
 import { RandomForestClassifier as RFClassifier } from "https://jspm.dev/ml-random-forest";
 
 self.addEventListener("message", async (e) => {
-    const { id, type, workerTime, repetitions } = e.data;
+    const { id, type, repetitions } = e.data;
     if (type !== "js_run_js_benchmark") return;
 
     // 1) Descarga y parseo del CSV de Iris

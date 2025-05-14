@@ -30,8 +30,15 @@ const {
         <script
             type="module"
             src="https://pyscript.net/releases/2024.5.2/core.js"></script>
-        {jsLibs.map((src: string) => <script src={src} />)}
-
+        {
+            jsLibs?.map((lib: any) =>
+                lib.type === 'importmap' ? (
+                    <script type="importmap" set:html={lib.content} />
+                ) : (
+                    <script src={lib} />
+                )
+            )
+        }
         <script type="module" src={`${jsPath}main.js`} defer></script>
         {
             pyConfig ? (

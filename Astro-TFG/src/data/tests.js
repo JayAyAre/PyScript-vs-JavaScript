@@ -336,11 +336,21 @@ export const tests = [
                         title: 'Version optimizada',
                         description:
                             'Esta prueba implementa una única versión optimizada que simula un escenario de entrenamiento y evaluación de un modelo de Machine Learning del mundo real. Utiliza el dataset Iris para entrenar un clasificador Random Forest durante múltiples repeticiones configurables. En cada repetición se mide el tiempo de entrenamiento, el tiempo de inferencia, y la precisión obtenida. Al finalizar, se calcula el promedio de estas métricas y se estima el tamaño del modelo resultante en memoria.',
-                        jsLibs: null,
-                        pyConfig: null,
+                        jsLibs:
+                            [
+                                {
+                                    type: 'importmap',
+                                    content: `{
+                                        "imports": {
+                                            "ml-random-forest": "https://cdn.jsdelivr.net/npm/ml-random-forest@2.1.0/dist/random-forest.js"
+                                        }
+                                    }`
+                                }
+                            ],
+                        pyConfig: "pyscript-main.json",
                         useNode: false,
                         useBackend: false,
-                        inputs: null,
+                        inputs: ["num-repetitions"],
                         graph: false,
                     },
                 ],

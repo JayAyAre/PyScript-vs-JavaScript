@@ -8,11 +8,10 @@ from sklearn.datasets import load_iris
 from sklearn.ensemble import RandomForestClassifier
 
 
-async def js_run_py_benchmark(worker_time):
-    # breve espera para asegurarnos de que el UI esté listo
+async def do_analisis():
     await asyncio.sleep(0.1)
     start_overall = time.perf_counter()
-    reps = int(document.getElementById("num-repetitions-py").value)
+    reps = int(document.getElementById("num-repetitions-pyscript").value)
 
     # cargar Iris
     data = load_iris()
@@ -60,4 +59,4 @@ async def js_run_py_benchmark(worker_time):
     return json.dumps(result)
 
 # exponemos la función al main.py
-sync.js_run_py_benchmark = js_run_py_benchmark
+sync.do_analisis = do_analisis
