@@ -5,7 +5,6 @@ self.addEventListener("message", async (event) => {
 
     const { id, repetitions, messageSizeMb } = data;
     try {
-        // small delay to mimic async setup
         await new Promise((r) => setTimeout(r, 100));
 
         const fileSizeBytes = Math.floor(messageSizeMb * 1024 * 1024);
@@ -19,6 +18,7 @@ self.addEventListener("message", async (event) => {
         const t0 = performance.now();
 
         for (let i = 0; i < repetitions; i++) {
+
             // generate AES-GCM key
             const key = await crypto.subtle.generateKey(
                 { name: "AES-GCM", length: 128 },
@@ -49,7 +49,7 @@ self.addEventListener("message", async (event) => {
                     successCount++;
                 }
             } catch (_) {
-                // fail silently
+                console.error("Decryption failed");
             }
             totalDec += performance.now() - decStart;
         }

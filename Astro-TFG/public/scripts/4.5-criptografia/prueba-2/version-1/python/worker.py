@@ -7,11 +7,11 @@ from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 
 
-async def js_run_py_benchmark(worker_time):
+async def do_hash(worker_time):
     await asyncio.sleep(0.1)
 
-    reps = int(document.getElementById("num-repetitions-py").value)
-    size_mb = float(document.getElementById("message-size-py").value)
+    reps = int(document.getElementById("num-repetitions-pyscript").value)
+    size_mb = float(document.getElementById("message-size-pyscript").value)
     size_b = int(size_mb * 1024 * 1024)
 
     plaintext = os.urandom(size_b)
@@ -58,4 +58,4 @@ async def js_run_py_benchmark(worker_time):
     }
     return json.dumps(result)
 
-sync.js_run_py_benchmark = js_run_py_benchmark
+sync.do_hash = do_hash

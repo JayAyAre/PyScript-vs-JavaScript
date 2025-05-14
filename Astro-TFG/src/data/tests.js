@@ -310,10 +310,10 @@ export const tests = [
                         description:
                             'Esta prueba cifra y descifra un mensaje de tamaño configurable utilizando el algoritmo AES en modo GCM. Se simulan operaciones criptográficas del mundo real, incluyendo el uso de un nonce y una etiqueta de autenticación. Se mide el rendimiento en términos de tiempo promedio de cifrado y descifrado, así como la integridad de los datos. Esta versión está optimizada para evaluar el rendimiento criptográfico en condiciones realistas.',
                         jsLibs: null,
-                        pyConfig: null,
+                        pyConfig: "pyscript-main.json",
                         useNode: false,
                         useBackend: false,
-                        inputs: null,
+                        inputs: ["num-repetitions", "message-size"],
                         graph: false,
                     },
                 ],

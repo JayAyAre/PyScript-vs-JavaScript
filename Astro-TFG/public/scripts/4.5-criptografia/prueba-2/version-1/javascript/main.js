@@ -1,4 +1,25 @@
+// main.js
 let worker = null;
+
+function displayResult(r, workerTime) {
+    const out = document.getElementById("javascript-output");
+
+    out.innerHTML = `
+      <div>Worker init time: ${workerTime.toFixed(2)} ms</div>
+      <div>Message size: ${r.message_size_mb.toFixed(2)} MB</div>
+      <div>Repetitions: ${r.repetitions}</div>
+      <div>Avg encrypt time: ${r.encrypt_avg_ms.toFixed(2)} ms</div>
+      <div>Avg decrypt time: ${r.decrypt_avg_ms.toFixed(2)} ms</div>
+      <div>Integrity check: ${r.integrity_ok ? "OK" : "FAIL"}</div>
+      <div>Integrity success: ${r.success_count} of ${r.repetitions
+        } (${r.success_percentage.toFixed(2)}%)</div>
+      <div>Ciphertext size: ${(r.ciphertext_bytes / 1024 / 1024).toFixed(
+            2
+        )} MB</div>
+      <div>Total crypto time: ${r.crypto_total_ms.toFixed(2)} ms</div>
+      <div>Overall total time: ${r.overall_time_ms.toFixed(2)} ms</div>
+    `;
+}
 
 async function javascriptBenchmark() {
     try {
@@ -14,8 +35,8 @@ async function javascriptBenchmark() {
             document.getElementById("num-repetitions-javascript").value,
             10
         );
-        const fileSizeMb = parseFloat(
-            document.getElementById("file-size-javascript").value
+        const messageSizeMb = parseFloat(
+            document.getElementById("message-size-javascript").value
         );
         const id = `js-${Date.now()}`;
 
@@ -25,10 +46,8 @@ async function javascriptBenchmark() {
                 worker.removeEventListener("message", onMessage);
                 if (e.data.error) {
                     reject(new Error(e.data.error));
-                } else if (e.data.json !== undefined) {
-                    resolve(e.data.json);
                 } else {
-                    reject(new Error("Worker dont return results"));
+                    resolve(e.data.json);
                 }
             }
             worker.addEventListener("message", onMessage);
@@ -37,7 +56,7 @@ async function javascriptBenchmark() {
                 type: "js_run_js_benchmark",
                 workerTime,
                 repetitions,
-                fileSizeMb,
+                messageSizeMb,
             });
         });
 
@@ -52,21 +71,6 @@ async function javascriptBenchmark() {
     }
 }
 
-function displayResult(result, workerTime) {
-    const out = document.getElementById("javascript-output");
-
-    out.innerHTML = `
-      <div>Worker time: ${workerTime.toFixed(2)} ms</div>
-      <div>Simulated file: ${result.file_size_mb.toFixed(2)} MB</div>
-      <div>Repetitions: ${result.repetitions}</div>
-      <div>Avg hash time: ${result.hash_avg_time_ms.toFixed(2)} ms</div>
-      <div>Avg verify time: ${result.verify_avg_time_ms.toFixed(2)} ms</div>
-      <div>Last hash (shortened): ${result.last_digest.slice(0, 20)}...</div>
-      <div>Total op time: ${result.total_time_ms.toFixed(2)} ms</div>
-      <div>Total time: ${result.total_time.toFixed(2)} ms</div>
-    `;
-}
-
 function initializeWorker() {
     return new Promise((resolve) => {
         if (worker) {
@@ -79,12 +83,9 @@ function initializeWorker() {
             "worker.js";
 
         worker = new Worker(workerPath);
-
         resolve();
     });
 }
 
 window.runJSBenchmark = javascriptBenchmark;
-
-
 

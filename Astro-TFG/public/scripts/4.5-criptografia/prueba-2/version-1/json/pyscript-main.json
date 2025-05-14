@@ -1,6 +1,6 @@
 {
     "files": {
-        "/python/worker.py": "worker.py"
+        "../python/worker.py": "worker.py"
     },
     "packages": ["pycryptodome"]
 }
