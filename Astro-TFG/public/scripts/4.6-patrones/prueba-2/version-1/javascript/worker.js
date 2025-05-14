@@ -1,10 +1,10 @@
 import KNN from "https://cdn.skypack.dev/ml-knn";
 
 self.addEventListener("message", async (e) => {
-    const { id, type, workerTime, repetitions } = e.data;
+    const { id, type, repetitions } = e.data;
     if (type !== "js_run_js_benchmark") return;
 
-    const DIGITS_URL = "/json/digits.json";
+    const DIGITS_URL = "../json/digits.json";
     const resp = await fetch(DIGITS_URL);
     const { data, target } = await resp.json();
 

@@ -1,113 +1,81 @@
-(() => {
-    let worker = null;
-    let jsTimer = null;
-    let jsStartTime = 0;
+// main.js
+let worker = null;
+let worker_time = 0;
 
-    function startJsTimer() {
-        jsStartTime = performance.now();
-        const timerElement = document.getElementById("js-timer-display");
-        function updateTimer() {
-            if (!jsTimer) return;
-            const elapsed = ((performance.now() - jsStartTime) / 1000).toFixed(
-                3
-            );
-            timerElement &&
-                (timerElement.textContent = `JS Timer: ${elapsed} s`);
-            jsTimer = requestAnimationFrame(updateTimer);
-        }
-        cancelAnimationFrame(jsTimer);
-        jsTimer = requestAnimationFrame(updateTimer);
-    }
+async function javascriptBenchmark() {
+    try {
+        window.clearCell("javascript-output");
+        window.showExecutionLoader();
 
-    function stopJsTimer() {
-        cancelAnimationFrame(jsTimer);
-        jsTimer = null;
-        const elapsed = ((performance.now() - jsStartTime) / 1000).toFixed(3);
-        const timerElement = document.getElementById("js-timer-display");
-        timerElement && (timerElement.textContent = `JS Timer: ${elapsed} s`);
-    }
+        const startWorkerTime = performance.now();
+        await initializeWorker();
+        const workerTime = performance.now() - startWorkerTime;
 
-    function setText(id, text) {
-        const el = document.getElementById(id);
-        if (el) el.textContent = text;
-        else console.warn(`Element with id \"${id}\" not found`);
-    }
+        const repetitions = parseInt(
+            document.getElementById("num-repetitions-javascript").value,
+            10
+        );
 
-    function clearMetrics(prefix) {
-        [
-            "worker",
-            "training",
-            "inference",
-            "accuracy",
-            "memory",
-            "total",
-        ].forEach((id) => {
-            setText(`${prefix}-${id}`, "");
-        });
-    }
+        const id = `js-${Date.now()}`;
 
-    async function javascriptBenchmark() {
-        const outputEl = document.getElementById("javascript-output");
-        try {
-            outputEl && (outputEl.textContent = "");
-            startJsTimer();
-            clearMetrics("javascript");
-
-            const startWorkerTime = performance.now();
-            if (!worker) {
-                worker = new Worker(new URL("worker.js", import.meta.url), {
-                    type: "module",
-                });
-            }
-            const workerTime = performance.now() - startWorkerTime;
-            setText("javascript-worker", `${workerTime.toFixed(2)} ms`);
-
-            const repetitions = parseInt(
-                document.getElementById("num-repetitions-js")?.value || "1",
-                10
-            );
-            const id = `js-${Date.now()}`;
-
-            const resultJson = await new Promise((resolve, reject) => {
-                function onMessage(e) {
-                    if (e.data.id !== id) return;
-                    worker.removeEventListener("message", onMessage);
-                    if (e.data.error) reject(new Error(e.data.error));
-                    else {
-                        console.log("Mensaje recibido del worker:", e.data);
-                        resolve(e.data.json);
-                    }
+        const resultJson = await new Promise((resolve, reject) => {
+            function onMessage(e) {
+                if (e.data.id !== id) return;
+                worker.removeEventListener("message", onMessage);
+                if (e.data.error) {
+                    reject(new Error(e.data.error));
+                } else {
+                    resolve(e.data.json);
                 }
-                worker.addEventListener("message", onMessage);
-                worker.postMessage({
-                    id,
-                    type: "js_run_js_benchmark",
-                    repetitions,
-                });
+            }
+            worker.addEventListener("message", onMessage);
+            worker.postMessage({
+                id,
+                type: "js_run_js_benchmark",
+                repetitions,
             });
+        });
 
-            const r = JSON.parse(resultJson);
-            displayResult(r);
-        } catch (err) {
-            console.error("Benchmark error:", err);
-            outputEl && (outputEl.textContent = `Error: ${err.message}`);
-        } finally {
-            stopJsTimer();
+        const r = JSON.parse(resultJson);
+        displayResult(r);
+    } catch (err) {
+        console.error("Benchmark error:", err);
+        document.getElementById(
+            "javascript-output"
+        ).textContent = `Error: ${err.message}`;
+    } finally {
+        window.hideExecutionLoader();
+    }
+}
+
+
+function displayResult(r) {
+    const out = document.getElementById("javascript-output");
+
+    out.innerHTML = `
+      <div>Worker init time: ${worker_time.toFixed(2)} ms</div>
+      <div>Training  time: ${r.training_time_ms.toFixed(2)} ms
+      <div>Inference time: ${r.inference_time_ms.toFixed(2)} ms</div>
+      <div>Accuracy: ${r.accuracy.toFixed(2)} %</div>
+      <div>Model size: ${r.model_size_mb.toFixed(2)} MB</div>
+      <div>Overall time: ${r.overall_time_ms.toFixed(2)} ms</div>
+    `
+}
+
+function initializeWorker() {
+    return new Promise((resolve) => {
+        if (worker) {
+            resolve();
+            return;
         }
-    }
 
-    function displayResult(r) {
-        setText("javascript-training", `${r.training_time_ms.toFixed(2)} ms`);
-        setText("javascript-inference", `${r.inference_time_ms.toFixed(2)} ms`);
-        setText("javascript-accuracy", `${r.accuracy.toFixed(2)} %`);
-        setText("javascript-memory", `${r.model_size_mb.toFixed(2)} MB`);
-        setText("javascript-total", `${r.overall_time_ms.toFixed(2)} ms`);
-    }
+        const workerPath = window.location.origin +
+            window.document.body.dataset.jsPath +
+            "worker.js";
 
-    document.addEventListener("DOMContentLoaded", () => {
-        const btn = document.getElementById("run-button-js");
-        if (btn) btn.addEventListener("click", javascriptBenchmark);
+        worker = new Worker(workerPath, { type: "module" });
+        resolve();
     });
+}
 
-    window.javascriptBenchmark = javascriptBenchmark;
-})();
+window.runJSBenchmark = javascriptBenchmark;

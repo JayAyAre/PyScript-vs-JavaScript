@@ -336,17 +336,7 @@ export const tests = [
                         title: 'Version optimizada',
                         description:
                             'Esta prueba implementa una única versión optimizada que simula un escenario de entrenamiento y evaluación de un modelo de Machine Learning del mundo real. Utiliza el dataset Iris para entrenar un clasificador Random Forest durante múltiples repeticiones configurables. En cada repetición se mide el tiempo de entrenamiento, el tiempo de inferencia, y la precisión obtenida. Al finalizar, se calcula el promedio de estas métricas y se estima el tamaño del modelo resultante en memoria.',
-                        jsLibs:
-                            [
-                                {
-                                    type: 'importmap',
-                                    content: `{
-                                        "imports": {
-                                            "ml-random-forest": "https://cdn.jsdelivr.net/npm/ml-random-forest@2.1.0/dist/random-forest.js"
-                                        }
-                                    }`
-                                }
-                            ],
+                        jsLibs: null,
                         pyConfig: "pyscript-main.json",
                         useNode: false,
                         useBackend: false,
@@ -365,10 +355,10 @@ export const tests = [
                         description:
                             'Esta prueba contiene una única versión optimizada que simula un escenario de clasificación real utilizando el dataset Digits. En cada repetición configurable, se entrena un modelo de vecinos más cercanos (KNN) con los datos de entrenamiento, se realiza interferencia sobre el conjunto de prueba y se calcula la precisión obtenida. Se miden y promedian los tiempos de entrenamiento, interferencia y precisión. Además, se estima el tamaño en memoria del modelo final para reflejar su impacto computacional.',
                         jsLibs: null,
-                        pyConfig: null,
+                        pyConfig: "pyscript-main.json",
                         useNode: false,
                         useBackend: false,
-                        inputs: null,
+                        inputs: ["num-repetitions"],
                         graph: false,
                     },
                 ],

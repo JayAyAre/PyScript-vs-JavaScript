@@ -46,6 +46,8 @@ import NavegationButton from '../schedule/NavegationButton.astro';
             </NavegationButton>
             <div class="group relative w-full sm:w-auto">
                 <button
+                    id="menu-button"
+                    type="button"
                     class="ease-in-out group-hover:bg-slate-700 flex w-full items-center justify-center gap-2 rounded-lg px-5 py-2 text-white opacity-70 transition-all duration-200 group-hover:text-purple-400 group-hover:opacity-100 hover:shadow-lg"
                 >
                     <svg
@@ -60,7 +62,8 @@ import NavegationButton from '../schedule/NavegationButton.astro';
                     <slot name="menu">Menú</slot>
                 </button>
                 <ul
-                    class="absolute right-0 z-10 hidden max-h-80 w-90 grid-cols-1 gap-2 rounded-lg bg-gray-800 p-2 shadow-xl group-hover:grid sm:grid-cols-2 lg:grid-cols-3"
+                    id="menu-list"
+                    class="absolute inset-x-0 z-10 whitespace-normal break-words hidden max-h-80 w-full sm:w-[26rem] grid grid-cols-1 gap-2 overflow-auto rounded-lg bg-gray-800 p-2 shadow-xl group-hover:grid sm:grid-cols-2 lg:grid-cols-3"
                 >
                     {
                         benchmarks.map((benchmark, index) => {
@@ -72,7 +75,7 @@ import NavegationButton from '../schedule/NavegationButton.astro';
                                 <li class="rounded-lg">
                                     <a
                                         href={link}
-                                        class="flex items-center gap-2 px-4 py-2 opacity-70 transition-all duration-200 ease-in-out hover:cursor-pointer hover:rounded-lg hover:bg-slate-700 hover:text-purple-400 hover:opacity-100 hover:shadow-lg focus:ring focus:ring-purple-400"
+                                        class="block items-center px-4 py-2 opacity-70 transition-all duration-200 ease-in-out hover:cursor-pointer hover:rounded-lg hover:bg-slate-700 hover:text-purple-400 hover:opacity-100 hover:shadow-lg focus:ring focus:ring-purple-400"
                                     >
                                         {index + 1}. {benchmark[0]}
                                     </a>
@@ -84,4 +87,28 @@ import NavegationButton from '../schedule/NavegationButton.astro';
             </div>
         </div>
     </div>
+    <script type="module">
+        const button = document.getElementById('menu-button');
+        const menu = document.getElementById('menu-list');
+
+        let isOpen = false;
+
+        button.addEventListener('click', () => {
+            isOpen = !isOpen;
+            menu.classList.toggle('hidden', !isOpen);
+            menu.classList.toggle('grid', isOpen); // para mostrar el grid si está abierto
+        });
+
+        // Opcional: cerrar al hacer clic fuera
+        document.addEventListener('click', (event) => {
+            if (
+                !button.contains(event.target) &&
+                !menu.contains(event.target)
+            ) {
+                isOpen = false;
+                menu.classList.add('hidden');
+                menu.classList.remove('grid');
+            }
+        });
+    </script>
 </header>
