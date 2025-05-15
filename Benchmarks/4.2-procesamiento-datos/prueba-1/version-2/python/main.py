@@ -2,7 +2,7 @@ import time
 import tracemalloc
 import gc
 import js  # type: ignore
-from pyscript import display  # type: ignore
+from pyscript import display
 import numpy as np
 
 

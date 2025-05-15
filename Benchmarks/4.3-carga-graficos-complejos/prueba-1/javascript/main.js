@@ -20,18 +20,15 @@ function initializeWorker() {
 }
 
 async function measureMemoryUsage(duration = 500, interval = 50) {
-    // Muestra el uso de memoria repetidamente durante 'duration' milisegundos
     const memoryUsages = [];
     const start = performance.now();
     return new Promise((resolve) => {
         const timer = setInterval(() => {
             if (performance.memory) {
-                // Guardamos el uso actual en bytes
                 memoryUsages.push(performance.memory.usedJSHeapSize);
             }
             if (performance.now() - start >= duration) {
                 clearInterval(timer);
-                // Tomamos el máximo y lo convertimos a MB
                 const maxUsage = Math.max(...memoryUsages);
                 resolve(maxUsage / (1024 * 1024));
             }
@@ -53,7 +50,7 @@ async function runJSBenchmark() {
         clearGraphContainer("graph-container-js");
 
         const numExecutions = parseInt(
-            document.getElementById("num-executions-js").value
+            document.getElementById("num-executions-javascript").value
         ) || 1;
 
         const results = [];
@@ -87,7 +84,7 @@ async function runJSBenchmark() {
         const avgDataGen = avg(results.map(r => r.data_gen_time));
         const avgRender = avg(results.map(r => r.render_time));
         const avgMemory = avg(results.map(r => r.memory));
-        const avgElapsed = adv(results.map(r => r.total_time));
+        const avgElapsed = avg(results.map(r => r.total_time));
 
         const outputContainer = document.getElementById("javascript-output");
         if (outputContainer) {
@@ -113,11 +110,9 @@ async function runJSBenchmark() {
         }
     } catch (error) {
         console.error("Worker error:", error);
-        displayJSText("javascript-output", `Worker Error: ${error}`);
     }
 }
 
-// Timer
 let jsTimerInterval = null;
 let jsStartTime = 0;
 

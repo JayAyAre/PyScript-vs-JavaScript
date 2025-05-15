@@ -23,7 +23,7 @@ def do_graph_rendering(size):
 
         render_start = time.perf_counter()
 
-        px = 1/plt.rcParams['figure.dpi']  # pixel in inches
+        px = 1/plt.rcParams['figure.dpi']
         fig, ax = plt.subplots(figsize=(800*px, 600*px))
 
         fig.patch.set_facecolor("white")

@@ -34,7 +34,6 @@ self.onmessage = function (event) {
         ctx.fillStyle = "white";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Ejes
         ctx.strokeStyle = "black";
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -44,7 +43,6 @@ self.onmessage = function (event) {
         ctx.lineTo(canvas.width - padding, canvas.height - padding);
         ctx.stroke();
 
-        // Ticks y etiquetas X
         ctx.font = "12px sans-serif";
         ctx.fillStyle = "black";
         ctx.textAlign = "center";
@@ -58,7 +56,6 @@ self.onmessage = function (event) {
             ctx.fillText(value.toFixed(1), xPos, canvas.height - padding + 18);
         }
 
-        // Ticks y etiquetas Y
         ctx.textAlign = "right";
         ctx.textBaseline = "middle";
         for (let i = 0; i <= 5; i++) {
@@ -71,7 +68,6 @@ self.onmessage = function (event) {
             ctx.fillText(value.toFixed(1), padding - 10, yPos);
         }
 
-        // Dibujar puntos
         ctx.globalAlpha = 0.5;
         ctx.fillStyle = "blue";
         for (let i = 0; i < size; i++) {
@@ -80,7 +76,6 @@ self.onmessage = function (event) {
             ctx.fillRect(x, y, 1, 1);
         }
 
-        // Título
         ctx.globalAlpha = 1.0;
         ctx.fillStyle = "black";
         ctx.font = "20px Arial";

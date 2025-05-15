@@ -2,7 +2,6 @@ import gc
 import time
 import js  # type: ignore
 import tracemalloc
-from pyscript import display  # type: ignore
 import numpy as np
 
 
@@ -22,11 +21,7 @@ def multiply_matrices(size):
 
     end = time.time()
 
-    # ET (Execution Time)
-
     execution_time = (end - start) * 1000
-
-    # RAM
 
     memory_usage = tracemalloc.get_traced_memory()[1] / (1024 * 1024)
     tracemalloc.stop()
@@ -37,8 +32,6 @@ def multiply_matrices(size):
         <div>ET: {round(execution_time, 2)} ms</div>
         <div>RAM: {round(memory_usage, 2)} MB</div>
     """
-
-    # PLT
 
     js.endTimerWebAssembly()
 

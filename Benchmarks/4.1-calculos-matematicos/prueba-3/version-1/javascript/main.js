@@ -56,24 +56,20 @@ function n_digits_pi(repetitions, digits) {
     }
 
     const endTotal = performance.now();
-    const totalExecTime = ((endTotal - startTotal) / 1000).toFixed(2);
+    const totalExecTime = (endTotal - startTotal).toFixed(2);
 
     const avgTime = Number((totalTime / repetitions).toFixed(2));
     const avgMemory = Number((totalMemory / repetitions).toFixed(2));
 
     const outputDiv = document.getElementById("javascript-output");
 
-    // ET (Execution Time)
-
     let timeDiv = document.createElement("div");
-    timeDiv.textContent = `Total ET: ${totalExecTime} s`;
+    timeDiv.textContent = `Total ET (1000x): ${totalExecTime} ms`;
     outputDiv.appendChild(timeDiv);
 
     let avgTimeDiv = document.createElement("div");
     avgTimeDiv.textContent = `ET (avg, 1000x): ${avgTime} ms`;
     outputDiv.appendChild(avgTimeDiv);
-
-    // RAM
 
     let avgMemoryDiv = document.createElement("div");
     avgMemoryDiv.textContent = `RAM (avg, 1000x): ${avgMemory} MB`;

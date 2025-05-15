@@ -96,13 +96,9 @@ async function n_digits_pi(repetitions, digits) {
         totalMemory += memoryUsage;
     }
 
-    // ET (Execution Time)
-
     const endTotal = performance.now();
     const totalExecTime = (endTotal - startTotal).toFixed(2);
     const avgTime = (totalTime / repetitions).toFixed(2);
-
-    // RAM
 
     const avgMemory = (totalMemory / repetitions).toFixed(2);
 

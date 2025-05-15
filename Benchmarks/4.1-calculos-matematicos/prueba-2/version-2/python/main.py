@@ -3,7 +3,7 @@ import time
 import tracemalloc
 import sympy
 import js  # type: ignore
-from pyscript import display  # type: ignore
+from pyscript import display
 
 
 def sieve_of_eratosthenes(n):
@@ -29,13 +29,9 @@ def benchmark_primes_py(repetitions, n):
         total_time += (end - start) * 1000
         total_memory += memory_usage
 
-    # ET (Execution Time)
-
     end_total = time.time()
     total_exec_time = round((end_total - start_total) * 1000, 2)
     avg_time = round(total_time / repetitions, 2)
-
-    # RAM
 
     avg_memory = round(total_memory / repetitions, 2)
 

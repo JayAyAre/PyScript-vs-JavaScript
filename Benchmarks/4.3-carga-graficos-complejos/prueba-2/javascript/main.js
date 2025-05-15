@@ -8,7 +8,6 @@ async function runJSBenchmark() {
 
         if (!worker) {
             worker = new Worker("javascript/worker.js");
-            await setupWorker();
         }
 
         const workerTime = performance.now() - startWorkerTime;
@@ -45,24 +44,6 @@ async function runJSBenchmark() {
     } catch (e) {
         displayError(e);
     }
-}
-
-function setupWorker() {
-    return new Promise((resolve) => {
-        worker.onmessage = (e) => {
-            if (e.data.type === "ready") {
-                resolve();
-            } else if (e.data.type === "result") {
-                handleWorkerResult(e.data.payload);
-            } else if (e.data.type === "error") {
-                displayError(new Error(e.data.payload));
-            }
-        };
-
-        worker.onerror = (error) => {
-            displayError(error);
-        };
-    });
 }
 
 function handleWorkerResult({ metrics, graphData }) {

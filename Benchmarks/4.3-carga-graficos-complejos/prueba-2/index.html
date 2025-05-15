@@ -9,13 +9,20 @@
     <script type="module" src="https://pyscript.net/releases/2024.8.1/core.js"></script>
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.1/core.css">
     
+
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.31.1/plotly.min.js"
+        crossorigin="anonymous"
+        integrity="sha512-⟨hash⟩"
+        ></script>
     <script src="javascript/main.js" defer></script>
-    <script src="https://cdn.plot.ly/plotly-3.0.1.min.js" charset="utf-8"></script>
-    
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
+    <script type="module" src="https://pyscript.net/releases/2024.8.1/core.js"></script>
+    <script src="javascript/main.js" defer></script>
     <script>
         if (!crypto.randomUUID) {
             crypto.randomUUID = function() {
-                // Genera un UUID v4
                 return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                 const r = Math.random() * 16 | 0;
                 const v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -154,6 +161,27 @@
             return memoryMB;
         }
 
+        function displayPlotFromJSON(jsonStr, elementId) {
+            try {
+                const graphData = JSON.parse(jsonStr);
+                const elementDiv = document.getElementById(elementId);
+                if (!elementDiv) return;
+                let container = document.createElement('div');
+                container.id = `container-graph-${elementId}`;
+                elementDiv.appendChild(container);
+                Plotly.newPlot(
+                    container.id,
+                    graphData.data,
+                    graphData.layout || {}
+                );
+            } catch (e) {
+                console.error('Error parsing or rendering Plotly graph:', e);
+                const el = document.getElementById(elementId);
+                if (el) {
+                    el.textContent = 'Error al mostrar el gráfico con Plotly';
+                }
+            }
+        }
     </script>
 <body>
     <script type="py" src="python/main.py" config="json/pyscript-main.json"></script>
@@ -171,17 +199,16 @@
 
 
     <label for="num-series">N° Series:</label>
-    <input type="number" id="num-series-py" value="5" min="1" max="100">
+    <input type="number" id="num-series-pyscript" value="5" min="1" max="100">
     <label for="num-points">N° Puntos:</label>
-    <input type="number" id="num-points-py" value="10000" min="1000" step="1000">
+    <input type="number" id="num-points-pyscript" value="10000" min="1000" step="1000">
     <button id="run-button-py" onclick="startPyTimer()" py-click="launch_worker">
         Run in PyScript (Loading...)</button>
 
     <pre id="output"></pre>
     <div id="graph-containers" style="display: flex; flex-direction: row;">
         <div id="graph-container-js"></div>
-        <div id="graph-container-py"></div>
-        <div id="graph-container-py"></div>
+        <div id="graph-container-pyscript"></div>
     </div>
 
     <table id="metrics-container">

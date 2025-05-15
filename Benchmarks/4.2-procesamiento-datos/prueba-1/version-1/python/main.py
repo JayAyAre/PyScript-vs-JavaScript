@@ -4,7 +4,7 @@ import random
 import tracemalloc
 import gc
 import js  # type: ignore
-from pyscript import display  # type: ignore
+from pyscript import display
 
 
 def create_data_structure(my_list, size):

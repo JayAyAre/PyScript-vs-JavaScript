@@ -41,17 +41,11 @@ def benchmark_primes_py(repetitions, n):
         total_memory += memory_usage
         total_cpu += cpu_after
 
-    # ET (Execution Time)
-
     end_total = time.time()
     total_exec_time = round((end_total - start_total) * 1000, 2)
     avg_time = round(total_time / repetitions, 2)
 
-    # RAM
-
     avg_memory = round(total_memory / repetitions, 2)
-
-    # CPU
 
     avg_cpu = round(total_cpu / repetitions, 2)
 
@@ -79,7 +73,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 def run_server():
     server_address = ('', 5000)
     httpd = HTTPServer(server_address, RequestHandler)
-    print("Servidor corriendo en http://localhost:5000")
+    print("Server running at http://localhost:5000")
     httpd.serve_forever()
 
 

@@ -50,17 +50,11 @@ async function computePi(digits, repetitions) {
         totalCpu += cpuUsage;
     }
 
-    // ET (Execution Time)
-
     let endReal = performance.now();
     let totalExecTime = ((endReal - startReal) / 1000).toFixed(2);
     let avgTime = (totalTime / repetitions).toFixed(2);
 
-    // RAM
-
     let avgMemory = (totalMemory / repetitions).toFixed(2);
-
-    // CPU
 
     let avgCpu = (totalCpu / repetitions).toFixed(2);
 

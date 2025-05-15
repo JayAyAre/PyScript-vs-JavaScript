@@ -44,17 +44,11 @@ def n_digits_pi(repetitions, digits):
         total_memory += memory_usage
         total_cpu += cpu_after
 
-    # ET (Execution Time)
-
     end_total = time.time()
     total_exec_time = round((end_total - start_total) * 1000, 2)
     avg_time = round(total_time / repetitions, 2)
 
-    # RAM
-
     avg_memory = round(total_memory / repetitions, 2)
-
-    # CPU
 
     avg_cpu = round(total_cpu / repetitions, 2)
 

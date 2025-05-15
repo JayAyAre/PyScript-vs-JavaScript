@@ -2,7 +2,7 @@ import gc
 import time
 import tracemalloc
 import js  # type: ignore
-from pyscript import display  # type: ignore
+from pyscript import display
 from mpmath import mp
 
 

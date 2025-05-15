@@ -7,7 +7,7 @@ function runNodeBenchmark() {
 
             Object.values(data).forEach((result) => {
                 let titleDiv = document.createElement("div");
-                titleDiv.textContent = `Matrix ${result.size}`;
+                titleDiv.textContent = `Matriz ${result.size}`;
                 titleDiv.style.fontWeight = "bold";
                 outputDiv.appendChild(titleDiv);
 
@@ -45,13 +45,9 @@ async function multiplyMatrices(size) {
     titleDiv.style.fontWeight = "bold";
     outputDiv.appendChild(titleDiv);
 
-    // ET (Execution Time)
-
     let timeDiv = document.createElement("div");
     timeDiv.textContent = `ET: ${Number((end - start).toFixed(2))} ms`;
     outputDiv.appendChild(timeDiv);
-
-    // RAM
 
     let memoryDiv = document.createElement("div");
     memoryDiv.textContent = getMemoryUsageJS();
@@ -62,7 +58,6 @@ async function multiplyMatrices(size) {
 
 async function runJSBenchmark() {
     clearCell("javascript-output");
-
     await multiplyMatrices(500);
     await multiplyMatrices(1000);
     await multiplyMatrices(2000);

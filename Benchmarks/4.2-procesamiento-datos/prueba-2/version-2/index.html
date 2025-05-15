@@ -50,12 +50,14 @@
 
     <label for="num-executions">Repeticiones:</label>
     <input type="number" id="num-executions-javascript" value="1" min="1">
+    <label for="parallel-workers">Workers:</label>
     <input type="number" id="parallel-workers-javascript" value="1" min="1" max="16">
     <button onclick="runJSBenchmark()">Run in JavaScript</button>
 
 
     <label for="num-executions">Repeticiones:</label>
     <input type="number" id="num-executions-pyscript" value="1" min="1">
+    <label for="parallel-workers">Workers:</label>
     <input type="number" id="parallel-workers-pyscript" value="1" min="1" max="16">
     <button id="run-button" onclick="runPyBenchmark()" py-click="js_run_py_benchmark">Run in PyScript (Loading...)</button>
 

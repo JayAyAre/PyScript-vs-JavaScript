@@ -56,12 +56,8 @@ function benchmarkPrimesJS(repetitions, n) {
         }
     }
 
-    // ET (Execution Time)
-
     let endTotal = performance.now();
     let totalExecTime = (endTotal - startTotal).toFixed(2);
-
-    // RAM
 
     let avgTime = (totalTime / repetitions).toFixed(2);
     let avgMemory = (totalMemory / repetitions).toFixed(2);

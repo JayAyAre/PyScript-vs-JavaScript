@@ -8,9 +8,9 @@ const app = express();
 const port = 3000;
 
 app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type']
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type']
 }));
 
 const cpu = osu.cpu;
@@ -78,15 +78,9 @@ async function runBenchmark(repetitions, digits) {
         const cpuEnd = await cpu.usage();
         const endMemory = process.memoryUsage().heapUsed;
 
-        // ET (Execution Time)
-
         const execTimeMs = (endTime[0] * 1000) + (endTime[1] / 1000000);
 
-        // RAM
-
         const memoryUsageMb = (endMemory - startMemory) / (1024 * 1024);
-
-        // CPU
 
         const cpuUsage = cpuEnd - cpuStart;
 
