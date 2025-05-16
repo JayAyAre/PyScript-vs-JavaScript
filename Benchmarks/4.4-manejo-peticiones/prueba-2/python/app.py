@@ -25,7 +25,7 @@ async def handler(websocket):
         response = {
             "status": "success",
             "delay": delay,
-            "id": req_id,  # Devolver el mismo ID
+            "id": req_id,
             "data": response_data
         }
 
@@ -33,7 +33,6 @@ async def handler(websocket):
 
 
 async def main():
-    # Configuración del servidor WebSocket con SSL
     async with serve(handler, "localhost", 5001):
         print("WebSocket server is running on wss://localhost:5001")
         await asyncio.Future()

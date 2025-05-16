@@ -66,7 +66,7 @@
         });
 
         function clearCell(elementId) {
-            const operations = ['output', 'exact'];
+            const operations = ['output'];
             operations.forEach(op => {
                 const element = document.getElementById(`${elementId}-${op}`);
                 if (element) {
@@ -125,11 +125,6 @@
                 <td>Times</td>
                 <td id="javascript-output"></td>
                 <td id="pyscript-output"></td>
-            </tr>
-            <tr>
-                <td>Total</td>
-                <td id="javascript-exact"></td>
-                <td id="pyscript-exact"></td>
             </tr>
         </tbody>
     </table>

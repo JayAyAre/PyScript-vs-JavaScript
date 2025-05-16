@@ -1,11 +1,11 @@
-from pyscript import display, document, window, PyWorker
+from pyscript import display, document, PyWorker
 import js  # type: ignore
 import time
 import asyncio
 import json
 
 worker = None
-PYTHON_WS_SERVER = "ws://localhost:5001"  # No usar wss://
+PYTHON_WS_SERVER = "ws://localhost:5001"
 
 
 async def websocket_benchmark(num_requests, delay, server_url):
@@ -28,12 +28,10 @@ async def websocket_benchmark(num_requests, delay, server_url):
 
     socket.onmessage = on_message
 
-    # Enviar todas las peticiones sin esperar
     for i in range(num_requests):
         pending[i] = time.perf_counter()
         socket.send(json.dumps({"delay": delay, "id": i}))
 
-    # Esperar a que todas las respuestas lleguen
     while len(responses) < num_requests:
         await asyncio.sleep(0.01)
 

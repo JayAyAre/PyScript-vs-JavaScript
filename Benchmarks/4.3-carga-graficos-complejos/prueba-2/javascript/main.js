@@ -59,9 +59,9 @@ function handleWorkerResult({ metrics, graphData }) {
 }
 
 function clearUI() {
-    document.getElementById("javascript-output").innerHTML = "";
-    document.getElementById("javascript-exact").innerHTML = "";
-    Plotly.purge("graph-container-js");
+    window.clearCell("javascript");
+    window.clearCell("javascript");
+    window.clearGraphContainer("graph-container-js");
 }
 
 function updateUI(metrics) {
@@ -69,10 +69,9 @@ function updateUI(metrics) {
     const exact = document.getElementById("javascript-exact");
     output.innerHTML = `
         <div>Worker Time: ${metrics.workerTime.toFixed(2)} ms</div>
-        <div>Generación datos: ${metrics.dataGenTime.toFixed(2)} ms</div>
-        <div>Renderizado: ${metrics.renderTime.toFixed(2)} ms</div>
-        <div>Memory DS: ${metrics.mem} MB</div>
-        <div>Memory by library: 2,6MB + 1.4MB</div>
+        <div>Data gen: ${metrics.dataGenTime.toFixed(2)} ms</div>
+        <div>Render: ${metrics.renderTime.toFixed(2)} ms</div>
+        <div>Memory: ${metrics.mem} MB</div>
     `;
 
     exact.innerHTML = `<div>TOTAL: ${metrics.totalTime.toFixed(2)} ms</div>`;

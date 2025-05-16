@@ -1,4 +1,3 @@
-# scripts/matrix_benchmark.py
 import json
 import random
 import time

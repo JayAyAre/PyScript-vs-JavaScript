@@ -1,4 +1,4 @@
-from pyscript import display, document, window, PyWorker, fetch
+from pyscript import display, document, PyWorker, fetch
 import js  # type: ignore
 import asyncio
 import time

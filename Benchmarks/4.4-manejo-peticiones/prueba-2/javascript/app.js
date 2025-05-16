@@ -14,7 +14,7 @@ wss.on("connection", (ws) => {
             delay = typeof data.delay === "number" ? data.delay : 0;
             id = data.id ?? null;
         } catch (e) {
-            // Si no es JSON válido, delay queda en 0
+            console.error("Error parsing message:", e);
         }
 
         setTimeout(() => {
@@ -26,7 +26,7 @@ wss.on("connection", (ws) => {
             const response = {
                 status: "success",
                 delay,
-                id, // <- devolvemos el mismo ID
+                id,
                 data: responseData,
             };
 

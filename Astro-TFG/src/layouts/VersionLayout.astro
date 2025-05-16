@@ -140,7 +140,7 @@ const {
                                 ))
                         }
                         <button
-                            onclick="runJSBenchmark()"
+                            onclick="runJsBenchmark()"
                             class="rounded-lg bg-gray-800 px-4 py-2 transition-all focus:ring focus:ring-purple-400 hover:scale-105 hover:bg-gray-700 hover:text-purple-400 cursor-pointer"
                         >
                             Ejecutar JavaScript
@@ -276,7 +276,7 @@ const {
                             {
                                 useNode && (
                                     <td
-                                        id="nodeJs-output"
+                                        id="node-js-output"
                                         class="border border-gray-700 px-4 py-2"
                                     >
                                         Esperando...
@@ -286,7 +286,7 @@ const {
                             {
                                 useBackend && (
                                     <td
-                                        id="pythonBackend-output"
+                                        id="python-backend-output"
                                         class="border border-gray-700 px-4 py-2"
                                     >
                                         Esperando...
@@ -305,18 +305,12 @@ const {
     <script>
         let jsPath = document.body.dataset.jsPath;
         let pyPath = document.body.dataset.pyPath;
-        let pyConfig = document.body.dataset.pyConfig;
         let useNode = document.body.dataset.useNode === 'true';
         let useBackend = document.body.dataset.useBackend === 'true';
 
-        console.log('script:', { pyPath, pyConfig });
-        console.log('jsPath:', { jsPath });
-        console.log('pyPath:', { pyPath });
-        console.log('PyConfig:', { pyConfig });
-
         window.runNodeBenchmark = async function () {
             if (!useNode) return;
-            window.clearCell('nodeJs-output');
+            window.clearCell('node-js-output');
             try {
                 import('../scripts/RunNodeServer.js')
                     .then((module) => {
@@ -330,10 +324,9 @@ const {
             }
         };
 
-        // Button handler para Python Backend
         window.runPyBackendBenchmark = async function () {
             if (!useBackend) return;
-            window.clearCell('pythonBackend-output');
+            window.clearCell('python-backend-output');
             try {
                 import('../scripts/RunPythonServer.js')
                     .then((module) => {

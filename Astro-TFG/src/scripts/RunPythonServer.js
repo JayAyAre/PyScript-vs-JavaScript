@@ -1,5 +1,5 @@
 export function runPyBackendBenchmark(pyPath) {
-    clearCell('pythonBackend-output');
+    clearCell('python-backend-output');
     const cleanedPath = encodeURIComponent(pyPath.replace(/^\/+/, ''));
 
     fetch('/api/run-backend', {
@@ -17,7 +17,7 @@ export function runPyBackendBenchmark(pyPath) {
             if (type === 'matrix') {
                 import('../scripts/MatrixDisplay.js')
                     .then((module) => {
-                        module.display(data, 'pythonBackend-output');
+                        module.display(data, 'python-backend-output');
                     })
                     .catch((error) => {
                         console.error('Error loading module:', error);
@@ -25,7 +25,7 @@ export function runPyBackendBenchmark(pyPath) {
             } else {
                 import('../scripts/GenericDisplay.js')
                     .then((module) => {
-                        module.display(data, 'pythonBackend-output');
+                        module.display(data.data, 'python-backend-output');
                     })
                     .catch((error) => {
                         console.error('Error loading module:', error);

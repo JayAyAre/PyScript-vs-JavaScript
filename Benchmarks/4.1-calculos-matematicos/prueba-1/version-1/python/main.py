@@ -25,17 +25,23 @@ def multiply_matrices(size):
                 _sum += A[i][k] * B[k][j]
             C[i][j] = _sum
 
-    end = time.time()
+    execution_time = (time.time() - start) * 1000
+    memory_usage = tracemalloc.get_traced_memory()[1] / (1024 * 1024)
+    tracemalloc.stop()
 
-    execution_time = (end - start) * 1000
-    display(f"ET: {round(execution_time, 2)} ms", target="pyscript-output")
+    results = {
+        "execution_time": execution_time,
+        "memory_usage": memory_usage
+    }
 
+    display_results(results)
     js.endTimerWebAssembly()
 
-    memory_usage = tracemalloc.get_traced_memory()[1] / (1024 * 1024)
-    display(f"RAM: {round(memory_usage, 2)} MB",
+
+def display_results(results):
+    display(f"ET: {results['execution_time']:.2f} ms",
             target="pyscript-output")
-    tracemalloc.stop()
+    display(f"RAM: {results['memory_usage']:.2f} MB", target="pyscript-output")
 
 
 def run_py_benchmark(event):

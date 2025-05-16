@@ -1,4 +1,3 @@
-# python/worker.py
 import time
 import numpy as np
 from pyscript import sync
@@ -14,7 +13,6 @@ def js_run_py_benchmark(num_series, num_points):
     data_gen_time = (time.perf_counter() - start_time) * 1000
     mem = (x.nbytes + sum(y.nbytes for y in ys)) / (1024**2)
 
-    # Construimos datos planos
     traces = []
     for i, y in enumerate(ys):
         traces.append({

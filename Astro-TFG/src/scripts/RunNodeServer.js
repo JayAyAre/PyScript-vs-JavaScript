@@ -1,5 +1,5 @@
 export function runNodeBenchmark(jsPath) {
-    clearCell('nodeJs-output');
+    clearCell('node-js-output');
     const cleanedPath = encodeURIComponent(jsPath.replace(/^\/+/, ''));
 
     fetch('/api/run-backend', {
@@ -16,7 +16,7 @@ export function runNodeBenchmark(jsPath) {
             if (type === 'matrix') {
                 import('../scripts/MatrixDisplay.js')
                     .then((module) => {
-                        module.display(data, 'nodeJs-output');
+                        module.display(data, 'node-js-output');
                     })
                     .catch((error) => {
                         console.error('Error loading module:', error);
@@ -24,7 +24,7 @@ export function runNodeBenchmark(jsPath) {
             } else {
                 import('../scripts/GenericDisplay.js')
                     .then((module) => {
-                        module.display(data, 'nodeJs-output');
+                        module.display(data.data, 'node-js-output');
                     })
                     .catch((error) => {
                         console.error('Error loading module:', error);

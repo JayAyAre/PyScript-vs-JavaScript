@@ -1,92 +1,108 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Benchmarking: JavaScript vs PyScript</title>
-    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
-    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
-    <script src="javascript/main.js" defer></script>
-    <script type="py" src="python/main.py"></script>
-    <script>
-        let startTime = performance.now();
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="stylesheet"
+            href="https://pyscript.net/releases/2024.1.1/core.css"
+        />
+        <script
+            type="module"
+            src="https://pyscript.net/releases/2024.1.1/core.js"
+        ></script>
 
-        document.addEventListener('py:ready', () => {
-            let endTime = performance.now();
-            let loadTime = endTime - startTime;
-            document.getElementById("output").innerText += `PLT: ${loadTime.toFixed(2)} ms`;
-        });
+        <title>Benchmarking: JavaScript vs PyScript</title>
 
-        var startTimerWebAssembly;
+        <script src="javascript/main.js" defer></script>
+        <script type="py" src="python/main.py"></script>
 
-        function runPyBenchmark() {
-            startTimerWebAssembly = performance.now();
-        }
+        <script>
+            let startTime = performance.now();
 
-        function endTimerWebAssembly() {
-            var endTime = performance.now();
-            var totalElapsedTime = endTime - startTimerWebAssembly;
-            var resultDiv = document.createElement("div");
-            resultDiv.textContent = `ET (Py + WA): ${totalElapsedTime.toFixed(2)} ms`;
-            document.getElementById("pyscript-output").appendChild(resultDiv);
-        }
+            document.addEventListener('py:ready', () => {
+                let endTime = performance.now();
+                let loadTime = endTime - startTime;
+                document.getElementById('output').innerText +=
+                    `PLT: ${loadTime.toFixed(2)} ms`;
+            });
 
-        function clearCell(elementId) {
-            document.getElementById(elementId).textContent = "";
-        }
+            var startTimerWebAssembly;
 
-        function runPyBackendBenchmark() {
-            clearCell("pythonBackend-output");
-            fetch("http://localhost:5000/")
-                .then(response => response.json())
-                .then(data => {
-                    let outputDiv = document.getElementById("pythonBackend-output");
+            function runPyBenchmark() {
+                startTimerWebAssembly = performance.now();
+            }
 
-                    let timeDiv = document.createElement("div");
-                    timeDiv.textContent = `ET: ${data.time} ms`;
-                    outputDiv.appendChild(timeDiv);
+            function endTimerWebAssembly() {
+                var endTime = performance.now();
+                var totalElapsedTime = endTime - startTimerWebAssembly;
+                var resultDiv = document.createElement('div');
+                resultDiv.textContent = `ET (Py + WA): ${totalElapsedTime.toFixed(2)} ms`;
+                document
+                    .getElementById('pyscript-output')
+                    .appendChild(resultDiv);
+            }
 
-                    let cpuDiv = document.createElement("div");
-                    cpuDiv.textContent = `CPU: ${data.cpu_usage} %`;
-                    outputDiv.appendChild(cpuDiv);
+            function clearCell(elementId) {
+                document.getElementById(elementId).textContent = '';
+            }
 
-                    let memoryDiv = document.createElement("div");
-                    memoryDiv.textContent = `RAM: ${data.memory_usage} MB`;
-                    outputDiv.appendChild(memoryDiv);
-                })
-                .catch(error => console.error("Error:", error));
-        }
-    </script>
-</head>
-<body>
-    <h1>Matrix multiplication (Native lists/arrays)</h1>
+            function runPyBackendBenchmark() {
+                clearCell('python-backend-output');
+                fetch('http://localhost:5000/')
+                    .then((response) => response.json())
+                    .then((data) => {
+                        let outputDiv = document.getElementById(
+                            'python-backend-output'
+                        );
 
-    <button onclick="runJSBenchmark()">Run in JavaScript</button>
-    <button onclick="runPyBenchmark()" py-click="run_py_benchmark">Run in PyScript</button>
-    <button onclick="runNodeBenchmark()">Run in Node</button>
-    <button onclick="runPyBackendBenchmark()">Run in Python Backend</button>
+                        let timeDiv = document.createElement('div');
+                        timeDiv.textContent = `ET: ${data.time} ms`;
+                        outputDiv.appendChild(timeDiv);
 
-    <h2>Results</h2>
+                        let cpuDiv = document.createElement('div');
+                        cpuDiv.textContent = `CPU: ${data.cpu_usage} %`;
+                        outputDiv.appendChild(cpuDiv);
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>JavaScript</th>
-                <th>PyScript</th>
-                <th>Node.js</th>
-                <th>Python Backend</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td id="javascript-output">Waiting...</td>
-                <td id="pyscript-output">Waiting...</td>
-                <td id="nodeJs-output">Waiting...</td>
-                <td id="pythonBackend-output">Waiting...</td>
-            </tr>
-        </tbody>
-    </table>
+                        let memoryDiv = document.createElement('div');
+                        memoryDiv.textContent = `RAM: ${data.memory_usage} MB`;
+                        outputDiv.appendChild(memoryDiv);
+                    })
+                    .catch((error) => console.error('Error:', error));
+            }
+        </script>
+    </head>
+    <body>
+        <h1>Matrix multiplication (Native lists/arrays)</h1>
 
-    <pre id="output"></pre>
-</body>
+        <button onclick="runJsBenchmark()">Run in JavaScript</button>
+        <button onclick="runPyBenchmark()" py-click="run_py_benchmark">
+            Run in PyScript
+        </button>
+        <button onclick="runNodeBenchmark()">Run in Node</button>
+        <button onclick="runPyBackendBenchmark()">Run in Python Backend</button>
+
+        <h2>Results</h2>
+
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>JavaScript</th>
+                    <th>PyScript</th>
+                    <th>Node.js</th>
+                    <th>Python Backend</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="javascript-output">Waiting...</td>
+                    <td id="pyscript-output">Waiting...</td>
+                    <td id="node-js-output">Waiting...</td>
+                    <td id="python-backend-output">Waiting...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <pre id="output"></pre>
+    </body>
 </html>

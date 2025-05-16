@@ -15,7 +15,6 @@ async function javascriptBenchmark() {
             10
         );
 
-        // Iniciar Web Worker si no existe
         let start_time_worker = performance.now();
         if (!worker) {
             worker = new Worker("javascript/worker.js");

@@ -3,15 +3,14 @@ const cors = require("cors");
 const os = require("os");
 const osu = require("node-os-utils");
 
+const cpu = osu.cpu;
 const app = express();
 const port = 3000;
 
 app.use(cors());
 
-const cpu = osu.cpu;
-
 function createMatrix(size) {
-    let matrix = new Array(size);
+    const matrix = new Array(size);
     for (let i = 0; i < size; i++) {
         matrix[i] = new Array(size);
         for (let j = 0; j < size; j++) {
@@ -21,16 +20,23 @@ function createMatrix(size) {
     return matrix;
 }
 
+function getMemoryUsage() {
+    return process.memoryUsage().heapUsed / (1024 * 1024);
+}
+
+async function getCpuUsage() {
+    return await cpu.usage();
+}
+
 async function multiplyMatrices(size) {
-    let A = createMatrix(size);
-    let B = createMatrix(size);
-    let C = new Array(size).fill(0).map(() => new Array(size).fill(0));
+    const startMemory = getMemoryUsage();
+    const startCpu = await getCpuUsage();
 
-    const startMemory = process.memoryUsage().heapUsed;
+    const A = createMatrix(size);
+    const B = createMatrix(size);
+    const C = new Array(size).fill(0).map(() => new Array(size).fill(0));
 
-    let startReal = performance.now();
-
-    let cpuAvg = await cpu.usage();
+    const startTime = performance.now();
 
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
@@ -42,14 +48,13 @@ async function multiplyMatrices(size) {
         }
     }
 
-    let endReal = performance.now();
+    const endTime = performance.now();
+    const endMemory = getMemoryUsage();
+    const endCpu = await getCpuUsage();
 
-    let executionTime = (endReal - startReal).toFixed(2);
-
-    let cpuUsage = cpuAvg.toFixed(2);
-
-    const endMemory = process.memoryUsage().heapUsed;
-    const memoryUsage = ((endMemory - startMemory) / (1024 * 1024)).toFixed(2);
+    const executionTime = +(endTime - startTime).toFixed(2);
+    const memoryUsage = +(endMemory - startMemory).toFixed(2);
+    const cpuUsage = +(endCpu - startCpu).toFixed(2);
 
     return {
         executionTime: executionTime,
@@ -59,10 +64,16 @@ async function multiplyMatrices(size) {
 }
 
 app.get("/", async (req, res) => {
-    let result = await multiplyMatrices(300);
-    res.json(result);
+    const results = await multiplyMatrices(300);
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.json(results);
 });
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+function runServer() {
+    app.listen(port, () => {
+        console.log(`Server running at http://localhost:${port}`);
+    });
+}
+
+runServer();

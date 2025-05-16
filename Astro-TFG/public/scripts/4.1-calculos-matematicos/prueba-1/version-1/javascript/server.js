@@ -14,14 +14,23 @@ function createMatrix(size) {
     return matrix;
 }
 
+function getMemoryUsage() {
+    return process.memoryUsage().heapUsed / (1024 * 1024);
+}
+
+async function getCpuUsage() {
+    return await cpu.usage();
+}
+
 async function multiplyMatrices(size) {
+    const startMemory = getMemoryUsage();
+    const startCpu = await getCpuUsage();
+
     let A = createMatrix(size);
     let B = createMatrix(size);
     let C = new Array(size).fill(0).map(() => new Array(size).fill(0));
 
-    const startMemory = process.memoryUsage().heapUsed;
-    const cpuAvg = await cpu.usage();
-    const startReal = performance.now();
+    const startTime = performance.now();
 
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
@@ -33,17 +42,18 @@ async function multiplyMatrices(size) {
         }
     }
 
-    const endReal = performance.now();
-    const endMemory = process.memoryUsage().heapUsed;
+    const endTime = performance.now();
+    const endMemory = getMemoryUsage();
+    const endCpu = await getCpuUsage();
 
-    const time = (endReal - startReal).toFixed(2);
-    const cpu_usage = ((endMemory - startMemory) / (1024 * 1024)).toFixed(2);
-    const memory_usage = cpuAvg.toFixed(2);
+    const executionTime = +(endTime - startTime).toFixed(2);
+    const memoryUsage = +(endMemory - startMemory).toFixed(2);
+    const cpuUsage = +(endCpu - startCpu).toFixed(2);
 
     return {
-        time: `ET: ${time} ms`,
-        cpu_usage: `CPU: ${cpu_usage} %`,
-        memory_usage: `RAM: ${memory_usage} MB`
+        time: `ET: ${executionTime} ms`,
+        cpu_usage: `CPU: ${cpuUsage} %`,
+        memory_usage: `RAM: ${memoryUsage} MB`
     };
 }
 

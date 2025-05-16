@@ -1,9 +1,9 @@
 function runNodeBenchmark() {
-    clearCell("nodeJs-output");
+    clearCell("node-js-output");
     fetch("http://localhost:3000/")
         .then(response => response.json())
         .then(data => {
-            let outputDiv = document.getElementById("nodeJs-output");
+            let outputDiv = document.getElementById("node-js-output");
 
             let timeDiv = document.createElement("div");
             timeDiv.textContent = `ET: ${data.executionTime} ms`;
@@ -33,11 +33,12 @@ function createMatrix(size) {
 }
 
 function multiplyMatrices(size) {
-    let A = createMatrix(size);
-    let B = createMatrix(size);
-    let C = new Array(size).fill(0).map(() => new Array(size).fill(0));
+    const A = createMatrix(size);
+    const B = createMatrix(size);
+    const C = Array.from({ length: size }, () => new Array(size).fill(0));
 
-    let start = performance.now();
+    const start = performance.now();
+
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
             let sum = 0;
@@ -47,31 +48,42 @@ function multiplyMatrices(size) {
             C[i][j] = sum;
         }
     }
-    let end = performance.now();
 
+    const executionTime = performance.now() - start;
+    const memoryUsage = getMemoryUsageJS();
 
-    let resultTime = Number((end - start).toFixed(2));
-    let result = `ET: ${resultTime} ms`;
-    let resultDiv = document.createElement("div");
-    resultDiv.textContent = result;
-    document.getElementById("javascript-output").appendChild(resultDiv);
-}
+    const results = {
+        execution_time: executionTime,
+        memory_usage: memoryUsage
+    };
 
-function runJSBenchmark() {
-    clearCell("javascript-output");
-    document.getElementById("javascript-output").textContent = ""
-    multiplyMatrices(300);
-
-    let memoryDiv = document.createElement("div");
-    memoryDiv.textContent = getMemoryUsageJS();
-    document.getElementById("javascript-output").appendChild(memoryDiv);
+    displayResults(results);
 }
 
 function getMemoryUsageJS() {
     if (performance.memory) {
-        let memoryUsed = performance.memory.usedJSHeapSize / (1024 * 1024);
-        return `RAM: ${memoryUsed.toFixed(2)} MB`;
-    } else {
-        return `RAM unsopported measurement in this browser.`;
+        return performance.memory.usedJSHeapSize / (1024 * 1024);
     }
+    return -1;
+}
+
+function displayResults(results) {
+    const output = document.getElementById("javascript-output");
+
+    const timeDiv = document.createElement("div");
+    timeDiv.textContent = `ET: ${results.execution_time.toFixed(2)} ms`;
+    output.appendChild(timeDiv);
+
+    const memoryDiv = document.createElement("div");
+    if (results.memory_usage !== -1) {
+        memoryDiv.textContent = `RAM: ${results.memory_usage.toFixed(2)} MB`;
+    } else {
+        memoryDiv.textContent = `RAM unsupported measurement in this browser.`;
+    }
+    output.appendChild(memoryDiv);
+}
+
+function runJsBenchmark(event) {
+    clearCell("javascript-output");
+    multiplyMatrices(300);
 }

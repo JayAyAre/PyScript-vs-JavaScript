@@ -10,11 +10,12 @@ function createMatrix(size) {
 }
 
 function multiplyMatrices(size) {
-    let A = createMatrix(size);
-    let B = createMatrix(size);
-    let C = new Array(size).fill(0).map(() => new Array(size).fill(0));
+    const A = createMatrix(size);
+    const B = createMatrix(size);
+    const C = Array.from({ length: size }, () => new Array(size).fill(0));
 
-    let start = performance.now();
+    const start = performance.now();
+
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
             let sum = 0;
@@ -24,19 +25,43 @@ function multiplyMatrices(size) {
             C[i][j] = sum;
         }
     }
-    let end = performance.now();
+    const executionTime = performance.now() - start;
+    const memoryUsage = getMemoryUsageJS();
 
-    // ET (Execution Time)
+    const results = {
+        execution_time: executionTime,
+        memory_usage: memoryUsage
+    };
 
-    let resultTime = Number((end - start).toFixed(2));
-    let result = `ET: ${resultTime} ms`;
-    let resultDiv = document.createElement("div");
-    resultDiv.textContent = result;
-    document.getElementById("javascript-output").appendChild(resultDiv);
-    document.getElementById('loading-message').style.display = 'none';
+    displayResults(results);
+    window.hideExecutionLoader();
 }
 
-window.runJSBenchmark = function () {
+function getMemoryUsageJS() {
+    if (performance.memory) {
+        return performance.memory.usedJSHeapSize / (1024 * 1024);
+    }
+    return -1;
+}
+
+
+function displayResults(results) {
+    const output = document.getElementById("javascript-output");
+
+    const timeDiv = document.createElement("div");
+    timeDiv.textContent = `ET: ${results.execution_time.toFixed(2)} ms`;
+    output.appendChild(timeDiv);
+
+    const memoryDiv = document.createElement("div");
+    if (results.memory_usage !== -1) {
+        memoryDiv.textContent = `RAM: ${results.memory_usage.toFixed(2)} MB`;
+    } else {
+        memoryDiv.textContent = `RAM unsupported measurement in this browser.`;
+    }
+    output.appendChild(memoryDiv);
+}
+
+window.runJsBenchmark = function () {
     clearCell("javascript-output");
     window.showExecutionLoader();
 
@@ -44,21 +69,8 @@ window.runJSBenchmark = function () {
         setTimeout(() => {
             document.getElementById("javascript-output").textContent = ""
             multiplyMatrices(300);
-            let memoryDiv = document.createElement("div");
-            memoryDiv.textContent = getMemoryUsageJS();
-            document.getElementById("javascript-output").appendChild(memoryDiv);
             window.hideExecutionLoader();
         }, 0);
     });
 
-}
-
-function getMemoryUsageJS() {
-    // RAM
-    if (performance.memory) {
-        let memoryUsed = performance.memory.usedJSHeapSize / (1024 * 1024);
-        return `RAM: ${memoryUsed.toFixed(2)} MB`;
-    } else {
-        return `RAM unsopported measurement in this browser.`;
-    }
 }

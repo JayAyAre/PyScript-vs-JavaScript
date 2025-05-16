@@ -8,7 +8,6 @@ self.onmessage = async function (e) {
         ws.onopen = resolve;
     });
 
-    // Consumir mensaje de handshake
     await new Promise((resolve) => {
         ws.onmessage = () => resolve();
     });
@@ -36,7 +35,7 @@ self.onmessage = async function (e) {
         }
     };
 
-    const start_time = performance.now(); // <--- Tiempo inicial de referencia
+    const start_time = performance.now();
 
     const promises = [];
     for (let i = 0; i < num_requests; i++) {
@@ -57,13 +56,13 @@ self.onmessage = async function (e) {
     await Promise.all(promises);
     ws.close();
 
-    const end_time = performance.now(); // <--- Tiempo final de referencia
-    const total_time = end_time - start_time; // <--- Tiempo total real
+    const end_time = performance.now();
+    const total_time = end_time - start_time;
 
     const avg_time =
         individual_times.length > 0
             ? individual_times.reduce((sum, t) => sum + t, 0) /
-              individual_times.length
+            individual_times.length
             : 0;
 
     self.postMessage({
