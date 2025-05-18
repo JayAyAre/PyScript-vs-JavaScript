@@ -1,11 +1,10 @@
-// main.js
 let worker = null;
 let jsTimer = null;
 let jsStartTime = 0;
 
 function startJsTimer() {
     jsStartTime = performance.now();
-    const timerElement = document.getElementById("js-timer-display");
+    const timerElement = document.getElementById("javascript-timer-display");
     function updateTimer() {
         if (!jsTimer) return;
         const elapsed = ((performance.now() - jsStartTime) / 1000).toFixed(3);
@@ -21,32 +20,37 @@ function stopJsTimer() {
     jsTimer = null;
     const elapsed = ((performance.now() - jsStartTime) / 1000).toFixed(3);
     document.getElementById(
-        "js-timer-display"
+        "javascript-timer-display"
     ).textContent = `JS Timer: ${elapsed} s`;
 }
 
-async function javascriptBenchmark() {
+function initializeWorker() {
+    if (!worker) {
+        worker = new Worker(new URL("worker.js", import.meta.url), {
+            type: "module",
+        });
+    }
+}
+
+async function runJsBenchmark() {
     try {
+        window.clearCell("javascript-output");
         startJsTimer();
+
         const startWorkerTime = performance.now();
-        if (!worker) {
-            worker = new Worker("./javascript/worker.js");
-        }
+        initializeWorker();
         const workerTime = performance.now() - startWorkerTime;
 
-        clearCell("javascript");
-
         const repetitions = parseInt(
-            document.getElementById("num-repetitions-js").value,
+            document.getElementById("num-repetitions-javascript").value,
             10
         );
         const fileSizeMb = parseFloat(
-            document.getElementById("file-size-js").value
+            document.getElementById("file-size-javascript").value
         );
         const id = `js-${Date.now()}`;
 
         const resultJson = await new Promise((resolve, reject) => {
-            // handler que sólo procesa nuestro mensaje
             function onMessage(e) {
                 if (e.data.id !== id) return;
                 worker.removeEventListener("message", onMessage);
@@ -61,8 +65,7 @@ async function javascriptBenchmark() {
             worker.addEventListener("message", onMessage);
             worker.postMessage({
                 id,
-                type: "js_run_js_benchmark",
-                workerTime,
+                type: "do_analisis",
                 repetitions,
                 fileSizeMb,
             });
@@ -72,37 +75,50 @@ async function javascriptBenchmark() {
         displayResult(result, workerTime);
     } catch (err) {
         console.error("Benchmark error:", err);
-        const out = document.getElementById("javascript-output");
-        out.textContent = `Error: ${err.message}`;
     } finally {
         stopJsTimer();
     }
 }
 
-function clearCell(prefix) {
-    ["output", "exact"].forEach((field) => {
-        const el = document.getElementById(`${prefix}-${field}`);
-        if (el) el.textContent = "";
-    });
+function createDiv() {
+    const div = document.createElement("div");
+    return div;
 }
 
-function displayResult(result, workerTime) {
-    const out = document.getElementById("javascript-output");
-    const exact = document.getElementById("javascript-exact");
+function displayResult(r, workerTime) {
+    const output = document.getElementById("javascript-output");
 
-    out.innerHTML = `
-      <div>Worker time: ${workerTime.toFixed(2)} ms</div>
-      <div>Simulated file: ${result.file_size_mb.toFixed(2)} MB</div>
-      <div>Repetitions: ${result.repetitions}</div>
-      <div>Avg hash time: ${result.hash_avg_time_ms.toFixed(2)} ms</div>
-      <div>Avg verify time: ${result.verify_avg_time_ms.toFixed(2)} ms</div>
-      <div>Last hash (shortened): ${result.last_digest.slice(0, 20)}...</div>
-    `;
-    exact.innerHTML = `
-      <div>Total op time: ${result.total_time_ms.toFixed(2)} ms</div>
-      <div>Total time: ${result.total_time.toFixed(2)} ms</div>
-    `;
+    const workerDiv = createDiv();
+    workerDiv.textContent = `Worker init time: ${workerTime.toFixed(2)} ms`;
+    output.appendChild(workerDiv);
+
+    const simulatedDiv = createDiv();
+    simulatedDiv.textContent = `Simulated file: ${r.file_size_mb.toFixed(2)} ms`;
+    output.appendChild(simulatedDiv);
+
+    const repetitionsDiv = createDiv();
+    repetitionsDiv.textContent = `Repetitions: ${r.repetitions.toFixed(2)} ms`;
+    output.appendChild(repetitionsDiv);
+
+    const hashDiv = createDiv();
+    hashDiv.textContent = `Avg hash time: ${r.hash_avg_time_ms.toFixed(2)} %`;
+    output.appendChild(hashDiv);
+
+    const verifyDiv = createDiv();
+    verifyDiv.textContent = `Avg verify time: ${r.verify_avg_time_ms.toFixed(2)} MB`;
+    output.appendChild(verifyDiv);
+
+    const lastDigestDiv = createDiv();
+    lastDigestDiv.textContent = `Last hash (shortened): ${r.last_digest.slice(0, 8)}`;
+    output.appendChild(lastDigestDiv);
+
+    const totalOpDiv = createDiv();
+    totalOpDiv.textContent = `Total hash + verify time: ${r.total_time_ms.toFixed(2)} ms`;
+    output.appendChild(totalOpDiv);
+
+    const totalDiv = createDiv();
+    totalDiv.textContent = `Total ET: ${r.total_time.toFixed(2)} ms`;
+    output.appendChild(totalDiv);
 }
 
-// dejar expuesta
-window.javascriptBenchmark = javascriptBenchmark;
+window.runJsBenchmark = runJsBenchmark;

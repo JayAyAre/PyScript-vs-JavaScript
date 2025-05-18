@@ -9,10 +9,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
 
-async def js_run_py_benchmark(worker_time):
+async def do_analisis():
     await asyncio.sleep(0.1)
     start_overall = time.perf_counter()
-    reps = int(document.getElementById("num-repetitions-py").value)
+    reps = int(document.getElementById("num-repetitions-pyscript").value)
 
     data = load_digits()
     X, y = data.data, data.target
@@ -57,4 +57,4 @@ async def js_run_py_benchmark(worker_time):
     }
     return json.dumps(result)
 
-sync.js_run_py_benchmark = js_run_py_benchmark
+sync.do_analisis = do_analisis

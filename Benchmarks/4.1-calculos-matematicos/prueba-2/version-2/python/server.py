@@ -16,7 +16,7 @@ def get_memory_usage():
 
 
 def get_cpu_usage():
-    return psutil.cpu_percent(interval=None)
+    return psutil.cpu_percent()
 
 
 def benchmark_primes_py(repetitions, n):
@@ -32,21 +32,17 @@ def benchmark_primes_py(repetitions, n):
 
         cpu_before = get_cpu_usage()
         primes = sieve_of_eratosthenes(n)
-        cpu_after = get_cpu_usage()
 
-        end = time.time()
         memory_usage = get_memory_usage() - start_memory
+        cpu_after = get_cpu_usage() - cpu_before
 
-        total_time += (end - start) * 1000
+        total_time += (time.time() - start) * 1000
         total_memory += memory_usage
         total_cpu += cpu_after
 
-    end_total = time.time()
-    total_exec_time = round((end_total - start_total) * 1000, 2)
+    total_exec_time = round((time.time() - start_total) * 1000, 2)
     avg_time = round(total_time / repetitions, 2)
-
     avg_memory = round(total_memory / repetitions, 2)
-
     avg_cpu = round(total_cpu / repetitions, 2)
 
     return {
@@ -65,7 +61,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.end_headers()
 
-            results = benchmark_primes_py(1000, 10_000)
+            results = benchmark_primes_py(1_000, 10_000)
             response = json.dumps(results)
             self.wfile.write(response.encode())
 

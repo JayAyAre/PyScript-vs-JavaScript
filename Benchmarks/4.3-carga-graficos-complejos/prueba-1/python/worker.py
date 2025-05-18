@@ -1,70 +1,113 @@
 import time
-import numpy as np
 import json
+import traceback
+import numpy as np
 import sys
 import matplotlib.pyplot as plt
 import io
 import base64
-from pyscript import sync
+from pyscript import sync, display
+import js  # type: ignore
+
+GRAPH_SIZE = 100_000
+FIG_W_PIX = 800
+FIG_H_PIX = 600
+DPI = 100
+PADDING = 50
+TICKS = 6
 
 
-def do_graph_rendering(size):
+def mean(arr):
+    return sum(arr) / len(arr) if arr else 0
+
+
+def png_to_base64(fig):
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=DPI, pad_inches=0.5)
+    buf.seek(0)
+    b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
     try:
-        start_time = time.perf_counter()
+        plt.close(fig)
+    except Exception as e:
+        print(f"Error closing figure: {e}")
+    return b64
 
-        rng = np.random.default_rng()
-        coords = rng.random((size, 2))
-        x, y = coords[:, 0], coords[:, 1]
 
-        memory_usage = (coords.nbytes + sys.getsizeof(x) +
-                        sys.getsizeof(y)) / (1024 ** 2)
+def graph_rendering_benchmark(size):
+    try:
+        t0 = time.perf_counter()
+        coords = np.random.default_rng().random((size, 2))
+        data_gen_time = (time.perf_counter() - t0) * 1000
+        mem_mb = (
+            coords.nbytes + sys.getsizeof(coords[:, 0]) + sys.getsizeof(coords[:, 1])) / (1024**2)
 
-        data_gen_time = (time.perf_counter() - start_time) * 1000
-
-        render_start = time.perf_counter()
-
-        px = 1/plt.rcParams['figure.dpi']
-        fig, ax = plt.subplots(figsize=(800*px, 600*px))
-
-        fig.patch.set_facecolor("white")
+        t1 = time.perf_counter()
+        px = 1 / plt.rcParams['figure.dpi']
+        fig, ax = plt.subplots(figsize=(FIG_W_PIX*px, FIG_H_PIX*px))
         ax.set_facecolor("white")
-
-        ax.scatter(x, y, s=1, alpha=0.5, color='blue')
-
+        ax.scatter(coords[:, 0], coords[:, 1], s=1, alpha=0.5)
         ax.set_xlim(0, 1)
         ax.set_ylim(0, 1)
 
-        ticks = np.linspace(0, 1, 6)
+        ticks = np.linspace(0, 1, TICKS)
         ax.set_xticks(ticks)
         ax.set_yticks(ticks)
-
         ax.tick_params(axis='both', labelsize=8)
-
-        for spine in ax.spines.values():
-            spine.set_visible(True)
-            spine.set_linewidth(1)
-            spine.set_color("black")
-
         ax.set_title(f"{size:,} Points Scatter Plot", fontsize=14)
 
-        buf = io.BytesIO()
-        fig.savefig(buf, format="png", dpi=100, pad_inches=0.5)
-        plt.close(fig)
-        encoded_img = base64.b64encode(buf.getvalue()).decode("utf-8")
-        render_time = (time.perf_counter() - render_start) * 1000
+        img_b64 = png_to_base64(fig)
+        render_time = (time.perf_counter() - t1) * 1000
+        total_time = (time.perf_counter() - t0) * 1000
 
-        total_time = (time.perf_counter() - start_time) * 1000
-
-        return json.dumps({
-            "image_base64": encoded_img,
+        return {
+            "image_base64": img_b64,
             "data_gen_time": data_gen_time,
             "render_time": render_time,
-            "memory": memory_usage,
+            "memory": mem_mb,
             "total_time": total_time
-        })
+        }
+    except Exception as e:
+        return {"error": str(e), "traceback": traceback.format_exc()}
+
+
+def do_analisis():
+    try:
+        num_exec = int(js.document.getElementById(
+            "num-executions-pyscript").value)
+        all_start = time.perf_counter()
+        runs = []
+
+        for _ in range(num_exec):
+            r = graph_rendering_benchmark(GRAPH_SIZE)
+            if "error" in r:
+                display(f"Worker Error: {r['error']}",
+                        target="pyscript-output")
+                return json.dumps({"error": r["error"]})
+            runs.append(r)
+
+        total_time = (time.perf_counter() - all_start) * 1000
+
+        avg_data = mean([r["data_gen_time"] for r in runs])
+        avg_rend = mean([r["render_time"] for r in runs])
+        avg_mem = mean([r["memory"] for r in runs])
+        avg_tot = mean([r["total_time"] for r in runs])
+
+        last_img = runs[-1]["image_base64"] if runs else ""
+
+        result = {
+            "data_gen_time":   avg_data,
+            "render_time":     avg_rend,
+            "memory":          avg_mem,
+            "average_time_ms": avg_tot,
+            "total_time_ms":   total_time,
+            "num_executions":  num_exec,
+            "image_base64":    last_img
+        }
+        return json.dumps(result)
 
     except Exception as e:
+        display(f"Error: {e}", target="pyscript-output")
         return json.dumps({"error": str(e)})
 
 
-sync.do_graph_rendering = do_graph_rendering
+sync.do_analisis = do_analisis

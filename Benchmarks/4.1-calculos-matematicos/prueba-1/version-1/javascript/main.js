@@ -50,11 +50,10 @@ function multiplyMatrices(size) {
     }
 
     const executionTime = performance.now() - start;
-    const memoryUsage = getMemoryUsageJS();
 
     const results = {
         execution_time: executionTime,
-        memory_usage: memoryUsage
+        memory_usage: getMemoryUsageJS(),
     };
 
     displayResults(results);

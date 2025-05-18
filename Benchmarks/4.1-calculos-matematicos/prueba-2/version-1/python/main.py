@@ -1,7 +1,7 @@
 import gc
 import time
-import js  # type: ignore
 import tracemalloc
+import js  # type: ignore
 from pyscript import display
 
 
@@ -20,10 +20,13 @@ def is_prime(n):
 
 
 def primes_to_n(n):
+    tracemalloc.start()
+
     primes = []
 
     start = time.time()
     gc.collect()
+
     if n > 2:
         primes.append(2)
 
@@ -31,20 +34,24 @@ def primes_to_n(n):
         if is_prime(i):
             primes.append(i)
 
-    end = time.time()
-
-    execution_time = (end - start) * 1000
-    display(f"ET: {round(execution_time, 2)} ms", target="pyscript-output")
-
-    js.endTimerWebAssembly()
-
+    execution_time = (time.time() - start) * 1000
     memory_usage = tracemalloc.get_traced_memory()[1] / (1024 * 1024)
-    display(f"RAM: {round(memory_usage, 2)} MB",
-            target="pyscript-output")
     tracemalloc.stop()
+
+    results = {
+        "execution_time": execution_time,
+        "memory_usage": memory_usage
+    }
+    display_results(results)
+
+
+def display_results(results):
+    display(f"ET: {results['execution_time']:.2f} ms",
+            target="pyscript-output")
+    display(f"RAM: {results['memory_usage']:.2f} MB", target="pyscript-output")
+    js.endTimerWebAssembly()
 
 
 def run_py_benchmark(event):
     js.clearCell('pyscript-output')
-    tracemalloc.start()
     primes_to_n(1_000_000)

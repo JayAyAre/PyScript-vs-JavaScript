@@ -1,9 +1,9 @@
 function runNodeBenchmark() {
-    clearCell("nodeJs-output");
+    window.clearCell("node-js-output");
     fetch("http://localhost:3000/")
         .then(response => response.json())
         .then(data => {
-            let outputDiv = document.getElementById("nodeJs-output");
+            let outputDiv = document.getElementById("node-js-output");
 
             let timeDiv = document.createElement("div");
             timeDiv.textContent = `Total ET (1000x): ${data.totalExecutionTime} ms`;
@@ -56,31 +56,47 @@ function n_digits_pi(repetitions, digits) {
     }
 
     const endTotal = performance.now();
-    const totalExecTime = (endTotal - startTotal).toFixed(2);
+    const totalExecTime = (endTotal - startTotal);
 
-    const avgTime = Number((totalTime / repetitions).toFixed(2));
-    const avgMemory = Number((totalMemory / repetitions).toFixed(2));
+    const avgTime = Number((totalTime / repetitions));
+    const avgMemory = Number((totalMemory / repetitions));
 
-    const outputDiv = document.getElementById("javascript-output");
-
-    let timeDiv = document.createElement("div");
-    timeDiv.textContent = `Total ET (1000x): ${totalExecTime} ms`;
-    outputDiv.appendChild(timeDiv);
-
-    let avgTimeDiv = document.createElement("div");
-    avgTimeDiv.textContent = `ET (avg, 1000x): ${avgTime} ms`;
-    outputDiv.appendChild(avgTimeDiv);
-
-    let avgMemoryDiv = document.createElement("div");
-    avgMemoryDiv.textContent = `RAM (avg, 1000x): ${avgMemory} MB`;
-    outputDiv.appendChild(avgMemoryDiv);
+    displayResults({
+        total_time: totalExecTime,
+        execution_time: avgTime,
+        memory_usage: avgMemory
+    });
 }
 
-function runJSBenchmark() {
-    clearCell("javascript-output");
+
+function getMemoryUsageJS() {
+    if (performance.memory) {
+        return performance.memory.usedJSHeapSize / (1024 * 1024);
+    }
+    return -1;
+}
+
+function displayResults(results) {
+    const output = document.getElementById("javascript-output");
+
+    const timeTotalDiv = document.createElement("div");
+    timeTotalDiv.textContent = `Total ET (1000x): ${results.total_time.toFixed(2)} ms`;
+    output.appendChild(timeTotalDiv);
+
+    const timeDiv = document.createElement("div");
+    timeDiv.textContent = `ET (avg, 1000x): ${results.execution_time.toFixed(2)} ms`;
+    output.appendChild(timeDiv);
+
+    const memoryDiv = document.createElement("div");
+    if (results.memory_usage !== -1) {
+        memoryDiv.textContent = `RAM (avg, 1000x): ${results.memory_usage.toFixed(2)} MB`;
+    } else {
+        memoryDiv.textContent = `RAM unsupported measurement in this browser.`;
+    }
+    output.appendChild(memoryDiv);
+}
+
+function runJsBenchmark() {
+    window.clearCell("javascript-output");
     n_digits_pi(1_000, 1_000);
-}
-
-function clearCell(elementId) {
-    document.getElementById(elementId).innerHTML = "";
 }

@@ -1,9 +1,9 @@
 function runNodeBenchmark() {
-    clearCell("nodeJs-output");
+    clearCell("node-js-output");
     fetch("http://localhost:3000/")
         .then(response => response.json())
         .then(data => {
-            let outputDiv = document.getElementById("nodeJs-output");
+            let outputDiv = document.getElementById("node-js-output");
 
             Object.values(data).forEach((result) => {
                 let titleDiv = document.createElement("div");
@@ -34,44 +34,52 @@ async function multiplyMatrices(size) {
     let B = tf.randomNormal([size, size]);
 
     let start = performance.now();
+
     let C = tf.matMul(A, B);
-    await C.data();
-    let end = performance.now();
 
-    let outputDiv = document.getElementById("javascript-output");
+    const executionTime = performance.now() - start;
 
-    let titleDiv = document.createElement("div");
-    titleDiv.textContent = `Matriz ${size}x${size}`;
-    titleDiv.style.fontWeight = "bold";
-    outputDiv.appendChild(titleDiv);
+    const results = {
+        size: `${size}x${size}`,
+        execution_time: executionTime,
+        memory_usage: getMemoryUsageJS(),
+    };
 
-    let timeDiv = document.createElement("div");
-    timeDiv.textContent = `ET: ${Number((end - start).toFixed(2))} ms`;
-    outputDiv.appendChild(timeDiv);
-
-    let memoryDiv = document.createElement("div");
-    memoryDiv.textContent = getMemoryUsageJS();
-    outputDiv.appendChild(memoryDiv);
-
-    outputDiv.appendChild(document.createElement("hr"));
-}
-
-async function runJSBenchmark() {
-    clearCell("javascript-output");
-    await multiplyMatrices(500);
-    await multiplyMatrices(1000);
-    await multiplyMatrices(2000);
+    displayResults(results);
 }
 
 function getMemoryUsageJS() {
     if (performance.memory) {
-        let memoryUsed = performance.memory.usedJSHeapSize / (1024 * 1024);
-        return `RAM: ${memoryUsed.toFixed(2)} MB`;
-    } else {
-        return `RAM: Unsupported measurement in this browser.`;
+        return performance.memory.usedJSHeapSize / (1024 * 1024);
     }
+    return -1;
 }
 
-function clearCell(elementId) {
-    document.getElementById(elementId).textContent = "";
+function displayResults(results) {
+    const output = document.getElementById("javascript-output");
+
+    const titleDiv = document.createElement("div");
+    titleDiv.textContent = `Matriz ${results.size}`;
+    titleDiv.style.fontWeight = "bold";
+    output.appendChild(titleDiv);
+
+    const timeDiv = document.createElement("div");
+    timeDiv.textContent = `ET: ${results.execution_time.toFixed(2)} ms`;
+    output.appendChild(timeDiv);
+
+    const memoryDiv = document.createElement("div");
+    if (results.memory_usage !== -1) {
+        memoryDiv.textContent = `RAM: ${results.memory_usage.toFixed(2)} MB`;
+    } else {
+        memoryDiv.textContent = `RAM unsupported measurement in this browser.`;
+    }
+    output.appendChild(memoryDiv);
+    output.appendChild(document.createElement("hr"));
+}
+
+async function runJsBenchmark() {
+    clearCell("javascript-output");
+    await multiplyMatrices(500);
+    await multiplyMatrices(1000);
+    await multiplyMatrices(2000);
 }

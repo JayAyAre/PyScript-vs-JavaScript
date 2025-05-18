@@ -1,41 +1,43 @@
 import asyncio
+import websockets
 import json
-import random
-from websockets import serve
+import numpy as np
+
+PORT = 5001
 
 
-async def handler(websocket):
-    await websocket.send("connected")
-
-    async for message in websocket:
-        try:
-            data = json.loads(message)
-            delay = data.get("delay", 0)
-            req_id = data.get("id")
-        except (ValueError, json.JSONDecodeError):
-            delay = 0
-            req_id = None
+async def process_message(websocket, message):
+    try:
+        data = json.loads(message)
+        delay = data.get("delay", 0)
+        req_id = data.get("id")
 
         if delay > 0:
             await asyncio.sleep(delay / 1000)
 
-        response_data = [{"id": i, "value": random.random()}
-                         for i in range(10)]
-
-        response = {
-            "status": "success",
-            "delay": delay,
+        payload = {
             "id": req_id,
-            "data": response_data
+            "status": "success",
+            "data": [{"id": i, "value": float(np.random.rand())} for i in range(10)]
         }
+        await websocket.send(json.dumps(payload))
+    except Exception as e:
+        print(f"Error processing message: {e}")
 
-        await websocket.send(json.dumps(response))
+
+async def handler(websocket):
+    try:
+        async for message in websocket:
+            asyncio.create_task(process_message(websocket, message))
+    except websockets.ConnectionClosed:
+        print("🔴 Python WebSocket disconnected.")
 
 
 async def main():
-    async with serve(handler, "localhost", 5001):
-        print("WebSocket server is running on wss://localhost:5001")
+    print(f"Python WebSocket Server running on ws://localhost:{PORT}")
+    async with websockets.serve(handler, "0.0.0.0", PORT):
         await asyncio.Future()
+
 
 if __name__ == "__main__":
     asyncio.run(main())

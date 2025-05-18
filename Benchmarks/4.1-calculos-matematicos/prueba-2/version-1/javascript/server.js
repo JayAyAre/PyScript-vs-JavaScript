@@ -2,13 +2,21 @@ const express = require("express");
 const cors = require("cors");
 const os = require("os");
 const osu = require("node-os-utils");
+const { performance } = require("perf_hooks");
 
+const cpu = osu.cpu;
 const app = express();
 const port = 3000;
 
 app.use(cors());
 
-const cpu = osu.cpu;
+function getMemoryUsage() {
+    return process.memoryUsage().heapUsed / (1024 * 1024);
+}
+
+async function getCpuUsage() {
+    return await cpu.usage();
+}
 
 function is_prime(size) {
     if (size < 2) {
@@ -29,11 +37,7 @@ function is_prime(size) {
 }
 
 async function primes_to_n(size) {
-    const startMemory = process.memoryUsage().heapUsed;
-
-    let startReal = performance.now();
-
-    let cpuAvg = await cpu.usage();
+    const startTime = performance.now();
 
     let primes = [];
 
@@ -47,27 +51,27 @@ async function primes_to_n(size) {
         }
     }
 
-    let endReal = performance.now();
-
-    let executionTime = (endReal - startReal).toFixed(2);
-
-    let cpuUsage = cpuAvg.toFixed(2);
-
-    const endMemory = process.memoryUsage().heapUsed;
-    const memoryUsage = ((endMemory - startMemory) / (1024 * 1024)).toFixed(2);
+    const executionTime = (performance.now() - startTime).toFixed(2);
+    const endMemory = getMemoryUsage();
+    const memoryUsage = endMemory.toFixed(2);
+    const endCpu = await getCpuUsage();
 
     return {
         executionTime: executionTime,
-        cpuUsage: cpuUsage,
+        cpuUsage: endCpu,
         memoryUsage: memoryUsage
     };
 }
 
 app.get("/", async (req, res) => {
-    let result = await primes_to_n(1000000);
+    let result = await primes_to_n(1_000_000);
     res.json(result);
 });
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+function runServer() {
+    app.listen(port, () => {
+        console.log(`Server running at http://localhost:${port}`);
+    });
+}
+
+runServer();

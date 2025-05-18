@@ -3,12 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link
+        rel="stylesheet"
+        href="https://pyscript.net/releases/2024.1.1/core.css"
+    />
+    <script
+        type="module"
+        src="https://pyscript.net/releases/2024.1.1/core.js"
+    ></script>
     <title>Benchmarking: JavaScript vs PyScript</title>
-    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
-    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.js"></script>
     <script src="javascript/main.js" defer></script>
     <script type="py" src="python/main.py" config="python/pyscript.toml"></script>
+    
     <script>
         let startTime = performance.now();
 
@@ -37,11 +46,11 @@
         }
 
         function runPyBackendBenchmark() {
-            clearCell("pythonBackend-output");
+            clearCell('python-backend-output');
             fetch("http://localhost:5000/")
                 .then(response => response.json())
                 .then(data => {
-                    let outputDiv = document.getElementById("pythonBackend-output");
+                    let outputDiv = document.getElementById("python-backend-output");
 
                     let timeDiv = document.createElement("div");
                     timeDiv.textContent = `Total ET (10x): ${data.time} ms`;
@@ -65,7 +74,7 @@
 <body>
     <h1>PI Digit Calculation (Gauss-Legendre)</h1>
 
-    <button onclick="runJSBenchmark()">Run in JavaScript</button>
+    <button onclick="runJsBenchmark()">Run in JavaScript</button>
     <button onclick="runPyBenchmark()" py-click="run_py_benchmark">Run in PyScript</button>
     <button onclick="runNodeBenchmark()">Run in Node</button>
     <button onclick="runPyBackendBenchmark()">Run in Python Backend</button>
@@ -85,8 +94,8 @@
             <tr>
                 <td id="javascript-output">Waiting...</td>
                 <td id="pyscript-output">Waiting...</td>
-                <td id="nodeJs-output">Waiting...</td>
-                <td id="pythonBackend-output">Waiting...</td>
+                <td id="node-js-output">Waiting...</td>
+                <td id="python-backend-output">Waiting...</td>
             </tr>
         </tbody>
     </table>

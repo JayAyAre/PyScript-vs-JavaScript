@@ -12,12 +12,15 @@ def create_matrix(size):
 
 def multiply_matrices(size):
     tracemalloc.start()
+
     A = create_matrix(size)
     B = create_matrix(size)
+
     C = [[0] * size for _ in range(size)]
 
     start = time.time()
     gc.collect()
+
     for i in range(size):
         for j in range(size):
             _sum = 0

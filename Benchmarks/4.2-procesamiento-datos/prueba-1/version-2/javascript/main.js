@@ -96,24 +96,34 @@ function do_operations(size) {
         memory_peak: max_memory,
     };
 
-    for (const [op, data] of Object.entries(metrics)) {
+    displayResults(metrics);
+}
+
+
+function displayResults(results) {
+    const output = document.getElementById("javascript-output");
+
+    for (const [op, data] of Object.entries(results)) {
         if (op !== 'output') {
-            let element = document.getElementById(`javascript-${op}`);
-            if (element) {
-                element.innerHTML = `${op.toUpperCase()} - Time: ${data.time.toFixed(2)} ms | RAM: ${data.memory.toFixed(2)} MB`;
-            }
+            const timeDiv = document.createElement("div");
+            timeDiv.textContent =
+                `${op.toUpperCase()} - Time: ${data.time.toFixed(2)} ms | RAM: ${data.memory.toFixed(2)} MB`;
+            output.appendChild(timeDiv);
         }
     }
 
-    const outputElement = document.getElementById('javascript-output');
-    if (outputElement) {
-        outputElement.innerHTML =
-            `TOTAL - Time: ${metrics['output'].total_time.toFixed(2)} ms | ` +
-            `RAM Peak: ${metrics['output'].memory_peak.toFixed(2)} MB`;
-    }
+    const timeTotalDiv = document.createElement("div");
+    timeTotalDiv.textContent =
+        `Total ET: ${results.output.total_time.toFixed(2)} ms`;
+    output.appendChild(timeTotalDiv);
+
+    const memoryDiv = document.createElement("div");
+    memoryDiv.textContent =
+        `RAM Peak: ${results.output.memory_peak.toFixed(2)} MB`;
+    output.appendChild(memoryDiv);
 }
 
-function runJSBenchmark() {
-    clearCell('javascript');
+function runJsBenchmark() {
+    window.clearCell('javascript-output');
     do_operations(10_000_000);
 }

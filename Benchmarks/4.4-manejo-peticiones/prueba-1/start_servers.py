@@ -1,9 +1,9 @@
-import subprocess
 import os
 import time
 import http.server
 import ssl
 import threading
+import subprocess
 import sys
 from pathlib import Path
 
@@ -20,7 +20,7 @@ class SecureHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
 
 def run_secure_server():
-    os.chdir(base_dir)  # Servir desde el directorio actual
+    os.chdir(base_dir)
     server_address = ('', 8000)
     httpd = http.server.HTTPServer(server_address, SecureHTTPRequestHandler)
 
@@ -28,18 +28,16 @@ def run_secure_server():
     context.load_cert_chain(certfile="cert.pem", keyfile="key.pem")
     httpd.socket = context.wrap_socket(httpd.socket, server_side=True)
 
-    print("🌐 HTTPS frontend disponible en https://localhost:8000")
+    print("🌐 Server HTTPS running on https://localhost:8000")
     httpd.serve_forever()
 
 
 def run_python_api():
-    print("🐍 Ejecutando Python API...")
     subprocess.run([sys.executable, str(
         base_dir / "python" / "app.py")], cwd=base_dir / "python")
 
 
 def run_js_api():
-    print("🟨 Ejecutando JavaScript API...")
     subprocess.run(["node", str(base_dir / "javascript" /
                    "app.js")], cwd=base_dir / "javascript")
 
@@ -50,24 +48,23 @@ commands = [
     ("JavaScript API", run_js_api)
 ]
 
-threads = []
+processes = []
 
 try:
     for name, target in commands:
-        print(f"🔄 Starting {name}...")
-        t = threading.Thread(target=target, daemon=True)
-        t.start()
-        threads.append((name, t))
+        print(f"Starting {name}...")
+        process = threading.Thread(target=target, daemon=True)
+        process.start()
+        processes.append((name, process))
         time.sleep(1)
 
-    print("\n✅ Todos los servidores están corriendo.")
-    print("Presiona Ctrl+C para detenerlos.\n")
+    print("✅ All servers started.")
 
     while True:
         time.sleep(10)
 
 except KeyboardInterrupt:
-    print("\n🛑 Deteniendo servidores...")
-    for name, _ in threads:
-        print(f"🔴 Cerrando {name}...")
-    print("✅ Todos los servidores detenidos.")
+    print("\n🛑 Stopping servers...")
+    for name, _ in processes:
+        print(f"🔴 Closing {name}...")
+    print("✅ All servers stopped.")

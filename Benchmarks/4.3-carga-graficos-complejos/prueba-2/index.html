@@ -3,41 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Benchmarking: JavaScript vs PyScript</title>
-
+    
     <script type="module" src="https://pyscript.net/releases/2024.8.1/core.js"></script>
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.1/core.css">
 
-    <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.31.1/plotly.min.js"
-        crossorigin="anonymous"
-        integrity="sha512-⟨hash⟩"
-        ></script>
-    <script src="javascript/main.js" defer></script>
-    <script>
-        if (!crypto.randomUUID) {
-            crypto.randomUUID = function() {
-                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                const r = Math.random() * 16 | 0;
-                const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-                });
-            }
-        }
-        document.addEventListener('py:ready', () => {
-            document.getElementById("run-button-py").disabled = false;
+    <title>Benchmarking: JavaScript vs PyScript</title>
 
-            document.getElementById("run-button-py").textContent = 'Run in PyScript';
-            console.log('PyScript fully loaded');
-        });
-    </script>
+    <script type="module" src="javascript/main.js"></script>
+    <script type="py" src="python/main.py" config="json/pyscript-main.json"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js"></script>
     <script>
         let pyTimer = null;
         let pyStartTime = 0;
+        let startTime = performance.now();
+        let relayoutEvents = 0;
+        let fpsMeasurements = [];
+        let fpsInterval = null;
+        let memoryMeasurements = {};
+
+        document.addEventListener('py:ready', () => {
+            document.getElementById("run-button-pyscript").disabled = false;
+
+            document.getElementById("run-button-pyscript").textContent = 'Run in PyScript';
+            console.log('PyScript fully loaded');
+        });
 
         function startPyTimer() {
             pyStartTime = performance.now();
-            const timerElement = document.getElementById("py-timer-display");
+            const timerElement = document.getElementById("pyscript-timer-display");
             
             function updateTimer() {
                 if (!pyTimer) return;
@@ -59,11 +53,8 @@
             
             const elapsedMs = performance.now() - pyStartTime;
             const elapsed = (elapsedMs / 1000).toFixed(3);
-            document.getElementById("py-timer-display").textContent = `PyScript Timer: ${elapsed} s`;
+            document.getElementById("pyscript-timer-display").textContent = `PyScript Timer: ${elapsed} s`;
         }
-    </script>
-    <script>
-        let startTime = performance.now();
 
         document.addEventListener('py:ready', () => {
             let endTime = performance.now();
@@ -71,51 +62,11 @@
             document.getElementById("output").innerText += `PLT: ${loadTime.toFixed(2)} ms`;
         });
 
-        function clearCell(elementId) {
-            const operations = ['output', 'exact'];
-            operations.forEach(op => {
-                const element = document.getElementById(`${elementId}-${op}`);
-                if (element) {
-                    element.innerHTML = "";
-                }
-            });
+         function clearCell(elementId) {
+            document.getElementById(elementId).textContent = '';
         }
-    </script>
-    <script>
-        let memoryMeasurements = {};
 
-        function measureMemory(phase) {
-            if (performance.memory) {
-                memoryMeasurements[phase] = {
-                    usedJSHeapSize: performance.memory.usedJSHeapSize,
-                    totalJSHeapSize: performance.memory.totalJSHeapSize,
-                    jsHeapSizeLimit: performance.memory.jsHeapSizeLimit,
-                    timestamp: performance.now()
-                };
-
-                if (Object.keys(memoryMeasurements).length > 1) {
-                    const phases = Object.keys(memoryMeasurements);
-                    const prevPhase = phases[phases.length - 2];
-                    const diff = memoryMeasurements[phase].usedJSHeapSize -
-                                memoryMeasurements[prevPhase].usedJSHeapSize;
-
-                    if (phase === 'final') {
-                        const outputDiv = document.getElementById("pyscript-output");
-                        const memoryInMB = Math.round((diff / 1024) / 1024);
-                        outputDiv.innerHTML += `<div>Memory: ~${memoryInMB} MB</div>`;
-                    }
-                }
-            } else {
-                console.warn("performance.memory API not available");
-            }
-        }
-    </script>
-    <script>
-        let relayoutEvents = 0;
-        let fpsMeasurements = [];
-        let fpsInterval = null;
-
-        function startFPSMeasurement(duration = 3000, id) {
+       function startFPSMeasurement(duration = 3000, id) {
             let start = performance.now();
             let frames = 0;
             fpsMeasurements = [];
@@ -145,84 +96,69 @@
 
         function clearGraphContainer(id) {
             const container = document.getElementById(id);
-            if (container.data) Plotly.purge(container);
             container.innerHTML = "";
         }
-
-        function estimateMemoryUsedByData(numSeries, numPoints) {
-            const totalBytes = numSeries * numPoints * 8;
-            const memoryMB = (totalBytes / 1024 / 1024).toFixed(2);
-            return memoryMB;
-        }
-
+    </script>
+    <script>
         function displayPlotFromJSON(jsonStr, elementId) {
             try {
                 const graphData = JSON.parse(jsonStr);
-                const elementDiv = document.getElementById(elementId);
-                if (!elementDiv) return;
-                let container = document.createElement('div');
-                container.id = `container-graph-${elementId}`;
-                elementDiv.appendChild(container);
-                Plotly.newPlot(
-                    container.id,
-                    graphData.data,
-                    graphData.layout || {}
-                );
-            } catch (e) {
+                const data = graphData.traces;  
+                const layout = graphData.layout || {};
+                const containerDiv = document.getElementById(elementId);
+                if (!containerDiv) return;
+
+                containerDiv.innerHTML = "";
+
+                const plotDiv = document.createElement('div');
+                plotDiv.id = `plot-${elementId}`;
+                containerDiv.appendChild(plotDiv);
+
+                Plotly.newPlot(plotDiv.id, data, layout);
+            }
+            catch (e) {
                 console.error('Error parsing or rendering Plotly graph:', e);
                 const el = document.getElementById(elementId);
-                if (el) {
-                    el.textContent = 'Error al mostrar el gráfico con Plotly';
-                }
+                if (el) el.textContent = 'Error displaying Plotly graph';
             }
         }
-    </script>
+        </script>
 <body>
-    <script type="py" src="python/main.py" config="json/pyscript-main.json"></script>
     <h1>Generation of time series graphs (Plotly.py/Plotly.js)</h1>
 
-    <h2 id="js-timer-display">JS Timer: 0.00 s</h2>
-    <h2 id="py-timer-display">PyScript Timer: 0.00 s</h2>
+    <h2 id="javascript-timer-display">JS Timer: 0.00 s</h2>
+    <h2 id="pyscript-timer-display">PyScript Timer: 0.00 s</h2>
 
     <label for="num-series">N° Series:</label>
-    <input type="number" id="num-series-js" value="5" min="1" max="100">
+    <input type="number" id="num-series-javascript" value="5" min="1" max="100">
     <label for="num-points">N° Puntos:</label>
-    <input type="number" id="num-points-js" value="10000" min="1000" step="1000">
-
-    <button id="run-button-js" onclick="runJSBenchmark()">Run in JavaScript</button>
+    <input type="number" id="num-points-javascript" value="10000" min="1000" step="1000">
+    <button id="run-button-javascript" onclick="runJsBenchmark()">Run in JavaScript</button>
 
 
     <label for="num-series">N° Series:</label>
     <input type="number" id="num-series-pyscript" value="5" min="1" max="100">
     <label for="num-points">N° Puntos:</label>
     <input type="number" id="num-points-pyscript" value="10000" min="1000" step="1000">
-    <button id="run-button-py" onclick="startPyTimer()" py-click="js_run_py_benchmark">
+    <button id="run-button-pyscript" py-click="launch_worker">
         Run in PyScript (Loading...)</button>
 
     <pre id="output"></pre>
     <div id="graph-containers" style="display: flex; flex-direction: row;">
-        <div id="graph-container-js"></div>
+        <div id="graph-container-javascript"></div>
         <div id="graph-container-pyscript"></div>
     </div>
 
     <table id="metrics-container">
         <thead>
             <tr>
-                <th>Metric</th>
-                <th>JavaScript</th>
-                <th>PyScript</th>
+                <th>JavaScript</th><th>PyScript</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>Times</td>
-                <td id="javascript-output"></td>
-                <td id="pyscript-output"></td>
-            </tr>
-            <tr>
-                <td>Total</td>
-                <td id="javascript-exact"></td>
-                <td id="pyscript-exact"></td>
+                <td id="javascript-output">Waiting...</td>
+                <td id="pyscript-output">Waiting...</td>
             </tr>
         </tbody>
     </table>

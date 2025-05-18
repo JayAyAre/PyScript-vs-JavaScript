@@ -1,5 +1,5 @@
 import js  # type: ignore
-from pyscript import display, PyWorker, document
+from pyscript import display, PyWorker
 import json
 import time
 import asyncio
@@ -8,10 +8,8 @@ workers = []
 workers_ready = False
 
 
-async def initialize_worker():
+async def initialize_worker(num_workers):
     global workers, workers_ready
-    num_workers = int(js.document.querySelector(
-        "#parallel-workers-pyscript").value)
 
     if len(workers) > num_workers:
         workers = workers[:num_workers]
@@ -28,19 +26,16 @@ async def initialize_worker():
 
     workers_ready = True
 
-asyncio.create_task(initialize_worker())
-
 
 async def run_py_benchmark(event):
     global workers
-    await initialize_worker()
     try:
         num_executions = int(js.document.querySelector(
             "#num-executions-pyscript").value)
         num_workers = int(js.document.querySelector(
             "#parallel-workers-pyscript").value)
 
-        await initialize_worker()
+        await initialize_worker(num_workers)
 
         start_time = time.perf_counter()
 
@@ -76,29 +71,29 @@ async def run_py_benchmark(event):
             'total_time': (time.perf_counter() - start_time) * 1000
         }
 
-        update_ui(results)
+        display_result(results)
 
     except Exception as e:
         display(f"Error: {str(e)}", target="pyscript-output")
 
 
-def update_ui(results):
+def display_result(results):
     for operation in ['create', 'sum', 'mean', 'std']:
         display(
-            f"{results[operation]['time']:.2f} ms | {results[operation]['memory']: .2f} MB",
-            target=f"pyscript-{operation}"
+            f"{operation.upper()} - Time: {results[operation]['time']:.2f} ms | RAM: {results[operation]['memory']: .2f} MB",
+            target="pyscript-output"
         )
 
     display(
-        f"{results['total']['average_per_execution']:.2f} ms",
+        f"Avg request time: {results['total']['average_per_execution']:.2f} ms",
         target="pyscript-output"
     )
     display(
-        f"{results['total']['total_time']:.2f} ms",
-        target="pyscript-exact"
+        f"Total ET: {results['total']['total_time']:.2f} ms",
+        target="pyscript-output"
     )
 
 
 def js_run_py_benchmark(event):
-    js.clearCell("pyscript")
+    js.clearCell("pyscript-output")
     asyncio.ensure_future(run_py_benchmark(None))

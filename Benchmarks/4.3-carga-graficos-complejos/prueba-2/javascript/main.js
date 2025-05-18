@@ -1,93 +1,19 @@
 let worker = null;
-let workerStartTime;
+let jsTimer = null;
+let jsStartTime = 0;
+let workerTime = 0;
 
-async function runJSBenchmark() {
-    try {
-        startJsTimer();
-        const startWorkerTime = performance.now();
-
-        if (!worker) {
-            worker = new Worker("javascript/worker.js");
-        }
-
-        const workerTime = performance.now() - startWorkerTime;
-
-        clearUI();
-
-        const numSeries = parseInt(
-            document.getElementById("num-series-js").value
-        );
-        const numPoints = parseInt(
-            document.getElementById("num-points-js").value
-        );
-
-        worker.onmessage = (e) => {
-            if (e.data.type === "result") {
-                const result = e.data.payload;
-                result.metrics.workerTime = workerTime;
-                handleWorkerResult(result);
-                stopJsTimer();
-            } else if (e.data.type === "error") {
-                displayError(new Error(e.data.payload));
-                stopJsTimer();
-            }
-        };
-
-        worker.postMessage({
-            type: "runBenchmark",
-            payload: {
-                numSeries: numSeries,
-                numPoints: numPoints,
-            },
+function initializeWorker() {
+    if (!worker) {
+        worker = new Worker(new URL("worker.js", import.meta.url), {
+            type: "module",
         });
-        stopJsTimer();
-    } catch (e) {
-        displayError(e);
     }
 }
 
-function handleWorkerResult({ metrics, graphData }) {
-    Plotly.newPlot(
-        "graph-container-js",
-        graphData.traces,
-        graphData.layout
-    ).then(() => {
-        attachRelayoutListener("graph-container-js", "javascript-output");
-    });
-    updateUI(metrics);
-    performance.measureMemory?.();
-}
-
-function clearUI() {
-    window.clearCell("javascript");
-    window.clearCell("javascript");
-    window.clearGraphContainer("graph-container-js");
-}
-
-function updateUI(metrics) {
-    const output = document.getElementById("javascript-output");
-    const exact = document.getElementById("javascript-exact");
-    output.innerHTML = `
-        <div>Worker Time: ${metrics.workerTime.toFixed(2)} ms</div>
-        <div>Data gen: ${metrics.dataGenTime.toFixed(2)} ms</div>
-        <div>Render: ${metrics.renderTime.toFixed(2)} ms</div>
-        <div>Memory: ${metrics.mem} MB</div>
-    `;
-
-    exact.innerHTML = `<div>TOTAL: ${metrics.totalTime.toFixed(2)} ms</div>`;
-}
-
-function displayError(error) {
-    document.getElementById(
-        "javascript-output"
-    ).innerHTML = `<div class="error">Error: ${error.message}</div>`;
-}
-let jsTimer = null;
-let jsStartTime = 0;
-
 function startJsTimer() {
     jsStartTime = performance.now();
-    const timerElement = document.getElementById("js-timer-display");
+    const timerElement = document.getElementById("javascript-timer-display");
 
     function updateTimer() {
         if (!jsTimer) return;
@@ -110,6 +36,105 @@ function stopJsTimer() {
     const elapsedMs = performance.now() - jsStartTime;
     const elapsed = (elapsedMs / 1000).toFixed(3);
     document.getElementById(
-        "js-timer-display"
+        "javascript-timer-display"
     ).textContent = `JS Timer: ${elapsed} s`;
 }
+
+async function runJsBenchmark() {
+    try {
+        window.clearCell("javascript-output");
+        window.clearGraphContainer("graph-container-javascript");
+        startJsTimer();
+
+        let start_time_worker = performance.now();
+        initializeWorker();
+        workerTime = performance.now() - start_time_worker;
+
+        const num_points = parseInt(
+            document.getElementById("num-points-javascript").value,
+            10
+        );
+
+        const num_series = parseInt(
+            document.getElementById("num-series-javascript").value,
+            10
+        );
+
+        const id = `js-${Date.now()}`;
+
+        const resultJson = await new Promise((resolve, reject) => {
+            function onMessage(e) {
+                if (e.data.id !== id) return;
+                worker.removeEventListener("message", onMessage);
+                if (e.data.error) {
+                    reject(new Error(e.data.error));
+                } else if (e.data.json !== undefined) {
+                    resolve(e.data.json);
+                } else {
+                    reject(new Error("Worker dont return results"));
+                }
+            }
+            worker.addEventListener("message", onMessage);
+            worker.postMessage({
+                id,
+                type: "do_analisis",
+                num_points: num_points,
+                num_series: num_series,
+            });
+        });
+
+        const result = JSON.parse(resultJson);
+        displayResult(result);
+    } catch (e) {
+        console.error("Error:", e);
+    } finally {
+        stopJsTimer();
+    }
+}
+
+function handleWorkerResult({ metrics, graphData }) {
+    Plotly.newPlot(
+        "graph-container-javascript",
+        graphData.traces,
+        graphData.layout
+    ).then(() => {
+        attachRelayoutListener("graph-container-javascript", "javascript-output");
+    });
+    updateUI(metrics);
+    performance.measureMemory?.();
+}
+
+function createDiv() {
+    const div = document.createElement("div");
+    return div;
+}
+
+function displayResult(r) {
+    const output = document.getElementById("javascript-output");
+
+    const workerDiv = createDiv();
+    workerDiv.textContent = `Worker init time: ${workerTime.toFixed(2)} ms`;
+    output.appendChild(workerDiv);
+
+    const avgDataGenDiv = createDiv();
+    avgDataGenDiv.textContent = `Data generation: ${r.data_gen_time.toFixed(2)} ms`;
+    output.appendChild(avgDataGenDiv);
+
+    const avgRenderDiv = createDiv();
+    avgRenderDiv.textContent = `Rendering: ${r.render_time.toFixed(2)} ms`;
+    output.appendChild(avgRenderDiv);
+
+    const memoryDiv = createDiv();
+    memoryDiv.textContent = `Memory: ${r.memory.toFixed(2)} MB`;
+    output.appendChild(memoryDiv);
+
+    const totalTimeDiv = createDiv();
+    totalTimeDiv.textContent = `Total ET: ${r.total_time_ms.toFixed(2)} ms`;
+    output.appendChild(totalTimeDiv);
+
+    const graphDiv = document.getElementById("graph-container-javascript");
+    graphDiv.innerHTML = "";
+    Plotly.newPlot(graphDiv, r.traces, r.layout);
+}
+
+window.runJsBenchmark = runJsBenchmark;

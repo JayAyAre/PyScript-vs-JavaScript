@@ -1,73 +1,91 @@
 const WEBSOCKET_SERVER = "ws://localhost:5002";
 
 self.onmessage = async function (e) {
-    const { num_requests, delay } = e.data;
+    const data = e.data;
 
-    const ws = new WebSocket(WEBSOCKET_SERVER);
-    await new Promise((resolve) => {
-        ws.onopen = resolve;
-    });
+    if (data.type === "do_analisis") {
+        try {
+            const { id, num_requests, delay } = data;
 
-    await new Promise((resolve) => {
-        ws.onmessage = () => resolve();
-    });
+            const results = [];
+            const individualTimes = [];
 
-    const responses = new Array(num_requests);
-    const individual_times = new Array(num_requests);
-    const pendingRequests = new Map();
-
-    let requestId = 0;
-
-    ws.onmessage = (event) => {
-        const raw = event.data;
-        const parsed = JSON.parse(raw);
-        const id = parsed.id;
-
-        if (pendingRequests.has(id)) {
-            const { resolve, start } = pendingRequests.get(id);
-            const elapsed = performance.now() - start;
-
-            individual_times[id] = elapsed;
-            responses[id] = parsed;
-
-            resolve();
-            pendingRequests.delete(id);
-        }
-    };
-
-    const start_time = performance.now();
-
-    const promises = [];
-    for (let i = 0; i < num_requests; i++) {
-        const id = requestId++;
-        const payload = JSON.stringify({ delay, id });
-
-        const promise = new Promise((resolve) => {
-            pendingRequests.set(id, {
-                resolve,
-                start: performance.now(),
+            const ws = new WebSocket(WEBSOCKET_SERVER);
+            await new Promise((resolve) => {
+                ws.onopen = resolve;
             });
-            ws.send(payload);
-        });
 
-        promises.push(promise);
+            const pendingRequests = new Map();
+            let requestId = 0;
+
+            ws.onmessage = (event) => {
+                const parsed = JSON.parse(event.data);
+                const respId = parsed.id;
+
+                if (pendingRequests.has(respId)) {
+                    const { resolve, start } = pendingRequests.get(respId);
+                    const elapsed = performance.now() - start;
+
+                    individualTimes[respId] = elapsed;
+                    results[respId] = parsed;
+
+                    resolve();
+                    pendingRequests.delete(respId);
+                }
+            };
+
+            const sendRequestWithTiming = async (currentDelay) => {
+                const currentId = requestId++;
+                const payload = JSON.stringify({ delay: currentDelay, id: currentId });
+
+                return new Promise((resolve) => {
+                    pendingRequests.set(currentId, {
+                        resolve,
+                        start: performance.now(),
+                    });
+                    ws.send(payload);
+                });
+            };
+
+
+            const fetchPromises = Array.from({ length: num_requests }, () =>
+                sendRequestWithTiming(delay)
+            );
+
+            const start_time = performance.now();
+            await Promise.all(fetchPromises);
+            const total_time = performance.now() - start_time;
+
+            ws.close();
+
+            const avg_time =
+                individualTimes.length > 0
+                    ? individualTimes.reduce((acc, t) => acc + t, 0) /
+                    individualTimes.length
+                    : 0;
+
+            let last_value = null;
+            for (let i = results.length - 1; i >= 0; i--) {
+                const r = results[i];
+                if (r && r.data && Array.isArray(r.data)) {
+                    last_value = r.data[r.data.length - 1].value;
+                    break;
+                }
+            }
+
+            const result = {
+                average_time_ms: avg_time,
+                total_time_ms: total_time,
+                total_requests: num_requests,
+                last_value
+            };
+
+            self.postMessage({ id, json: JSON.stringify(result) });
+        } catch (error) {
+            self.postMessage({
+                id: data.id,
+                error: `Error in worker: ${error.message}`,
+            });
+        }
     }
-
-    await Promise.all(promises);
-    ws.close();
-
-    const end_time = performance.now();
-    const total_time = end_time - start_time;
-
-    const avg_time =
-        individual_times.length > 0
-            ? individual_times.reduce((sum, t) => sum + t, 0) /
-            individual_times.length
-            : 0;
-
-    self.postMessage({
-        total_time,
-        avg_time,
-        results: responses,
-    });
 };

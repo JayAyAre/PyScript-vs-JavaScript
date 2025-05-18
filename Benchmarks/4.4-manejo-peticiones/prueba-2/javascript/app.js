@@ -1,42 +1,36 @@
-const WebSocket = require("ws");
+const { WebSocketServer } = require("ws");
 
-const wss = new WebSocket.Server({ port: 5002 });
+const port = 5002;
 
-wss.on("connection", (ws) => {
-    ws.send("connected");
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-    ws.on("message", (message) => {
-        let delay = 0;
-        let id = null;
+const wss = new WebSocketServer({ port });
 
+wss.on("connection", ws => {
+    ws.on("message", async message => {
         try {
             const data = JSON.parse(message);
-            delay = typeof data.delay === "number" ? data.delay : 0;
-            id = data.id ?? null;
-        } catch (e) {
-            console.error("Error parsing message:", e);
-        }
+            const delay = data.delay || 0;
+            const req_id = data.id;
 
-        setTimeout(() => {
-            const responseData = Array.from({ length: 10 }, (_, i) => ({
-                id: i,
-                value: Math.random(),
-            }));
+            if (delay > 0) await sleep(delay);
 
-            const response = {
+            const payload = {
+                id: req_id,
                 status: "success",
-                delay,
-                id,
-                data: responseData,
+                data: Array.from({ length: 10 }, (_, i) => ({
+                    id: i,
+                    value: Math.random()
+                }))
             };
 
-            ws.send(JSON.stringify(response));
-        }, delay);
-    });
-
-    ws.on("error", (err) => {
-        console.error("WebSocket error:", err);
+            ws.send(JSON.stringify(payload));
+        } catch (e) {
+            console.error("Error:", e);
+        }
     });
 });
 
-console.log("WebSocket server is running on ws://localhost:5002");
+console.log(`JavaScript WebSocket Server running on ws://localhost:${port}`);

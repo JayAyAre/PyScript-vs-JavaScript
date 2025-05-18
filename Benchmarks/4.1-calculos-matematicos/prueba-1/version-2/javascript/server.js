@@ -3,38 +3,39 @@ const cors = require("cors");
 const osu = require("node-os-utils");
 const tf = require("@tensorflow/tfjs");
 
+const cpu = osu.cpu;
 const app = express();
 const port = 3000;
 
 app.use(cors());
 
-const cpu = osu.cpu;
+function getMemoryUsage() {
+    return process.memoryUsage().heapUsed / (1024 * 1024);
+}
+
+async function getCpuUsage() {
+    return await cpu.usage();
+}
 
 async function multiplyMatrices(size) {
-    const startMemory = process.memoryUsage().heapUsed;
-    let startReal = performance.now();
-    let cpuAvg = await cpu.usage();
-
     let A = tf.randomNormal([size, size]);
     let B = tf.randomNormal([size, size]);
 
+    const startTime = performance.now();
+
     let C = tf.matMul(A, B);
-    await C.data();
 
-    let endReal = performance.now();
 
-    let executionTime = (endReal - startReal).toFixed(2);
-
-    let cpuUsage = cpuAvg.toFixed(2);
-
-    const endMemory = process.memoryUsage().heapUsed;
-    const memoryUsage = ((endMemory - startMemory) / (1024 * 1024)).toFixed(2);
+    const executionTime = (performance.now() - startTime).toFixed(2);
+    const endMemory = getMemoryUsage();
+    const memoryUsage = endMemory.toFixed(2);
+    const endCpu = await getCpuUsage();
 
     return {
         size: `${size}x${size}`,
-        executionTime,
-        cpuUsage,
-        memoryUsage
+        executionTime: executionTime,
+        cpuUsage: endCpu,
+        memoryUsage: memoryUsage
     };
 }
 
@@ -44,10 +45,15 @@ app.get("/", async (req, res) => {
         matrices1000: await multiplyMatrices(1000),
         matrices2000: await multiplyMatrices(2000)
     };
-
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Access-Control-Allow-Origin", "*");
     res.json(results);
 });
 
-app.listen(port, () => {
-    console.log(`Servidor corriendo en http://localhost:${port}`);
-});
+function runServer() {
+    app.listen(port, () => {
+        console.log(`Server running at http://localhost:${port}`);
+    });
+}
+
+runServer();

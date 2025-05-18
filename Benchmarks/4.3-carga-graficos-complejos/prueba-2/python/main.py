@@ -1,14 +1,13 @@
 import time
 import js  # type: ignore
-import asyncio
 from pyscript import PyWorker, display
+import json
 
 worker = None
 
 
-async def launch_worker(event):
+async def initialize_worker():
     global worker
-    start_worker_time = time.perf_counter()
     if worker is None:
         worker = PyWorker(
             "./python/worker.py",
@@ -16,31 +15,34 @@ async def launch_worker(event):
             config="./json/pyscript-worker.json"
         )
         await worker.ready
-    worker_time = (time.perf_counter() - start_worker_time) * 1000
 
-    num_series = int(js.document.getElementById("num-series-pyscript").value)
-    num_points = int(js.document.getElementById("num-points-pyscript").value)
 
-    result = await worker.sync.js_run_py_benchmark(num_series, num_points)
-
+async def launch_worker(event):
+    global worker, worker_time
+    js.clearCell('pyscript-output')
     js.clearGraphContainer("graph-container-pyscript")
+    js.startPyTimer()
 
-    js.window.Plotly.newPlot(
-        "graph-container-pyscript",
-        result.traces,
-        result.layout
-    )
+    start_w = time.perf_counter()
+    await initialize_worker()
+    worker_time = (time.perf_counter() - start_w) * 1000
 
-    display(f"Worker Time: {worker_time:.2f} ms", target="pyscript-output")
-    display(f"Data gen: {result.data_gen_time:.2f} ms",
+    result_json = await worker.sync.do_analisis()
+    result = json.loads(result_json)
+
+    js.displayPlotFromJSON(result_json, "graph-container-pyscript")
+    display_result(result)
+
+
+def display_result(result):
+    display(f"Worker init time: {worker_time:.2f} ms",
             target="pyscript-output")
-    display(f"Render: {result.render_time:.2f} ms", target="pyscript-output")
-    display(f"Memory: {result.memory:.2f} MB", target="pyscript-output")
-    display(f"TOTAL: {result.total_time:.2f} ms", target="pyscript-exact")
+    display(
+        f"Data generation: {result['data_gen_time']:.2f} ms", target="pyscript-output")
+    display(
+        f"Rendering: {result['render_time']:.2f} ms", target="pyscript-output")
+    display(f"Memory: {result['memory']:.2f} MB", target="pyscript-output")
+    display(
+        f"Total ET: {result['total_time_ms']:.2f} ms", target="pyscript-output")
 
     js.stopPyTimer()
-
-
-def js_run_py_benchmark(event):
-    js.clearCell("pyscript")
-    asyncio.ensure_future(launch_worker(None))

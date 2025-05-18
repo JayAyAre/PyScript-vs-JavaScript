@@ -1,12 +1,21 @@
 const express = require("express");
 const cors = require("cors");
 const osu = require("node-os-utils");
+const { performance } = require("perf_hooks");
 
+const cpu = osu.cpu;
 const app = express();
 const port = 3000;
 
 app.use(cors());
-const cpu = osu.cpu;
+
+function getMemoryUsage() {
+    return process.memoryUsage().heapUsed / (1024 * 1024); // en MB
+}
+
+async function getCpuUsage() {
+    return await cpu.usage(); // porcentaje
+}
 
 function sieveOfEratosthenes(n) {
     let primes = new Uint8Array(n + 1).fill(1);
@@ -28,47 +37,50 @@ async function benchmarkPrimesJS(repetitions, n) {
     let totalMemory = 0;
     let totalCPU = 0;
 
-    let startTotal = performance.now();
+    const startTotal = performance.now();
 
     for (let i = 0; i < repetitions; i++) {
-        const startMemory = process.memoryUsage().heapUsed;
-        let start = performance.now();
-
-        let cpuBefore = await cpu.usage();
+        const startMemory = getMemoryUsage();
+        const start = performance.now();
+        const cpuBefore = await getCpuUsage();
 
         sieveOfEratosthenes(n);
 
-        let end = performance.now();
+        const cpuAfter = await getCpuUsage();
+        const end = performance.now();
+        const endMemory = getMemoryUsage();
+
         totalTime += (end - start);
-
-        let cpuAfter = await cpu.usage();
-        totalCPU += cpuAfter;
-
-        const endMemory = process.memoryUsage().heapUsed;
-        totalMemory += (endMemory - startMemory) / (1024 * 1024);
+        totalMemory += (endMemory - startMemory);
+        totalCPU += (cpuAfter - cpuBefore);
     }
 
-    let endTotal = performance.now();
-    let totalExecTime = (endTotal - startTotal).toFixed(2);
-    let avgTime = (totalTime / repetitions).toFixed(2);
-
-    let avgMemory = (totalMemory / repetitions).toFixed(2);
-
-    let avgCPU = (totalCPU / repetitions).toFixed(2);
+    const totalExecTime = (performance.now() - startTotal).toFixed(2);
+    const avgTime = (totalTime / repetitions).toFixed(2);
+    const avgMemory = (totalMemory / repetitions).toFixed(2);
+    const avgCPU = (totalCPU / repetitions).toFixed(2);
 
     return {
-        totalExecutionTime: totalExecTime,
-        avgExecutionTime: avgTime,
-        avgMemoryUsage: avgMemory,
-        avgCPUUsage: avgCPU
+        totalExecutionTime: `${totalExecTime} ms`,
+        avgExecutionTime: `${avgTime} ms`,
+        avgMemoryUsage: `${avgMemory} MB`,
+        avgCPUUsage: `${avgCPU} %`
     };
 }
 
 app.get("/", async (req, res) => {
-    let result = await benchmarkPrimesJS(50, 10_000);
-    res.json(result);
+    try {
+        const result = await benchmarkPrimesJS(50, 10_000);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: "Benchmark failed", details: err.message });
+    }
 });
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+function runServer() {
+    app.listen(port, () => {
+        console.log(`Server running at http://localhost:${port}`);
+    });
+}
+
+runServer();

@@ -1,4 +1,3 @@
-import subprocess
 import os
 import time
 import http.server
@@ -25,7 +24,7 @@ def run_secure_server():
     context.load_cert_chain(certfile="cert.pem", keyfile="key.pem")
     httpd.socket = context.wrap_socket(httpd.socket, server_side=True)
 
-    print("Server HTTPS running on https://localhost:8000")
+    print("🌐 Server HTTPS running on https://localhost:8000")
     httpd.serve_forever()
 
 

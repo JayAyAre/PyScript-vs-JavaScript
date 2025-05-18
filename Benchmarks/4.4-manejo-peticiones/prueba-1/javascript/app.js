@@ -7,7 +7,7 @@ app.use(cors());
 
 function sleepBlocking(ms) {
     const start = Date.now();
-    while (Date.now() - start < ms) {}
+    while (Date.now() - start < ms) { }
 }
 
 app.get("/mock-api/:delay", (req, res) => {
@@ -30,5 +30,5 @@ app.get("/mock-api/:delay", (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+    console.log(`JavaScript Server is running on http://localhost:${port}`);
 });

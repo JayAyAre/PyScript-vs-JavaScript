@@ -1,14 +1,12 @@
 const express = require("express");
 const cors = require("cors");
-const os = require("os");
 const osu = require("node-os-utils");
 
+const cpu = osu.cpu;
 const app = express();
 const port = 3000;
 
 app.use(cors());
-
-const cpu = osu.cpu;
 
 function calculatePi(digits) {
     let pi = 0.0;
@@ -23,6 +21,14 @@ function calculatePi(digits) {
     return pi;
 }
 
+function getMemoryUsage() {
+    return process.memoryUsage().heapUsed / (1024 * 1024);
+}
+
+async function getCpuUsage() {
+    return await cpu.usage();
+}
+
 async function computePi(digits, repetitions) {
     let totalTime = 0;
     let totalMemory = 0;
@@ -32,45 +38,46 @@ async function computePi(digits, repetitions) {
 
     for (let i = 0; i < repetitions; i++) {
         const startMemory = process.memoryUsage().heapUsed;
-        let cpuBefore = await cpu.usage();
 
         let start = performance.now();
         let piValue = calculatePi(digits);
         let end = performance.now();
 
-        let cpuAfter = await cpu.usage();
         let endMemory = process.memoryUsage().heapUsed;
 
         let executionTime = end - start;
         let memoryUsage = (endMemory - startMemory) / (1024 * 1024);
-        let cpuUsage = cpuAfter - cpuBefore;
+
 
         totalTime += executionTime;
         totalMemory += memoryUsage;
-        totalCpu += cpuUsage;
     }
 
-    let endReal = performance.now();
-    let totalExecTime = ((endReal - startReal) / 1000).toFixed(2);
+    let totalExecTime = ((performance.now() - startReal) / 1000).toFixed(2);
+    totalCpu = await getCpuUsage();
+
     let avgTime = (totalTime / repetitions).toFixed(2);
-
     let avgMemory = (totalMemory / repetitions).toFixed(2);
-
-    let avgCpu = (totalCpu / repetitions).toFixed(2);
 
     return {
         totalExecutionTime: totalExecTime,
         avgExecutionTime: avgTime,
         avgMemoryUsage: avgMemory,
-        avgCPUUsage: avgCpu
+        avgCPUUsage: totalCpu
     };
 }
 
 app.get("/", async (req, res) => {
-    let result = await computePi(1000, 1000);
+    let result = await computePi(1_000, 1_000);
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Access-Control-Allow-Origin", "*");
     res.json(result);
 });
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+function runServer() {
+    app.listen(port, () => {
+        console.log(`Server running at http://localhost:${port}`);
+    });
+}
+
+runServer();

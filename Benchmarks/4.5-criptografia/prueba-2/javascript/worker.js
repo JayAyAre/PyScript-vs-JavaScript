@@ -1,11 +1,9 @@
-// worker.js
 self.addEventListener("message", async (event) => {
     const data = event.data;
-    if (data.type !== "js_run_js_benchmark") return;
+    if (data.type !== "do_analisis") return;
 
     const { id, repetitions, messageSizeMb } = data;
     try {
-        // small delay to mimic async setup
         await new Promise((r) => setTimeout(r, 100));
 
         const fileSizeBytes = Math.floor(messageSizeMb * 1024 * 1024);
@@ -19,7 +17,6 @@ self.addEventListener("message", async (event) => {
         const t0 = performance.now();
 
         for (let i = 0; i < repetitions; i++) {
-            // generate AES-GCM key
             const key = await crypto.subtle.generateKey(
                 { name: "AES-GCM", length: 128 },
                 true,
@@ -27,7 +24,6 @@ self.addEventListener("message", async (event) => {
             );
             const iv = crypto.getRandomValues(new Uint8Array(12));
 
-            // encrypt
             const encStart = performance.now();
             const ctBuf = await crypto.subtle.encrypt(
                 { name: "AES-GCM", iv: iv },
@@ -37,7 +33,6 @@ self.addEventListener("message", async (event) => {
             totalEnc += performance.now() - encStart;
             ciphertext = ctBuf;
 
-            // decrypt + verify
             const decStart = performance.now();
             try {
                 const ptBuf = await crypto.subtle.decrypt(
@@ -48,8 +43,11 @@ self.addEventListener("message", async (event) => {
                 if (buffersEqual(ptBuf, buffer)) {
                     successCount++;
                 }
-            } catch (_) {
-                // fail silently
+            } catch (error) {
+                self.postMessage({
+                    id: data.id,
+                    error: `Error in worker: ${error.message}`,
+                });
             }
             totalDec += performance.now() - decStart;
         }
@@ -75,7 +73,6 @@ self.addEventListener("message", async (event) => {
     }
 });
 
-// Helper: fill a large Uint8Array with random values in 64k chunks
 function getRandomBuffer(size) {
     const buf = new Uint8Array(size);
     const chunk = 65536;
@@ -86,7 +83,6 @@ function getRandomBuffer(size) {
     return buf.buffer;
 }
 
-// Helper: compare two ArrayBuffers
 function buffersEqual(a, b) {
     if (a.byteLength !== b.byteLength) return false;
     const v1 = new Uint8Array(a);

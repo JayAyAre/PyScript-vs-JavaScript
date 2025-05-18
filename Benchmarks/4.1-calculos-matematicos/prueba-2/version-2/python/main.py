@@ -11,11 +11,12 @@ def sieve_of_eratosthenes(n):
 
 
 def benchmark_primes_py(repetitions, n):
+    tracemalloc.start()
+    start_total_time = time.time()
+    gc.collect()
+
     total_time = 0
     total_memory = 0
-
-    start_total = time.time()
-
     for _ in range(repetitions):
         tracemalloc.start()
         start = time.time()
@@ -29,16 +30,28 @@ def benchmark_primes_py(repetitions, n):
         total_time += (end - start) * 1000
         total_memory += memory_usage
 
-    end_total = time.time()
-    total_exec_time = round((end_total - start_total) * 1000, 2)
-    avg_time = round(total_time / repetitions, 2)
+    total_exec_time = (time.time() - start_total_time) * 1000
+    avg_time = total_time / repetitions
+    avg_memory = total_memory / repetitions
 
-    avg_memory = round(total_memory / repetitions, 2)
+    tracemalloc.stop()
 
-    display(f"Total ET (1000x): {total_exec_time} ms",
+    results = {
+        "total_time": total_exec_time,
+        "execution_time": avg_time,
+        "memory_usage": avg_memory
+    }
+
+    display_results(results)
+
+
+def display_results(results):
+    display(f"Total ET (1000x): {results['total_time']:.2f} ms",
             target="pyscript-output")
-    display(f"ET (avg, 1000x): {avg_time} ms", target="pyscript-output")
-    display(f"RAM (avg, 1000x): {avg_memory} MB", target="pyscript-output")
+    display(f"ET (avg, 1000x): {results['execution_time']:.2f} ms",
+            target="pyscript-output")
+    display(
+        f"RAM (avg, 1000x): {results['memory_usage']:.2f} MB", target="pyscript-output")
     js.endTimerWebAssembly()
 
 

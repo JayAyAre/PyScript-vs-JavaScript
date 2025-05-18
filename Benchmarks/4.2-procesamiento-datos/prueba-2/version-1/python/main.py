@@ -25,15 +25,17 @@ def calculate_std(data):
 
 def do_statistical_analysis(size):
     metrics = {}
-    start_total = time.time()
+    start_total = time.perf_counter()
     tracemalloc.start()
+
     max_memory = 0
 
-    start_op = time.time()
+    start_op = time.perf_counter()
     data = create_data_structure(size)
     current_mem = tracemalloc.get_traced_memory()
+
     metrics['create'] = {
-        'time': (time.time() - start_op) * 1000,
+        'time': (time.perf_counter() - start_op) * 1000,
         'memory': abs(current_mem[1] / (1024 * 1024))
     }
     max_memory = max(max_memory, current_mem[1] / (1024 * 1024))
@@ -47,10 +49,10 @@ def do_statistical_analysis(size):
 
     for op_name, op_func, args in operations:
         tracemalloc.start()
-        start_op = time.time()
+        start_op = time.perf_counter()
         gc.collect()
         result = op_func(*args)
-        op_time = (time.time() - start_op) * 1000
+        op_time = (time.perf_counter() - start_op) * 1000
         current_mem = tracemalloc.get_traced_memory()
         op_memory = current_mem[1] / (1024 * 1024)
         metrics[op_name] = {
@@ -60,27 +62,29 @@ def do_statistical_analysis(size):
         max_memory = max(max_memory, op_memory)
         tracemalloc.stop()
 
-    end_total = time.time()
     metrics['output'] = {
-        'total_time': (end_total - start_total) * 1000,
+        'total_time': (time.perf_counter() - start_total) * 1000,
         'memory_peak': max_memory
     }
     tracemalloc.stop()
+    display_results(metrics)
 
-    for op, data in metrics.items():
+
+def display_results(results):
+    for op, data in results.items():
         if op != 'output':
             display(
                 f"{op.upper()} - Time: {data['time']:.2f} ms | RAM: {data['memory']:.2f} MB",
-                target=f"pyscript-{op}"
+                target="pyscript-output"
             )
-
     display(
-        f"TOTAL - Time: {metrics['output']['total_time']:.2f} ms | "
-        f"RAM Peak: {metrics['output']['memory_peak']:.2f} MB",
-        target="pyscript-output"
+        f"Total ET: {results['output']['total_time']:.2f} ms", target="pyscript-output"
+    )
+    display(
+        f"RAM Peak: {results['output']['memory_peak']:.2f} MB", target="pyscript-output"
     )
 
 
 def run_py_benchmark(event):
-    js.clearCell('pyscript')
+    js.clearCell('pyscript-output')
     do_statistical_analysis(10_000_000)

@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const os = require("os");
 const osu = require("node-os-utils");
+const { memo } = require("react");
 
 const cpu = osu.cpu;
 const app = express();
@@ -48,18 +49,15 @@ async function multiplyMatrices(size) {
         }
     }
 
-    const endTime = performance.now();
-    const endMemory = getMemoryUsage();
-    const endCpu = await getCpuUsage();
-
-    const executionTime = +(endTime - startTime).toFixed(2);
-    const memoryUsage = +(endMemory - startMemory).toFixed(2);
-    const cpuUsage = +(endCpu - startCpu).toFixed(2);
+    const executionTime = +(performance.now() - startTime).toFixed(2);
+    const memoryUsage = +(getMemoryUsage() - startMemory).toFixed(2);
+    const memoryUsageJs = memoryUsage.toFixed(2);
+    const cpuUsage = +(await getCpuUsage() - startCpu).toFixed(2);
 
     return {
         executionTime: executionTime,
         cpuUsage: cpuUsage,
-        memoryUsage: memoryUsage
+        memoryUsage: memoryUsageJs
     };
 }
 

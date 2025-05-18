@@ -3,6 +3,7 @@ import json
 import time
 import psutil
 import tracemalloc
+import gc
 
 
 def calculate_pi(digits):
@@ -31,8 +32,7 @@ def n_digits_pi(repetitions, digits):
     for _ in range(repetitions):
         tracemalloc.start()
         start = time.time()
-
-        cpu_before = get_cpu_usage()
+        gc.collect()
         pi_value = calculate_pi(digits)
         cpu_after = get_cpu_usage()
 
@@ -44,12 +44,9 @@ def n_digits_pi(repetitions, digits):
         total_memory += memory_usage
         total_cpu += cpu_after
 
-    end_total = time.time()
-    total_exec_time = round((end_total - start_total) * 1000, 2)
+    total_exec_time = round((time.time() - start_total) * 1000, 2)
     avg_time = round(total_time / repetitions, 2)
-
     avg_memory = round(total_memory / repetitions, 2)
-
     avg_cpu = round(total_cpu / repetitions, 2)
 
     return {

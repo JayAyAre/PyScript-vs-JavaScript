@@ -1,4 +1,3 @@
-// worker.js
 importScripts("https://cdn.jsdelivr.net/npm/danfojs@1.1.2/lib/bundle.js");
 
 self.onmessage = function (event) {

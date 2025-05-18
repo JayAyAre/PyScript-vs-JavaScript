@@ -1,9 +1,9 @@
 function runNodeBenchmark() {
-    clearCell("nodeJs-output");
+    window.clearCell("node-js-output");
     fetch("http://localhost:3000/")
         .then(response => response.json())
         .then(data => {
-            let outputDiv = document.getElementById("nodeJs-output");
+            let outputDiv = document.getElementById("node-js-output");
 
             let timeDiv = document.createElement("div");
             timeDiv.textContent = `ET: ${data.executionTime} ms`;
@@ -53,30 +53,41 @@ function primes_to_n(size) {
             primes.push(i);
         }
     }
-    let end = performance.now();
 
-    let resultTime = Number((end - start).toFixed(2));
-    let result = `ET: ${resultTime} ms`;
-    let resultDiv = document.createElement("div");
-    resultDiv.textContent = result;
-    document.getElementById("javascript-output").appendChild(resultDiv);
-}
+    const executionTime = performance.now() - start;
 
-function runJSBenchmark() {
-    clearCell("javascript-output");
-    document.getElementById("javascript-output").textContent = ""
-    primes_to_n(1_000_000);
-    let memoryDiv = document.createElement("div");
-    memoryDiv.textContent = getMemoryUsageJS();
-    document.getElementById("javascript-output").appendChild(memoryDiv);
+    const results = {
+        execution_time: executionTime,
+        memory_usage: getMemoryUsageJS(),
+    };
+
+    displayResults(results);
 }
 
 function getMemoryUsageJS() {
-
     if (performance.memory) {
-        let memoryUsed = performance.memory.usedJSHeapSize / (1024 * 1024);
-        return `RAM: ${memoryUsed.toFixed(2)} MB`;
-    } else {
-        return `RAM unsopported measurement in this browser.`;
+        return performance.memory.usedJSHeapSize / (1024 * 1024);
     }
+    return -1;
+}
+
+function displayResults(results) {
+    const output = document.getElementById("javascript-output");
+
+    const timeDiv = document.createElement("div");
+    timeDiv.textContent = `ET: ${results.execution_time.toFixed(2)} ms`;
+    output.appendChild(timeDiv);
+
+    const memoryDiv = document.createElement("div");
+    if (results.memory_usage !== -1) {
+        memoryDiv.textContent = `RAM: ${results.memory_usage.toFixed(2)} MB`;
+    } else {
+        memoryDiv.textContent = `RAM unsupported measurement in this browser.`;
+    }
+    output.appendChild(memoryDiv);
+}
+
+function runJsBenchmark() {
+    window.clearCell("javascript-output");
+    primes_to_n(1_000_000);
 }

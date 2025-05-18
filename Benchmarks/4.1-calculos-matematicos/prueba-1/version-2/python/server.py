@@ -27,21 +27,21 @@ def multiply_matrices(size):
     B = create_matrix(size)
 
     start_time = time.time()
+
     C = np.dot(A, B)
+
     end_time = time.time()
 
     end_memory = get_memory_usage()
     end_cpu = get_cpu_usage()
 
     execution_time = round((end_time - start_time) * 1000, 2)
-
     memory_used = round(end_memory - start_memory, 2)
-
     cpu_usage = round(end_cpu - start_cpu, 2)
 
     return {
         'size': f'{size}x{size}',
-        'execution_time': execution_time,
+        'time': execution_time,
         'cpu_usage': cpu_usage,
         'memory_usage': memory_used
     }

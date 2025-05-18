@@ -5,6 +5,7 @@ import time
 
 app = Flask(__name__)
 CORS(app)
+PORT = 5001
 
 
 @app.route('/mock-api/<int:delay>')
@@ -22,4 +23,5 @@ def mock_api(delay):
 
 
 if __name__ == '__main__':
-    app.run(port=5001)
+    print(f"Python Server is running on http://localhost:{PORT}")
+    app.run(port=PORT)

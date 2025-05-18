@@ -1,9 +1,11 @@
+const { cpu } = require("node-os-utils");
+
 function runNodeBenchmark() {
-    clearCell("nodeJs-output");
+    clearCell("node-js-output");
     fetch("http://localhost:3000/")
         .then(response => response.json())
         .then(data => {
-            let outputDiv = document.getElementById("nodeJs-output");
+            let outputDiv = document.getElementById("node-js-output");
 
             let timeDiv = document.createElement("div");
             timeDiv.textContent = `Total ET (50x): ${data.totalExecutionTime} ms`;
@@ -49,28 +51,53 @@ function benchmarkPrimesJS(repetitions, n) {
         let start = performance.now();
         let primes = sieveOfEratosthenes(n);
         let end = performance.now();
-        totalTime += (end - start);
 
-        if (performance.memory) {
-            totalMemory += performance.memory.usedJSHeapSize / (1024 * 1024);
-        }
+        totalTime += (end - start);
+        totalMemory += getMemoryUsageJS();
     }
 
-    let endTotal = performance.now();
-    let totalExecTime = (endTotal - startTotal).toFixed(2);
+    const executionTime = performance.now() - startTotal;
 
-    let avgTime = (totalTime / repetitions).toFixed(2);
-    let avgMemory = (totalMemory / repetitions).toFixed(2);
+    let avgTime = (totalTime / repetitions);
+    let avgMemory = (totalMemory / repetitions);
 
-    let outputDiv = document.getElementById("javascript-output");
-    outputDiv.innerHTML = `
-        <div>Total ET (1000x): ${totalExecTime} ms</div>
-        <div>ET (avg, 1000x): ${avgTime} ms</div>
-        <div>RAM (avg, 1000x): ${avgMemory} MB</div>
-    `;
+    const results = {
+        total_time: executionTime,
+        execution_time: avgTime,
+        memory_usage: avgMemory,
+    };
+
+    displayResults(results);
 }
 
-function runJSBenchmark() {
-    document.getElementById("javascript-output").textContent = "";
+function getMemoryUsageJS() {
+    if (performance.memory) {
+        return performance.memory.usedJSHeapSize / (1024 * 1024);
+    }
+    return -1;
+}
+
+function displayResults(results) {
+    const output = document.getElementById("javascript-output");
+
+    const timeTotalDiv = document.createElement("div");
+    timeTotalDiv.textContent = `Total ET (1000x): ${results.total_time.toFixed(2)} ms`;
+    output.appendChild(timeTotalDiv);
+
+    const timeDiv = document.createElement("div");
+    timeDiv.textContent = `ET (avg, 1000x): ${results.execution_time.toFixed(2)} ms`;
+    output.appendChild(timeDiv);
+
+    const memoryDiv = document.createElement("div");
+    if (results.memory_usage !== -1) {
+        memoryDiv.textContent = `RAM (avg, 1000x): ${results.memory_usage.toFixed(2)} MB`;
+    } else {
+        memoryDiv.textContent = `RAM unsupported measurement in this browser.`;
+    }
+    output.appendChild(memoryDiv);
+}
+
+function runJsBenchmark() {
+    window.clearCell("javascript-output");
     benchmarkPrimesJS(1000, 10_000);
 }

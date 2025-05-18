@@ -34,6 +34,7 @@ def primes_to_n(n):
     start_time = time.time()
 
     primes = []
+
     if n > 2:
         primes.append(2)
 
@@ -41,15 +42,11 @@ def primes_to_n(n):
         if is_prime(i):
             primes.append(i)
 
-    end_time = time.time()
-
     end_memory = get_memory_usage()
     end_cpu = get_cpu_usage()
 
-    execution_time = round((end_time - start_time) * 1000, 2)
-
+    execution_time = round((time.time() - start_time) * 1000, 2)
     memory_used = round(end_memory - start_memory, 2)
-
     cpu_usage = round(end_cpu - start_cpu, 2)
 
     return {
@@ -70,7 +67,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.end_headers()
 
-            results = primes_to_n(1000000)
+            results = primes_to_n(1_000_000)
             response = json.dumps(results)
             self.wfile.write(response.encode())
 

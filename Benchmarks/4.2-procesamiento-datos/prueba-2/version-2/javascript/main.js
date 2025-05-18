@@ -46,8 +46,9 @@ function initializeWorkers() {
 }
 const pendingPromises = new Map();
 
-async function runJSBenchmark(event) {
+async function runJsBenchmark(event) {
     try {
+        window.clearCell("javascript-output");
         const numExecutions =
             parseInt(
                 document.getElementById("num-executions-javascript").value
@@ -58,7 +59,6 @@ async function runJSBenchmark(event) {
             ) || 1;
 
         await initializeWorkers();
-        clearCell("javascript");
 
         const simulationStartTime = performance.now();
         const promises = [];
@@ -68,7 +68,7 @@ async function runJSBenchmark(event) {
             const id = `${i}-${Date.now()}`;
 
             promises.push(
-                new Promise((resolve, reject) => {
+                new Promise((resolve) => {
                     pendingPromises.set(id, resolve);
                     worker.postMessage({ id, size: 10_000_000 });
                 })
@@ -109,60 +109,30 @@ async function runJSBenchmark(event) {
         displayResults(results);
     } catch (error) {
         console.error("Worker error:", error);
-        displayJSText("javascript-output", `Worker Error: ${error}`);
     }
 }
 
 function displayResults(results) {
-    displayJSText(
-        "javascript-create",
-        `${results.create.time.toFixed(2)} ms | ${results.create.memory.toFixed(
-            2
-        )} MB`
-    );
-    displayJSText(
-        "javascript-sum",
-        `${results.sum.time.toFixed(2)} ms | ${results.sum.memory.toFixed(
-            2
-        )} MB`
-    );
-    displayJSText(
-        "javascript-mean",
-        `${results.mean.time.toFixed(2)} ms | ${results.mean.memory.toFixed(
-            2
-        )} MB`
-    );
-    displayJSText(
-        "javascript-std",
-        `${results.std.time.toFixed(2)} ms | ${results.std.memory.toFixed(
-            2
-        )} MB`
-    );
-    displayJSText(
-        "javascript-output",
-        `${results.total.average_per_execution.toFixed(2)} ms`
-    );
-    displayJSText(
-        "javascript-exact",
-        `${results.total.total_time.toFixed(2)} ms`
-    );
-}
+    const output = document.getElementById("javascript-output");
 
-function clearCell(prefix) {
-    const operations = ["create", "sum", "mean", "std", "output", "exact"];
-    operations.forEach((op) => {
-        const element = document.getElementById(`${prefix}-${op}`);
-        if (element) {
-            element.innerHTML = "";
+    for (const [op, data] of Object.entries(results)) {
+        if (op !== 'total') {
+            const div = document.createElement("div");
+            div.textContent =
+                `${op.toUpperCase()} - Time: ${data.time.toFixed(2)} ms | RAM: ${data.memory.toFixed(2)} MB`;
+            output.appendChild(div);
         }
-    });
+    }
+
+    const avgTimeDiv = document.createElement("div");
+    avgTimeDiv.textContent =
+        `Avg request time: ${results.total.average_per_execution.toFixed(2)} ms`;
+    output.appendChild(avgTimeDiv);
+
+    const timeTotalDiv = document.createElement("div");
+    timeTotalDiv.textContent =
+        `Total ET: ${results.total.total_time.toFixed(2)} ms`;
+    output.appendChild(timeTotalDiv);
 }
 
-function displayJSText(elementId, text) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.textContent += text;
-    } else {
-        console.warn(`Element with ID ${elementId} not found.`);
-    }
-}
+window.runJsBenchmark = runJsBenchmark;

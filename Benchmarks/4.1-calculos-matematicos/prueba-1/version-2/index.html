@@ -1,105 +1,122 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Benchmarking: JavaScript vs PyScript</title>
-    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.5.2"></script>
-    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
-    <script src="javascript/main.js" defer></script>
-    <script type="py" src="python/main.py" config="python/pyscript.toml"></script>
-    <script>
-        let startTime = performance.now();
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="stylesheet"
+            href="https://pyscript.net/releases/2024.1.1/core.css"
+        />
+        <script
+            type="module"
+            src="https://pyscript.net/releases/2024.1.1/core.js"
+        ></script>
 
-        document.addEventListener('py:ready', () => {
+        <title>Benchmarking: JavaScript vs PyScript</title>
 
-            let endTime = performance.now();
-            let loadTime = endTime - startTime;
-            document.getElementById("output").innerText += `PLT: ${loadTime.toFixed(2)} ms`;
-        });
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.5.2"></script>
+        <script src="javascript/main.js" defer></script>
+        <script
+            type="py"
+            src="python/main.py"
+            config="python/pyscript.toml"
+        ></script>
 
-        var startTimerWebAssembly;
+        <script>
+            let startTime = performance.now();
 
-        function runPyBenchmark() {
-            startTimerWebAssembly = performance.now();
-        }
+            document.addEventListener('py:ready', () => {
+                let endTime = performance.now();
+                let loadTime = endTime - startTime;
+                document.getElementById('output').innerText +=
+                    `PLT: ${loadTime.toFixed(2)} ms`;
+            });
 
-        function endTimerWebAssembly() {
-            var endTime = performance.now();
-            var totalElapsedTime = endTime - startTimerWebAssembly;
-            var resultDiv = document.createElement("div");
-            resultDiv.textContent = `ET (Py + WA): ${totalElapsedTime.toFixed(2)} ms`;
-            document.getElementById("pyscript-output").appendChild(resultDiv);
-            document.getElementById("pyscript-output").appendChild(document.createElement("hr"))
-        }
+            var startTimerWebAssembly;
 
-        function clearCell(elementId) {
-            document.getElementById(elementId).textContent = "";
-        }
+            function runPyBenchmark() {
+                startTimerWebAssembly = performance.now();
+            }
 
-        function runPyBackendBenchmark() {
-            clearCell("pythonBackend-output");
-            fetch("http://localhost:5000/")
-                .then(response => response.json())
-                .then(data => {
-                    let outputDiv = document.getElementById("pythonBackend-output");
+            function endTimerWebAssembly() {
+                var endTime = performance.now();
+                var totalElapsedTime = endTime - startTimerWebAssembly;
+                var resultDiv = document.createElement('div');
+                resultDiv.textContent = `ET (Py + WA): ${totalElapsedTime.toFixed(2)} ms`;
+                document
+                    .getElementById('pyscript-output')
+                    .appendChild(resultDiv);
+            }
 
-                    Object.entries(data).forEach(([key, value]) => {
-                        let titleDiv = document.createElement("div");
-                        titleDiv.textContent = `Matriz ${value.size}`;
-                        titleDiv.style.fontWeight = "bold";
-                        outputDiv.appendChild(titleDiv);
+            function clearCell(elementId) {
+                document.getElementById(elementId).textContent = '';
+            }
 
-                        let timeDiv = document.createElement("div");
-                        timeDiv.textContent = `TE: ${value.execution_time} ms`;
-                        outputDiv.appendChild(timeDiv);
+            function runPyBackendBenchmark() {
+                clearCell('python-backend-output');
+                fetch('http://localhost:5000/')
+                    .then((response) => response.json())
+                    .then((data) => {
+                        let outputDiv = document.getElementById(
+                            'python-backend-output'
+                        );
 
-                        let cpuDiv = document.createElement("div");
-                        cpuDiv.textContent = `CPU: ${value.cpu_usage} %`;
-                        outputDiv.appendChild(cpuDiv);
+                        Object.entries(data).forEach(([key, value]) => {
+                            let titleDiv = document.createElement('div');
+                            titleDiv.textContent = `Matriz ${value.size}`;
+                            titleDiv.style.fontWeight = 'bold';
+                            outputDiv.appendChild(titleDiv);
 
-                        let memoryDiv = document.createElement("div");
-                        memoryDiv.textContent = `RAM: ${value.memory_usage} MB`;
-                        outputDiv.appendChild(memoryDiv);
+                            let timeDiv = document.createElement('div');
+                            timeDiv.textContent = `TE: ${value.time} ms`;
+                            outputDiv.appendChild(timeDiv);
 
-                        outputDiv.appendChild(document.createElement("hr")); // Separador visual
-                    });
-                })
-                .catch(error => console.error("Error:", error));
-        }
+                            let cpuDiv = document.createElement('div');
+                            cpuDiv.textContent = `CPU: ${value.cpu_usage} %`;
+                            outputDiv.appendChild(cpuDiv);
 
-    </script>
+                            let memoryDiv = document.createElement('div');
+                            memoryDiv.textContent = `RAM: ${value.memory_usage} MB`;
+                            outputDiv.appendChild(memoryDiv);
+
+                            outputDiv.appendChild(document.createElement('hr'));
+                        });
+                    })
+                    .catch((error) => console.error('Error:', error));
+            }
+        </script>
     </head>
-<body>
-    <h1>Matrix multiplication (Numpy/TypeArrays)</h1>
+    <body>
+        <h1>Matrix multiplication (Numpy/TypeArrays)</h1>
 
-    <button onclick="runJSBenchmark()">Run in JavaScript</button>
-    <button onclick="runPyBenchmark()" py-click="run_py_benchmark">Run in PyScript</button>
-    <button onclick="runNodeBenchmark()">Run in Node</button>
-    <button onclick="runPyBackendBenchmark()">Run in Python Backend</button>
+        <button onclick="runJsBenchmark()">Run in JavaScript</button>
+        <button onclick="runPyBenchmark()" py-click="run_py_benchmark">
+            Run in PyScript
+        </button>
+        <button onclick="runNodeBenchmark()">Run in Node</button>
+        <button onclick="runPyBackendBenchmark()">Run in Python Backend</button>
 
-    <h2>Results</h2>
+        <h2>Results</h2>
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>JavaScript</th>
-                <th>PyScript</th>
-                <th>Node.js</th>
-                <th>Python Backend</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td id="javascript-output">Waiting...</td>
-                <td id="pyscript-output">Waiting...</td>
-                <td id="nodeJs-output">Waiting...</td>
-                <td id="pythonBackend-output">Waiting...</td>
-            </tr>
-        </tbody>
-    </table>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>JavaScript</th>
+                    <th>PyScript</th>
+                    <th>Node.js</th>
+                    <th>Python Backend</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="javascript-output">Waiting...</td>
+                    <td id="pyscript-output">Waiting...</td>
+                    <td id="node-js-output">Waiting...</td>
+                    <td id="python-backend-output">Waiting...</td>
+                </tr>
+            </tbody>
+        </table>
 
-    <pre id="output"></pre>
-</body>
+        <pre id="output"></pre>
+    </body>
 </html>

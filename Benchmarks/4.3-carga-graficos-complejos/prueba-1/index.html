@@ -3,40 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script type="module" src="https://pyscript.net/releases/2024.8.1/core.js"></script>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.1/core.css">
+
     <title>Benchmarking: JavaScript vs PyScript</title>
 
-    <link rel="stylesheet" href="https://pyscript.net/releases/2024.5.2/core.css">
-    <script type="module" src="https://pyscript.net/releases/2024.5.2/core.js"></script>
-    <script src="javascript/main.js" defer></script>
+    <script type="module" src="javascript/main.js"></script>
+    <script type="py" src="python/main.py" config="json/pyscript-main.json"></script>
+    
     <script>
-        document.addEventListener('py:ready', () => {
-            document.getElementById("run-button").disabled = false;
+        let pyTimer = null;
+        let pyStartTime = 0;
+        let startTime = performance.now();
 
-            document.getElementById("run-button").textContent = 'Run in PyScript';
+        document.addEventListener('py:ready', () => {
+            document.getElementById("run-button-pyscript").disabled = false;
+
+            document.getElementById("run-button-pyscript").textContent = 'Run in PyScript';
             console.log('PyScript fully loaded');
         });
-        let pyTimerInterval = null;
-        let pyStartTime = 0;
     
-        function startPyTimer() {
+         function startPyTimer() {
             pyStartTime = performance.now();
-            const timerElement = document.getElementById("py-timer-display");
-    
-            clearInterval(pyTimerInterval);
-    
-            pyTimerInterval = setInterval(() => {
-                const elapsed = (performance.now() - pyStartTime) / 1000;
-                timerElement.textContent = `Timer: ${elapsed.toFixed(4)} s`;
-            }, 100);
+            const timerElement = document.getElementById("pyscript-timer-display");
+
+            function updateTimer() {
+                if (!pyTimer) return;
+
+                const elapsedMs = performance.now() - pyStartTime;
+                const elapsed = (elapsedMs / 1000).toFixed(3);
+                timerElement.textContent = `PyScript Timer: ${elapsed} s`;
+
+                pyTimer = requestAnimationFrame(updateTimer);
+            }
+
+            cancelAnimationFrame(pyTimer);
+            pyTimer = requestAnimationFrame(updateTimer);
         }
     
         function stopPyTimer() {
-            clearInterval(pyTimerInterval);
-            pyTimerInterval = null;
+            cancelAnimationFrame(pyTimer);
+            pyTimer = null;
+
+            const elapsedMs = performance.now() - pyStartTime;
+            const elapsed = (elapsedMs / 1000).toFixed(3);
+            document.getElementById("pyscript-timer-display").textContent = `PyScript Timer: ${elapsed} s`;
         }
-    </script>
-    <script>
-        let startTime = performance.now();
 
         document.addEventListener('py:ready', () => {
             let endTime = performance.now();
@@ -51,68 +64,54 @@
         }
 
         function clearCell(elementId) {
-            const operations = ['output', 'exact'];
-            operations.forEach(op => {
-                const element = document.getElementById(`${elementId}-${op}`);
-                if (element) {
-                    element.innerHTML = "";
-                }
-            });
+            document.getElementById(elementId).textContent = '';
         }
-    </script>
-    <script>
+
         function clearGraphContainer(id) {
             const container = document.getElementById(id);
             container.innerHTML = "";
         }
 
-        function displayPlotPy(base64Data) {
+        function displayPlot(base64Data, id) {
             const img = document.createElement("img");
             img.src = `data:image/png;base64,${base64Data}`;
             img.style.maxWidth = "100%";
-            document.getElementById("graph-container-py").appendChild(img);
+            document.getElementById(id).appendChild(img);
         }
     </script>
 <body>
-    <script type="py" src="python/main.py" config="json/pyscript-main.json" async></script>
     <h1>Graph Rendering Benchmark (Matplotlib/Canva)</h1>
 
-    <h2 id="js-timer-display">JS Timer: 0.00 s</h2>
-    <h2 id="py-timer-display">Timer: 0.00 s</h2>
+    <pre id="output"></pre>
 
-    <label for="num-executions">Repeticiones:</label>
+    <label for="num-executions">Repetitions:</label>
     <input type="number" id="num-executions-javascript" value="1" min="1">
-    <button onclick="runJSBenchmark()">Run in JavaScript</button>
+    <button id="run-button-javascript" onclick="runJsBenchmark()">Run in JavaScript</button>
 
 
     <label for="num-executions">Repeticiones:</label>
     <input type="number" id="num-executions-pyscript" value="1" min="1">
-    <button id="run-button" onclick="runPyBenchmark()" py-click="js_run_py_benchmark">Run in PyScript (Loading...)</button>
+    <button id="run-button-pyscript" py-click="launch_worker">Run in PyScript (Loading...)</button>
 
-    <pre id="output"></pre>
     <div id="graph-containers" style="display: flex; flex-direction: row;">
-        <div id="graph-container-js"></div>
-        <div id="graph-container-py"></div>
+        <div id="graph-container-javascript"></div>
+        <div id="graph-container-pyscript"></div>
     </div>
 
-    <table id="metrics-container">
+    <h2 id="javascript-timer-display">JS Timer: 0.00 s</h2>
+    <h2 id="pyscript-timer-display">PyScript Timer: 0.00 s</h2>
+
+
+   <table id="metrics-container">
         <thead>
             <tr>
-                <th>Metric</th>
-                <th>JavaScript</th>
-                <th>PyScript</th>
+                <th>JavaScript</th><th>PyScript</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>Times</td>
-                <td id="javascript-output"></td>
-                <td id="pyscript-output"></td>
-            </tr>
-            <tr>
-                <td>Total</td>
-                <td id="javascript-exact"></td>
-                <td id="pyscript-exact"></td>
+                <td id="javascript-output">Waiting...</td>
+                <td id="pyscript-output">Waiting...</td>
             </tr>
         </tbody>
     </table>
