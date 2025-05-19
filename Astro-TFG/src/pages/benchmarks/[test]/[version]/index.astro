@@ -2,8 +2,9 @@
 import { tests as testData } from '../../../../data/tests';
 import VersionLayout from '../../../../layouts/VersionLayout.astro';
 import '../../../../styles/global.css';
-
 export const prerender = true;
+
+// Genera dinámicamente todas las rutas posibles según los benchmarks, tests y versiones
 
 export async function getStaticPaths() {
     const paths: { params: { test: string; version: string } }[] = [];
@@ -19,29 +20,42 @@ export async function getStaticPaths() {
     return paths;
 }
 
+// Extrae los parámetros de la URL (test y version)
+
 const { test: testParam, version: versionParam } = Astro.params as {
     test: string;
     version: string;
 };
 
+// Busca el benchmark actual usando el nombre en el parámetro
+
 const currentBenchmark = testData.find((b) => b.link === testParam);
 if (!currentBenchmark) {
-    throw new Error(`Benchmark no encontrado para ${testParam}`);
+    throw new Error(`Benchmark not found: ${testParam}`);
 }
+
+// Extrae el índice del test y de la versión a partir del string 'test-X-version-Y'
+
 const [_, testNumStr, __, versionNumStr] = versionParam.split('-');
 const testIndex = parseInt(testNumStr, 10) - 1;
 const versionIndex = parseInt(versionNumStr, 10) - 1;
 
+// Obtiene los datos del test y de la versión específica
+
 const test = currentBenchmark.tests[testIndex];
 const rawVersion = test.versions[versionIndex];
 if (!test || !rawVersion) {
-    throw new Error(`Versión no encontrada para ${versionParam}`);
+    throw new Error(`Versión not found: ${versionParam}`);
 }
+
+// Extrae el objeto `version` desde `rawVersion`, manejando el caso en que sea un string o un objeto
 
 const version =
     typeof rawVersion === 'object' && 'version' in rawVersion
         ? (rawVersion as any).version
         : rawVersion;
+
+// Construye rutas públicas hacia los archivos JS/Python para esa versión
 
 const versionDir = `version-${versionNumStr}`;
 const pruebaDir = `prueba-${testIndex + 1}`;
@@ -49,14 +63,7 @@ const basePublic = `/scripts/${testParam}/${pruebaDir}/${versionDir}`;
 const jsPath = `${basePublic}/javascript/`;
 let pyPath = `${basePublic}/python/`;
 
-// if (version.pyConfig) {
-//     if (version.pyConfig.endsWith('.json')) {
-//         pyPath = `${basePublic}/json/`;
-//     }else{
-//         pyPath = `${basePublic}/python/`;
-//     }
-//     pyConfig = version.pyConfig;
-// }
+// Obtiene las librerías JS definidas para esta versión (si las hay)
 
 const jsLibs = Array.isArray(version.jsLibs) ? version.jsLibs : [];
 ---
@@ -73,5 +80,4 @@ const jsLibs = Array.isArray(version.jsLibs) ? version.jsLibs : [];
     useNode={version.useNode}
     useBackend={version.useBackend}
     inputs={version.inputs}
-    graph={version.graph}
 />

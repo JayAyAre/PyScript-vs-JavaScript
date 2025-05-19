@@ -8,6 +8,11 @@ export function display(base64Data, elementId) {
 }
 
 export function displayPlotFromJSON(jsonStr, elementId) {
+    if (typeof Plotly === "undefined") {
+        console.warn("Plotly is not ready yet, retrying in 100ms...");
+        setTimeout(() => displayPlotFromJSON(jsonStr, elementId), 100);
+        return;
+    }
     try {
         const graphData = JSON.parse(jsonStr);
         const elementDiv = document.getElementById(elementId);
@@ -15,7 +20,8 @@ export function displayPlotFromJSON(jsonStr, elementId) {
         let container = document.createElement('div');
         container.id = `container-graph-${elementId}`;
         elementDiv.appendChild(container);
-        Plotly.newPlot(
+        console.log(window.Plotly);
+        window.Plotly.newPlot(
             container.id,
             graphData.data,
             graphData.layout || {}
@@ -24,7 +30,7 @@ export function displayPlotFromJSON(jsonStr, elementId) {
         console.error('Error parsing or rendering Plotly graph:', e);
         const el = document.getElementById(elementId);
         if (el) {
-            el.textContent = 'Error al mostrar el gráfico con Plotly';
+            el.textContent = 'Error displaying Plotly graph';
         }
     }
 }

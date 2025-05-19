@@ -1,7 +1,14 @@
-// src/pages/api/run-backend.astro
 import { fileURLToPath } from 'url';
 import { spawn } from 'child_process';
+
+// Desactiva el prerender en Astro para permitir ejecución dinámica del lado servidor
 export const prerender = false;
+
+/**
+ * Ejecuta un script externo (Python o Node) como un proceso hijo
+ * @param type - Tipo de script a ejecutar ('python' o 'node')
+ * @param scriptPath - Ruta absoluta del script en el sistema de archivos
+ */
 
 function runWorkerProcess(
     type: 'python' | 'node',
@@ -27,17 +34,22 @@ function runWorkerProcess(
                 try {
                     const result = JSON.parse(output);
                     resolve(result);
-                } catch (err) {
-                    reject(new Error('Error al parsear JSON: ' + err.message));
+                } catch (err: any) {
+                    reject(new Error('Error parsing result: ' + err.message));
                 }
             } else {
-                reject(new Error('Worker fallo: ' + errorOutput));
+                reject(new Error('Worker failed with: ' + errorOutput));
             }
         });
     });
 }
 
-export async function POST({ request }) {
+/**
+ * Endpoint HTTP POST que recibe tipo y ruta del script,
+ * lo ejecuta en el servidor y devuelve su salida
+ */
+
+export async function POST({ request }: { request: Request }) {
     const { type, path: relativePath } = await request.json();
     const decodedPath = decodeURIComponent(relativePath);
     const scriptPath = fileURLToPath(
@@ -49,11 +61,11 @@ export async function POST({ request }) {
         return new Response(JSON.stringify(result), {
             headers: { 'Content-Type': 'application/json' },
         });
-    } catch (error) {
-        console.error('Error ejecutando o parseando el script:', error);
+    } catch (error: any) {
+        console.error('Error executing script:', error);
         return new Response(
             JSON.stringify({
-                error: 'Error ejecutando script',
+                error: 'Error executing script',
                 details: error.message,
             }),
             { status: 500 }

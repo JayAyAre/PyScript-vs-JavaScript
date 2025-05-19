@@ -1,4 +1,3 @@
-// src/pages/api/run-mock.ts
 import { fileURLToPath } from 'url';
 import { spawn } from 'child_process';
 import type { APIRoute } from 'astro';
@@ -25,13 +24,13 @@ function runWorkerProcess(scriptPath: string, args: string[]): Promise<any> {
             if (code === 0) {
                 try {
                     resolve(JSON.parse(stdout));
-                } catch (err) {
-                    reject(new Error(`JSON inválido: ${err.message}`));
+                } catch (err: any) {
+                    reject(new Error(`Invalid JSON: ${err.message}`));
                 }
             } else {
                 reject(
                     new Error(
-                        `Script finalizó con código ${code}: ${stderr || stdout}`
+                        `Script exited with code ${code}: ${stderr.trim()}`
                     )
                 );
             }
@@ -53,7 +52,7 @@ export const POST: APIRoute = async ({ request }) => {
             headers: { 'Content-Type': 'application/json' },
         });
     } catch (err: any) {
-        console.error('Error en run-mock:', err);
+        console.error('Error on API route:', err);
         return new Response(
             JSON.stringify({
                 status: 'error',

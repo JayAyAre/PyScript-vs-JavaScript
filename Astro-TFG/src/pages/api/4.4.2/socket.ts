@@ -1,5 +1,3 @@
-// src/pages/api/4.4.2/socket.ts
-import { WebSocketServer } from 'ws';
 import type { APIRoute } from 'astro';
 
 export const prerender = false;

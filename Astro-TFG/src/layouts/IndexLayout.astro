@@ -20,7 +20,6 @@ const { title } = Astro.props;
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="generator" content={Astro.generator} />
         <title>{title}</title>
     </head>
@@ -33,7 +32,7 @@ const { title } = Astro.props;
             <HeaderCard id="introduction" title="Introducción">
                 <p>
                     Esta es la página de inicio del Trabajo de Fin de Grado de
-                    Jordi Ramírez. Aquí se recopila información clave sobre el
+                    Jordi Ramírez. Aquí se recopila información sobre el
                     proyecto, incluyendo el análisis comparativo y los
                     benchmarks de rendimiento y eficiencia entre <span
                         class="text-[#EFD81D]">JavaScript</span
@@ -51,13 +50,12 @@ const { title } = Astro.props;
                     soluciones innovadoras para el análisis y visualización de
                     datos directamente en la web.
                     <br /><br />
-                    Además, el proyecto surge del interés por explorar el auge de
-                    estas tecnologías emergentes, planteando preguntas fundamentales
-                    como: ¿Pueden PyScript y Pyodide ofrecer un rendimiento comparable
-                    al de JavaScript en aplicaciones web? ¿Cuál es la tecnología
-                    más adecuada según las necesidades de una aplicación: visualización
-                    gráfica, análisis de datos en tiempo real o interacción con el
-                    usuario?
+                    El proyecto surge del interés por explorar el auge de estas tecnologías
+                    emergentes, planteando preguntas fundamentales como: ¿Pueden
+                    PyScript y Pyodide ofrecer un rendimiento comparable al de JavaScript
+                    en aplicaciones web? ¿Cuál es la tecnología más adecuada según
+                    las necesidades de una aplicación: visualización gráfica, análisis
+                    de datos en tiempo real o interacción con el usuario?
                     <br /><br />
                     Este trabajo busca dar respuesta a estas cuestiones y ofrecer
                     una visión más amplia sobre la relación y la complementariedad
@@ -80,21 +78,16 @@ const { title } = Astro.props;
                             </div>
                         </summary>
                         <p class="mt-2 text-gray-400">
-                            En general, el proyecto define un total de 7 ámbitos
-                            (el último de ellos es una adaptación de los
-                            anteriores en dispositivos móviles), que representan
-                            distintos casos de uso de JavaScript y PyScript.
-                            Estos recogen pruebas con diferentes objetivos, pero
-                            que en gran medida miden las mismas métricas de
-                            rendimiento y eficiencia. Los ámbitos escogidos
-                            fueron:
+                            En general, el proyecto define un total de 6 ámbitos
+                            que representan distintos casos de uso de JavaScript
+                            y PyScript. Estos recogen pruebas con diferentes
+                            objetivos, pero en gran medida miden las mismas
+                            métricas de rendimiento y eficiencia. Los ámbitos
+                            escogidos fueron:
                         </p>
                         <ul class="mt-2 ml-6 list-disc text-gray-400">
                             <li>Cálculos matemáticos intensivos</li>
-                            <li>
-                                Procesamiento de grandes volúmenes de datos en
-                                memoria
-                            </li>
+                            <li>Procesamiento de grandes volúmenes de datos</li>
                             <li>
                                 Carga y representación de gráficos complejos
                             </li>
@@ -105,13 +98,17 @@ const { title } = Astro.props;
                                 Cálculo y verificación de integridad en datos
                                 sensibles
                             </li>
-                            <li>Desempeño en teléfonos móviles</li>
+                            <li>
+                                Reconocimiento de patrones y entrenamiento de
+                                modelos
+                            </li>
                         </ul>
                         <p class="mt-2 text-gray-400">
                             Cada uno de estos ámbitos incluye diversas pruebas,
-                            con varias versiones. Dichas versiones permiten
-                            observar el rendimiento de las tecnologías empleando
-                            distintas herramientas y metodologías.
+                            con varias versiones de implementaciones. Dichas
+                            versiones permiten observar el rendimiento de las
+                            tecnologías empleando distintas herramientas y
+                            metodologías.
                         </p>
                     </details>
 
@@ -131,10 +128,10 @@ const { title } = Astro.props;
                             web, resulta esencial explorar tecnologías
                             emergentes como PyScript que, sin reemplazar
                             JavaScript, podrían complementar sus capacidades. El
-                            análisis comparativo de fortalezas y debilidades de
-                            cada enfoque permite a los desarrolladores construir
-                            aplicaciones más eficientes, aprovechando sinergias
-                            dentro del mismo ecosistema.
+                            análisis de fortalezas y debilidades de cada enfoque
+                            permite a los desarrolladores construir aplicaciones
+                            más eficientes, aprovechando sinergias dentro del
+                            mismo ecosistema.
                         </p>
                     </details>
 
@@ -153,23 +150,23 @@ const { title } = Astro.props;
                             Para el desarrollo integral tanto en backend como
                             frontend, se emplearon diversas tecnologías y
                             herramientas que permitieron analizar y comparar el
-                            rendimiento de JavaScript y PyScript. El stack
-                            incluyó:
+                            rendimiento de JavaScript y PyScript. Entre ellas
+                            son:
                         </p>
                         <ul class="mt-2 ml-6 list-disc text-gray-400">
                             <li>
                                 JavaScript
                                 <ul class="ml-6 list-disc">
                                     <li>Node.js</li>
-                                    <li>Librerías especializadas</li>
+                                    <li>Librerías</li>
                                 </ul>
                             </li>
                             <li>
                                 PyScript
                                 <ul class="ml-6 list-disc">
-                                    <li>Python 3.11</li>
-                                    <li>Pyodide 0.23</li>
-                                    <li>Librerías científicas</li>
+                                    <li>Python</li>
+                                    <li>Pyodide</li>
+                                    <li>Librerías</li>
                                 </ul>
                             </li>
                             <li>Astro Framework</li>
@@ -189,11 +186,11 @@ const { title } = Astro.props;
                             </div>
                         </summary>
                         <p class="mt-2 text-gray-400">
-                            Cada ámbito de evaluación incluyó pruebas
-                            específicas diseñadas para analizar el rendimiento
-                            comparativo mediante metodologías estandarizadas.
-                            Las pruebas contemplaron múltiples perspectivas y
-                            enfoques metodológicos, destacando:
+                            Cada ámbito de evaluación se abordó mediante pruebas
+                            específicas pensadas para analizar los resultados
+                            desde distintos enfoques y perspectivas. De entre
+                            los distintos ambitos, las pruebas más intuitivas
+                            que se pueden realizar en el mundo cotidiano son:
                         </p>
                         <ul class="mt-2 ml-6 list-disc text-gray-400">
                             <li>Multiplicación de matrices</li>
@@ -202,24 +199,29 @@ const { title } = Astro.props;
                                 Cálculo de dígitos de π con aritmética de
                                 precisión arbitraria
                             </li>
-                            <li>
-                                Procesamiento ETL de grandes conjuntos de datos
-                            </li>
+                            <li>Procesamiento de grandes conjuntos de datos</li>
                             <li>
                                 Análisis estadístico con paralelización masiva
                             </li>
-                            <li>Entre otras 9 pruebas adicionales...</li>
+                            <li>...</li>
                         </ul>
                         <p class="mt-2 text-gray-400">
-                            En total se ejecutaron 14 pruebas principales, cada
-                            una con variantes específicas que totalizaron 42
-                            escenarios de evaluación diferentes.
+                            En total se realizaron de entre 6 entornos o ambitos
+                            conceptuales, se realizaron un total de 18
+                            implementaciones de las diferentes pruebas. Algunas
+                            son varias versiones de la misma prueba, y otras
+                            contienen una unica version de la prueba.
                         </p>
                     </details>
                 </div>
             </HeaderCard>
 
-            <BenchmarkListCard id="benchmarks" title="Benchmarks" />
+            <BenchmarkListCard
+                id="benchmarks"
+                title="Benchmarks"
+                ref="benchmarks"
+            />
+
             <HeaderCard id="results" title="Resultados">
                 <div
                     class="grid grid-cols-1 gap-4 overflow-x-hidden sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3"
@@ -341,28 +343,6 @@ const { title } = Astro.props;
                             </li>
                         </ol>
                     </ResultsCard>
-
-                    <!-- 7. Rendimiento en dispositivos móviles -->
-                    <div
-                        class="col-span-1 mt-2 sm:col-span-2 md:col-span-3 lg:col-span-3"
-                    >
-                        <ResultsCard
-                            title="7. Rendimiento en dispositivos móviles"
-                        >
-                            <ol class="list-decimal list-inside space-y-2">
-                                <li>
-                                    <strong>JavaScript</strong><br />
-                                    Se adaptó mejor a las limitaciones de hardware,
-                                    ofreciendo tiempos de respuesta más ágiles.
-                                </li>
-                                <li>
-                                    <strong>PyScript</strong><br />
-                                    Presentó un consumo de batería elevado y tiempos
-                                    de carga inicial menos competitivos.
-                                </li>
-                            </ol>
-                        </ResultsCard>
-                    </div>
 
                     <!-- Conclusiones Generales -->
                     <div

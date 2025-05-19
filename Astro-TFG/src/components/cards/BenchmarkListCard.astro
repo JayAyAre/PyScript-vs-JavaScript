@@ -1,29 +1,40 @@
 ---
-// El archivo principal
 import HeaderCard from '../cards/HeaderCard.astro';
 import BenchmarkDetails from '../cards/BenchmarkListElementCard.astro';
 
-const { id = 'benchmarks', title = 'Benchmarks' } = Astro.props;
+const benchmarks = [
+    '1-calculos-matematicos',
+    '2-procesamiento-datos',
+    '3-carga-graficos-complejos',
+    '4-manejo-peticiones',
+    '5-criptografia',
+    '6-patrones',
+];
+const {
+    id = 'benchmarks',
+    title = 'Benchmarks',
+    ref = 'benchmarks',
+} = Astro.props;
 ---
 
-<HeaderCard id={id} title={title}>
+<HeaderCard id={id} title={title} ref={ref}>
     <div class="space-y-4">
         <!-- Cálculos matemáticos intensivos -->
         <BenchmarkDetails
             title="Cálculos matemáticos intensivos"
-            linkRef="/benchmarks/4.1-calculos-matematicos"
+            linkRef={`/benchmarks/${benchmarks[0]}`}
             benchmarkItems={[
                 {
                     title: 'Multiplicación de matrices',
                     versions: [
-                        'Estructuras de Datos nativas',
-                        'Estructuras de Datos Optimizado',
+                        'Listas nativas/Arrays nativas',
+                        'Numpy/TypeArrays',
                     ],
                 },
                 {
                     title: 'Detección de números primos',
                     versions: [
-                        'Algoritmos Convencionales (Estructuras Nativas)',
+                        'Algoritmos Convencionales junto a estructuras nativas',
                         'Algoritmos Optimizados con Librerías Especializadas',
                     ],
                 },
@@ -40,7 +51,7 @@ const { id = 'benchmarks', title = 'Benchmarks' } = Astro.props;
         <!-- Procesamiento de grandes volúmenes de datos -->
         <BenchmarkDetails
             title="Procesamiento de grandes volúmenes de datos"
-            linkRef="/benchmarks/4.2-procesamiento-datos"
+            linkRef={`/benchmarks/${benchmarks[1]}`}
             benchmarkItems={[
                 {
                     title: 'Carga y transformación de datos',
@@ -59,7 +70,7 @@ const { id = 'benchmarks', title = 'Benchmarks' } = Astro.props;
                 {
                     title: 'Pandas vs Danfo.js',
                     versions: [
-                        'Mismas tareas de la versión anterior, pero utilizando Pandas y Danfo.js',
+                        'Mismas tareas de la implementación anterior, pero utilizando Pandas y Danfo.js',
                     ],
                 },
             ]}
@@ -68,7 +79,7 @@ const { id = 'benchmarks', title = 'Benchmarks' } = Astro.props;
         <!-- Carga y representación de gráficos complejos -->
         <BenchmarkDetails
             title="Carga y representación de gráficos complejos"
-            linkRef="/benchmarks/4.3-carga-graficos-complejos"
+            linkRef={`/benchmarks/${benchmarks[2]}`}
             benchmarkItems={[
                 {
                     title: 'Renderizado de gráficos de dispersión masivos',
@@ -88,7 +99,7 @@ const { id = 'benchmarks', title = 'Benchmarks' } = Astro.props;
         <!-- Manejo de múltiples solicitudes concurrentes -->
         <BenchmarkDetails
             title="Manejo de múltiples solicitudes concurrentes"
-            linkRef="/benchmarks/4.4-manejo-peticiones"
+            linkRef={`/benchmarks/${benchmarks[3]}`}
             benchmarkItems={[
                 {
                     title: 'Solicitudes concurrentes con Fetch/Promise.all (JavaScript) vs Asyncio/Fetch (PyScript)',
@@ -108,7 +119,7 @@ const { id = 'benchmarks', title = 'Benchmarks' } = Astro.props;
         <!-- Cálculo y verificación de integridad en datos sensibles -->
         <BenchmarkDetails
             title="Cálculo y verificación de integridad en datos sensibles"
-            linkRef="/benchmarks/4.5-criptografia"
+            linkRef={`/benchmarks/${benchmarks[4]}`}
             benchmarkItems={[
                 {
                     title: 'Generación y Verificación de Hashes Criptográficos SHA-256',
@@ -128,7 +139,7 @@ const { id = 'benchmarks', title = 'Benchmarks' } = Astro.props;
         <!-- Reconocimiento de patrones y clasificación de datos -->
         <BenchmarkDetails
             title="Reconocimiento de patrones y clasificación de datos"
-            linkRef="/benchmarks/4.6-patrones"
+            linkRef={`/benchmarks/${benchmarks[5]}`}
             benchmarkItems={[
                 {
                     title: 'Clasificación del dataset Iris',

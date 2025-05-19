@@ -4,6 +4,7 @@ import BenchmarkLayout from '../../../layouts/BenchmarkLayout.astro';
 import '../../../styles/global.css';
 
 // Genera las rutas staticas reemplazando [test] por cada link de benchmark
+
 export async function getStaticPaths() {
     return testData.map((benchmark) => ({
         params: { test: benchmark.link },
@@ -11,13 +12,15 @@ export async function getStaticPaths() {
 }
 
 // Obtiene la url actual
+
 const { params } = Astro;
 
 // Busca el benchmark por su `link` y asigna el Benchmark al layout
+
 const currentBenchmark = testData.find((b) => b.link === params.test);
 
 if (!currentBenchmark) {
-    throw new Error(`Benchmark no encontrado para ${params.test}`);
+    throw new Error(`Benchmark not found: ${params.test}`);
 }
 ---
 

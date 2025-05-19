@@ -14,7 +14,6 @@ const {
     useNode,
     useBackend,
     inputs,
-    graph,
 } = Astro.props;
 ---
 
@@ -23,18 +22,20 @@ const {
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
         <title>{versionTitle} - {benchmarkTitle}</title>
-        <link
-            rel="stylesheet"
-            href="https://pyscript.net/releases/2024.5.2/core.css"
-        />
         <script
             type="module"
-            src="https://pyscript.net/releases/2024.5.2/core.js"></script>
+            src="https://pyscript.net/releases/2024.5.1/core.js"></script>
+        <link
+            rel="stylesheet"
+            href="https://pyscript.net/releases/2024.5.1/core.css"
+        />
+
         {jsLibs.map((src: string) => <script src={src} />)}
 
         <script type="module" src={`${jsPath}main.js`} defer></script>
         {
             pyConfig ? (
+                <!-- @ts-ignore -->
                 <script
                     type="py"
                     src={`${pyPath}main.py`}
@@ -307,8 +308,13 @@ const {
         let pyPath = document.body.dataset.pyPath;
         let useNode = document.body.dataset.useNode === 'true';
         let useBackend = document.body.dataset.useBackend === 'true';
+        let startTimerWebAssembly: number = 0;
+        let startTime = performance.now();
 
-        window.runNodeBenchmark = async function () {
+        jsPath = jsPath?.concat('server.js');
+        pyPath = pyPath?.concat('server.py');
+
+        (window as any)["runNodeBenchmark"] = async function () {
             if (!useNode) return;
             window.clearCell('node-js-output');
             try {
@@ -320,11 +326,11 @@ const {
                         console.error('Error loading module:', error);
                     });
             } catch (err) {
-                console.error('Error al ejecutar Node benchmark:', err);
+                console.error('Error executing Node benchmark:', err);
             }
         };
 
-        window.runPyBackendBenchmark = async function () {
+        (window as any)["runPyBackendBenchmark"] = async function () {
             if (!useBackend) return;
             window.clearCell('python-backend-output');
             try {
@@ -336,14 +342,11 @@ const {
                         console.error('Error loading module:', error);
                     });
             } catch (err) {
-                console.error('Error al ejecutar Python backend:', err);
+                console.error('Error executing Python backend:', err);
             }
         };
 
-        jsPath = jsPath?.concat('server.js');
-        pyPath = pyPath?.concat('server.py');
-
-        let startTime = performance.now();
+  
         document.addEventListener('py:ready', () => {
             document.getElementById('pyscript-loader')?.remove();
             let endTime = performance.now();
@@ -359,37 +362,36 @@ const {
             outputDiv.innerText += `PLT: ${loadTime.toFixed(2)} ms\n`;
         });
 
-        let startTimerWebAssembly: number = 0;
 
-        window.showExecutionLoader = function () {
+        (window as any)["showExecutionLoader"] = function () {
             let loadingMessage = document.getElementById('loading-message');
             if (!loadingMessage) return;
             loadingMessage.style.display = 'flex';
         };
 
-        window.hideExecutionLoader = function () {
+        (window as any)["hideExecutionLoader"] = function () {
             let loadingMessage = document.getElementById('loading-message');
             if (!loadingMessage) return;
             loadingMessage.style.display = 'none';
         };
 
-        window.runPy = function () {
-            window.showExecutionLoader();
+        (window as any)["runPy"] = function () {
+            (window as any)["showExecutionLoader"]();
 
             requestAnimationFrame(() => {
                 setTimeout(() => {
-                    if (window.run_py_benchmark) {
+                    if ((window as any)["run_py_benchmark"]) {
                         startTimerWebAssembly = performance.now();
-                        window.run_py_benchmark(event);
+                        (window as any)["run_py_benchmark"](event);
                     } else {
                         console.error('run_py_benchmark no está definido');
-                        window.hideExecutionLoader();
+                        (window as any)["hideExecutionLoader"]();
                     }
                 }, 0);
             });
         };
 
-        window.endTimerWebAssembly = function () {
+        (window as any)["endTimerWebAssembly"] = function () {
             const endTime = performance.now();
             const totalElapsedTime = endTime - startTimerWebAssembly;
             const resultDiv = document.createElement('div');
@@ -399,7 +401,7 @@ const {
             if (!pyscriptOutput) return;
 
             pyscriptOutput.appendChild(resultDiv);
-            window.hideExecutionLoader();
+            (window as any)["hideExecutionLoader"]();
         };
 
         window.clearCell = function (elementId: string) {
@@ -408,33 +410,33 @@ const {
             element.textContent = '';
         };
 
-        window.displayPlot = function (base64Data, elementId) {
+        (window as any)["displayPlot"] = function (base64Data : string, elementId : string) {
             try {
                 import('../scripts/DisplayPlot.js').then((module) => {
                     module.display(base64Data, elementId);
                 });
             } catch (err) {
-                console.error('Error al mostrar gráfico:', err);
+                console.error('Error showing graph:', err);
             }
         };
 
-        window.startFPSMeasurement = function (duration, elementId) {
+        (window as any)["startFPSMeasurement"] = function (duration : number, elementId : string) {
             try {
                 import('../scripts/DisplayPlot.js').then((module) => {
                     module.startFPSMeasurement(duration, elementId);
                 });
             } catch (err) {
-                console.error('Error al mostrar gráfico:', err);
+                console.error('Error starting FPS measurement:', err);
             }
         };
 
-        window.displayPlotFromJSON = function (jsonStr, elementId) {
+        (window as any)["displayPlotFromJSON"] = function (jsonStr : string, elementId : string) {
             try {
                 import('../scripts/DisplayPlot.js').then((module) => {
                     module.displayPlotFromJSON(jsonStr, elementId);
                 });
             } catch (err) {
-                console.error('Error al mostrar gráfico:', err);
+                console.error('Error displaying graph from JSON:', err);
             }
         };
     </script>

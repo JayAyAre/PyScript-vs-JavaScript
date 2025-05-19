@@ -12,6 +12,8 @@ export function display(data, elementId) {
 
             if (index === 3) {
                 outputDiv.appendChild(document.createElement('br'));
+                outputDiv.appendChild(document.createElement('hr'));
+                outputDiv.appendChild(document.createElement('br'));
             }
         });
     });

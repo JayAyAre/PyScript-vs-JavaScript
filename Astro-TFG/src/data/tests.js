@@ -1,7 +1,7 @@
 export const tests = [
     {
         title: '1. Cálculos matemáticos intensivos',
-        link: '4.1-calculos-matematicos',
+        link: '1-calculos-matematicos',
         description:
             'Estas pruebas medirán la eficiencia de cada tecnología al ejecutar operaciones matemáticas de alto costo computacional, como transformaciones numéricas, factorizaciones, cálculos algebraicos, entre otros. Con el objetivo principal de evaluar el rendimiento en operaciones típicas que se usarían en el ámbito científico del desarrollo web.',
         warning:
@@ -13,7 +13,7 @@ export const tests = [
                     'El propósito de esta prueba es principalmente evaluar y comparar el rendimiento del manejo de matrices, tanto en su manipulación como en su operación, de tal manera que se observe cuán eficiente es el uso de las estructuras nativas de ambas herramientas y de aquellas incluidas en librerías externas.',
                 versions: [
                     {
-                        title: 'Estructuras de Datos Nativas',
+                        title: 'Listas nativas/Arrays nativas',
                         description:
                             'Esta versión usará estructuras de datos nativas sin usar librerías externas. Consistirá en realizar la operación de multiplicación de matrices mediante bucles anidados. La matriz a operar será de 300×300 y con valores entre 0 y 1.',
                         jsLibs: null,
@@ -24,7 +24,7 @@ export const tests = [
                         graph: false,
                     },
                     {
-                        title: 'Estructuras de Datos Optimizadas',
+                        title: 'Numpy/TypeArrays',
                         description:
                             'Esta versión usará estructuras de datos optimizadas que pueden ser de librerías externas, tanto en Python con NumPy como en JS usando TypedArrays. Consistirá en realizar la operación de multiplicación de matrices mediante funciones de librerías. La matriz puede ser de 500×500, 1000×1000 o 2000×2000 y con valores entre 0 y 1.',
                         jsLibs: [
@@ -44,7 +44,7 @@ export const tests = [
                     'El propósito de esta prueba es evaluar y comparar el rendimiento de algoritmos convencionales y optimizados en JavaScript y Python para la detección de números primos. Con esta prueba podremos observar cuán eficiente es el uso de diferentes algoritmos matemáticos y cuál es la diferencia entre ambos.',
                 versions: [
                     {
-                        title: 'Algoritmos Convencionales (Estructuras Nativas)',
+                        title: 'Algoritmos Convencionales junto a estructuras nativas',
                         description:
                             'Esta versión usará estructuras de datos nativas y comprobará divisibilidad básica hasta la raíz cuadrada del número. El rango máximo será hasta 10⁶.',
                         jsLibs: null,
@@ -62,7 +62,7 @@ export const tests = [
                         pyConfig: 'pyscript.toml',
                         useNode: true,
                         useBackend: true,
-                        inputs: ["num-executions", "parallel-workers"],
+                        inputs: null,
                         graph: false,
                     },
                 ],
@@ -73,7 +73,7 @@ export const tests = [
                     'El objetivo de esta prueba es evaluar el rendimiento de Python y JavaScript en el cálculo de dígitos de π, tanto sin usar como usando precisión arbitraria. Se busca medir cómo afecta el uso de estructuras de datos nativas y optimizadas a la velocidad de cálculo y al consumo de memoria. Al indicar “precisión arbitraria” se quiere señalar que el algoritmo calcula dígitos que no se pueden representar exactamente con un número de bits, como un float o double.',
                 versions: [
                     {
-                        title: 'BBP (Estructuras nativas) sin precisión arbitraria',
+                        title: 'Bailey-Borwein-Plouffe (BBP con Estructuras nativas)',
                         description:
                             'Se calcularán N=10³ dígitos de π con la implementación de la fórmula BBP usando estructuras nativas. Esta simulación se ejecutará 1000 veces para obtener una medición estadística.',
                         jsLibs: null,
@@ -84,7 +84,7 @@ export const tests = [
                         graph: false,
                     },
                     {
-                        title: 'Gauss–Legendre (Estructuras optimizadas) con precisión arbitraria',
+                        title: 'Gauss-Legendre (Estructuras optimizadas)',
                         description:
                             'Se calcularán N=10⁴ dígitos de π con la implementación de Gauss–Legendre usando estructuras optimizadas. Esta simulación se ejecutará 10 veces para obtener una medición estadística mínima.',
                         jsLibs: ["https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.js"],
@@ -100,7 +100,7 @@ export const tests = [
     },
     {
         title: '2. Procesamiento de grandes volúmenes de datos',
-        link: '4.2-procesamiento-datos',
+        link: '2-procesamiento-datos',
         description:
             'Estas pruebas medirán la capacidad de cada tecnologia para manejar y procesar grandes cantidades de datos. Se analizarán diversos escenarios que involucren manipulación de estructuras de datos a gran escala, carga masiva de información y ejecución de algoritmos de procesamiento intensivo.',
         warning:
@@ -112,7 +112,7 @@ export const tests = [
                     'El propósito de esta prueba es principalmente evaluar y comparar el rendimiento del manejo de matrices, tanto manipulación como de operación, de tal manera observar que tan eficiente es el uso de las estructuras nativas de ambas herramientas y de aquellas incluidas en librerías externas. Las operaciones a medir seran; crear, transformar, ordenar, buscar, filtrar y eliminar.',
                 versions: [
                     {
-                        title: 'Estructuras de Datos Nativas',
+                        title: 'Estructuras de Datos nativas con implementaciones no optimizadas',
                         description:
                             'Esta version empleara arrays y listas nativas correspondientes a JavaScript y a PyScript. Esta version se encargara de crear y manipular un conjunto de 10 millones de numeros aleatorios entre 1 y 1000. Al ser la primera version, se usaran algoritmos no optimizados, por ejemplo; En la busqueda de un dato sobre el conjunto, se empleara un bucle donde se itera sobre cada elemento hasta encontrarlo.',
                         jsLibs: null,
@@ -123,7 +123,7 @@ export const tests = [
                         graph: false,
                     },
                     {
-                        title: 'Estructuras de Datos Optimizadas con concurrismo y paralelismo',
+                        title: 'Estructuras de Datos Optimizadas con implementaciones optimizadas',
                         description:
                             'Esta version adicionalmente usara paralelismo y concurrencia para ejecutar las operaciones, de tal manera que ambas tecnologias usaran web workers para ejecutar las operaciones en paralelo, pero se mandaran a ejecutar de forma concurrente. Las ejecuciones seran individuales, y el conjunto de datos tendra un tamaño de 10 millones de elementos.',
                         jsLibs: null,
@@ -152,7 +152,7 @@ export const tests = [
                         graph: false,
                     },
                     {
-                        title: 'Algoritmos Optimizados con Librerías Especializadas',
+                        title: 'Estructuras optimizadas con paralelismo',
                         description:
                             'Esta version empleara librerias optimizadas para la deteccion de los numeros, para ello, se usara el algoritmo de la criba de Eratosthenes. El rango maximo sera hasta 10^4 y se ejecutara 1000 veces para tener un numero de medicion estadistico.',
                         jsLibs: ["https://cdn.jsdelivr.net/npm/danfojs@1.2.0/lib/bundle.min.js"],
@@ -170,7 +170,7 @@ export const tests = [
                     'Esta prueba tendrá el objetivo de comparar el rendimiento de Pandas (Python) y Danfo.js (JavaScript) en operaciones estadísticas sobre datasets de 100.000 elementos, utilizando paralelización con workers para optimizar el procesamiento. Esta prueba emplea las mismas operaciones que el apartado anterior, sin embargo se usarán librerías especializadas en análisis estadístico diferentes a las anteriores, esto nos proporciona una visión más amplia de las opciones de crear algoritmos.',
                 versions: [
                     {
-                        title: 'Version optimizada',
+                        title: 'Misma version que la anterior, pero usando Pando y Danfo.js',
                         description:
                             'Esta prueba contiene una unica version que representa un codigo de la forma mas optimizada posible para simular un codigo del mundo real. Se usara en PyScript Pandas y Numpy, y en JavaScript Danfo.js y Arrays.',
                         jsLibs: ["https://cdn.jsdelivr.net/npm/danfojs@1.2.0/lib/bundle.min.js"],
@@ -185,11 +185,11 @@ export const tests = [
         ],
     }, {
         title: '3. Carga y representación de gráficos complejos',
-        link: '4.3-carga-graficos-complejos',
+        link: '3-carga-graficos-complejos',
         description:
             'Este apartado compara el rendimiento de las librerías estándar de visualización científica en Python y JavaScript cuando operan en el navegador, analizando su eficiencia en escenarios reales de investigación. Las métricas clave incluyen: RAM, Tiempo de ejecucion, latencia, rendimiento con Web Workers, FPS en graficos interactivos.',
         warning:
-            'En estos escenarios se emplean WebWorkers, por lo que no se bloquearan las pruebas mientras se ejecutan. Sin embargo, siempre que se use PyScript, seguira existiendo el PLT.',
+            'En estos escenarios se emplean WebWorkers, por lo que no se bloquearan las pruebas mientras se ejecutan. Sin embargo, se decidio mantener la pantalla de carga (aunque no esten en el hilo principal)) para informar al usuario de que la prueba está en curso.',
         tests: [
             {
                 title: 'Renderizado de gráficos de dispersión masivos (100,000 puntos',
@@ -230,11 +230,11 @@ export const tests = [
         ],
     }, {
         title: '4. Manejo múltiples solicitudes concurrentes',
-        link: '4.4-manejo-peticiones',
+        link: '4-manejo-peticiones',
         description:
             'Este apartado permitira evaluar el funcionamiento de ambas tecnologias en el manejo de peticiones HTTP, que permiten realizar operaciones concurrentes en diferentes partes del mismo servidor. Tambien por otro lado, podremos observar su funcionamiento utilizando peticiones mediante WebSockets.',
         warning:
-            'En estos escenarios se emplean WebWorkers, por lo que no se bloquearan las pruebas mientras se ejecutan. Sin embargo, siempre que se use PyScript, seguira existiendo el PLT.',
+            'En estos escenarios se emplean WebWorkers, por lo que no se bloquearan las pruebas mientras se ejecutan. Sin embargo, se decidio mantener la pantalla de carga (aunque no esten en el hilo principal)) para informar al usuario de que la prueba está en curso.',
         tests: [
             {
                 title: 'Solicitudes concurrentes con Fetch/Promise.all (JavaScript) vs Asyncio/Fetch (PyScript)',
@@ -276,11 +276,11 @@ export const tests = [
     },
     {
         title: '5. Cálculo y verificación de integridad en datos sensibles',
-        link: '4.5-criptografia',
+        link: '5-criptografia',
         description:
             'Este apartado analizara las librerias disponibles para la cifrado y descifrado de datos, así como su eficiencia en el procesamiento de datos sensibles.',
         warning:
-            'En estos escenarios se emplean WebWorkers, por lo que no se bloquearan las pruebas mientras se ejecutan. Sin embargo, siempre que se use PyScript, seguira existiendo el PLT.',
+            'En estos escenarios se emplean WebWorkers, por lo que no se bloquearan las pruebas mientras se ejecutan. Sin embargo, se decidio mantener la pantalla de carga (aunque no esten en el hilo principal)) para informar al usuario de que la prueba está en curso.',
         tests: [
             {
                 title: 'Generación y Verificación de Hashes Criptográficos SHA-256',
@@ -321,11 +321,11 @@ export const tests = [
         ],
     }, {
         title: '6. Reconocimiento de patrones y clasificación de datos',
-        link: '4.6-patrones',
+        link: '6-patrones',
         description:
             'Este apartado analizara las librerias disponibles para el entrenamiento de modelos de aprendizaje automático y su eficiencia en el procesamiento de datos. Esto es importante en los tiempos actuales de la inteligencia artificial, ya que se necesitan modelos de aprendizaje automático para realizar tareas como la clasificación de imágenes, el reconocimiento facial, la detección de patrones en imágenes y la generación de texto.',
         warning:
-            'En estos escenarios se emplean WebWorkers, por lo que no se bloquearan las pruebas mientras se ejecutan. Sin embargo, siempre que se use PyScript, seguira existiendo el PLT.',
+            'En estos escenarios se emplean WebWorkers, por lo que no se bloquearan las pruebas mientras se ejecutan. Sin embargo, se decidio mantener la pantalla de carga (aunque no esten en el hilo principal)) para informar al usuario de que la prueba está en curso.',
         tests: [
             {
                 title: 'Clasificación del dataset Iris',
