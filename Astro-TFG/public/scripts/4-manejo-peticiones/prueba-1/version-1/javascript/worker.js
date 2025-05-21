@@ -1,43 +1,63 @@
 self.onmessage = async function (e) {
-    const { num_requests, delay, worker_time } = e.data;
-    const base_url = location.origin;
+    const data = e.data;
 
-    const urls = Array.from({ length: num_requests }, () => `${base_url}/api/4.4/${delay}.ts`);
-    const results = [];
-    const responseTimes = [];
-
-    async function fetchUrl(url) {
+    if (data.type === "do_analisis") {
         try {
-            const response = await fetch(url);
+            const { id, num_requests, delay } = data;
+            const BASE_URL = location.origin;
 
-            if (response.ok) {
-                const data = await response.json();
-                results.push(data);
-                responseTimes.push(data.response_time); // Obtén el tiempo de respuesta de la API
-            } else {
-                results.push({ error: `Request failed with status ${response.status}` });
-                responseTimes.push(0); // Si la solicitud falla, lo tratamos como 0ms
-            }
-        } catch (e) {
-            results.push({ error: `Request failed: ${e.message}` });
-            responseTimes.push(0); // Si ocurre un error, también lo tratamos como 0ms
+            const urls = Array.from(
+                { length: num_requests },
+                () => `${BASE_URL}/api/4.1.1/${delay}.ts`
+            );
+
+            const results = [];
+            const responseTimes = [];
+
+            const fetchWithTiming = async (url) => {
+                const start = performance.now();
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error(`Status ${res.status}`);
+
+                    const payload = await res.json();
+                    const elapsed = performance.now() - start;
+
+                    results.push(payload);
+                    responseTimes.push(elapsed);
+                } catch (err) {
+                    const elapsed = performance.now() - start;
+                    results.push({ error: err.message });
+                    responseTimes.push(elapsed);
+                }
+            };
+
+            const tStart = performance.now();
+            await Promise.all(urls.map(fetchWithTiming));
+            const total_time = performance.now() - tStart;
+
+            const totalResponseTime = responseTimes.reduce((sum, t) => sum + t, 0);
+            const avg_time = num_requests > 0 ? totalResponseTime / num_requests : 0;
+
+            const lastRes = results[results.length - 1];
+            const lastArr = lastRes && Array.isArray(lastRes.data) ? lastRes.data : [];
+            const last_value = lastArr.length > 0 ? lastArr[lastArr.length - 1].value : null;
+
+            const result = {
+                total_time,
+                avg_time,
+                last_value,
+            };
+
+            self.postMessage({
+                id,
+                json: JSON.stringify(result),
+            });
+        } catch (error) {
+            self.postMessage({
+                id: data.id,
+                error: `Error in worker: ${error.message}`,
+            });
         }
     }
-
-    const start_time = performance.now();
-    console.log("mandamos peticiones");
-    await Promise.all(urls.map(url => fetchUrl(url)));
-
-    const total_time = performance.now() - start_time;
-
-    const totalResponseTime = responseTimes.reduce((acc, time) => acc + time, 0);
-    const avg_time = num_requests > 0 ? totalResponseTime / num_requests : 0;
-
-
-    self.postMessage({
-        worker_time,
-        total_time,
-        avg_time,
-        results,
-    });
 };

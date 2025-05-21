@@ -24,9 +24,9 @@ export const tests = [
                         graph: false,
                     },
                     {
-                        title: 'Numpy/TypeArrays',
+                        title: 'Numpy/TensorFlow',
                         description:
-                            'Esta versión usará estructuras de datos optimizadas que pueden ser de librerías externas, tanto en Python con NumPy como en JS usando TypedArrays. Consistirá en realizar la operación de multiplicación de matrices mediante funciones de librerías. La matriz puede ser de 500×500, 1000×1000 o 2000×2000 y con valores entre 0 y 1.',
+                            'Esta versión usará estructuras de datos optimizadas que pueden ser de librerías externas, tanto en Python con NumPy como en JS usando TypedArrays y TensorFlow. Consistirá en realizar la operación de multiplicación de matrices mediante funciones de librerías. La matriz puede ser de 500×500, 1000×1000 o 2000×2000 y con valores entre 0 y 1.',
                         jsLibs: [
                             'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.5.2'
                         ],

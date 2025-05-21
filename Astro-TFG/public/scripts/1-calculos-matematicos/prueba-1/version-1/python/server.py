@@ -15,14 +15,11 @@ def get_memory_usage():
     return round(process.memory_info().rss / (1024 * 1024), 2)
 
 
-def get_cpu_usage():
-    return psutil.cpu_percent()
-
-
 def multiply_matrices(size):
     gc.collect()
     start_memory = get_memory_usage()
-    start_cpu = get_cpu_usage()
+    process = psutil.Process(os.getpid())
+    process.cpu_percent(interval=None)
 
     A = create_matrix(size)
     B = create_matrix(size)
@@ -40,12 +37,9 @@ def multiply_matrices(size):
 
     end_time = time.perf_counter()
 
-    end_memory = get_memory_usage()
-    end_cpu = get_cpu_usage()
-
     execution_time = round((end_time - start_time) * 1000, 2)
-    memory_used = round(end_memory - start_memory, 2)
-    cpu_usage = round(end_cpu - start_cpu, 2)
+    memory_used = abs(round(get_memory_usage() - start_memory, 2))
+    cpu_usage = abs(process.cpu_percent(interval=1))
 
     return {
         'time': f"ET: {execution_time} ms",

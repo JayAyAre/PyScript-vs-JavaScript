@@ -1,29 +1,15 @@
-# main.py
 from pyscript import display, document, PyWorker
 import js  # type: ignore
-import time
 import asyncio
+import time
+import json
 
 worker = None
+worker_time = 0.0
 
 
-def update_results(res, worker_time):
-    display(f"Worker Init Time: {worker_time:.2f} ms",
-            target="pyscript-output")
-    display(
-        f"Avg Request Time: {res.avg_time:.2f} ms", target="pyscript-output")
-    display(f"Total Time: {res.total_time:.2f} ms",
-            target="pyscript-output")
-    display(
-        f"Finished Requests: {len(res.individual_times)}", target="pyscript-output")
-    last = res.results[-1]
-    display(
-        f"Last Result Value: {last.data[0].value}", target="pyscript-output")
-
-
-async def launch_worker(event):
+async def initialize_worker():
     global worker
-    t0 = time.perf_counter()
     if worker is None:
         base = js.window.location.origin + js.window.document.body.dataset.pyPath
         worker = PyWorker(
@@ -32,19 +18,42 @@ async def launch_worker(event):
             config=f"{base.replace('python', 'json')}pyscript-worker.json"
         )
         await worker.ready
-    worker_time = (time.perf_counter() - t0) * 1000  # en ms
 
+
+async def launch_worker(event):
+    global worker, worker_time
     try:
+        t0 = time.perf_counter()
+        await initialize_worker()
+        worker_time = (time.perf_counter() - t0) * 1000
+
         num_requests = int(document.getElementById(
             "num-requests-pyscript").value)
         delay = int(document.getElementById("request-delay-pyscript").value)
+        base_url = js.location.origin
 
-        res = await worker.sync.do_ws_requests(num_requests, delay)
-        print(res.avg_time)
-        update_results(res, worker_time)
-        js.window.hideExecutionLoader()
+        res = await worker.sync.do_analisis(num_requests, delay, base_url)
+
+        display_result(res)
+
     except Exception as e:
-        display(f"Error: {e}", target="pyscript-output")
+        display(f"Error: {str(e)}", target="pyscript-output")
+        print(e)
+
+
+def display_result(result):
+    global worker_time
+    data = json.loads(result)
+
+    display(f"Worker init time: {worker_time:.2f} ms",
+            target="pyscript-output")
+    display(
+        f"Avg request time: {data['average_time_ms']:.2f} ms", target="pyscript-output")
+    display(f"Total ET: {data['total_time_ms']:.2f} ms",
+            target="pyscript-output")
+    display(f"Requests: {data['total_requests']}", target="pyscript-output")
+    display(f"Last value {data['last_value']:.2f}", target="pyscript-output")
+    js.window.hideExecutionLoader()
 
 
 def js_run_py_benchmark(event):

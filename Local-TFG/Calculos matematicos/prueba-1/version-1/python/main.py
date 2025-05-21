@@ -10,7 +10,12 @@ def create_matrix(size):
     return [[random.random() for _ in range(size)] for _ in range(size)]
 
 
+def get_memory_usage():
+    return tracemalloc.get_traced_memory()[1] / (1024 * 1024)
+
+
 def multiply_matrices(size):
+    gc.collect()
     tracemalloc.start()
 
     A = create_matrix(size)
@@ -19,7 +24,6 @@ def multiply_matrices(size):
     C = [[0] * size for _ in range(size)]
 
     start = time.perf_counter()
-    gc.collect()
 
     for i in range(size):
         for j in range(size):
@@ -29,7 +33,7 @@ def multiply_matrices(size):
             C[i][j] = _sum
 
     execution_time = (time.perf_counter() - start) * 1000
-    memory_usage = tracemalloc.get_traced_memory()[1] / (1024 * 1024)
+    memory_usage = abs(get_memory_usage())
     tracemalloc.stop()
 
     results = {

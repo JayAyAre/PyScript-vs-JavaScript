@@ -47,60 +47,67 @@ def delete_from_data_structure(my_list, value):
 def do_operations(size):
     my_list = []
     metrics = {}
-    start_total = time.time()
+    start_total = time.perf_counter()
 
-    # CREATE
     tracemalloc.start()
-    start_op = time.time()
+    gc.collect()
+    start_op = time.perf_counter()
+
     create_data_structure(my_list, size)
-    current_mem = tracemalloc.get_traced_memory()[1] / (1024 * 1024)
-    metrics['CREATE'] = {
-        'time': (time.time() - start_op) * 1000,
-        'memory': current_mem
+
+    current_mem = tracemalloc.get_traced_memory()
+
+    metrics['create'] = {
+        'time': (time.perf_counter() - start_op) * 1000,
+        'memory': current_mem[1] / (1024 * 1024)
     }
+
     tracemalloc.stop()
 
     operations = [
-        ('TRANSFORM', transform_data_structure, (my_list,)),
-        ('SORT',      sort_data_structure,      (my_list,)),
-        ('SEARCH',    search_in_data_structure, (my_list, random.choice(my_list))),
-        ('FILTER',    filter_data_structure,    (my_list, 500)),
-        ('DELETE',    delete_from_data_structure, (my_list, random.choice(my_list)))
+        ('transform', transform_data_structure, (my_list,)),
+        ('sort', sort_data_structure, (my_list,)),
+        ('search', search_in_data_structure, (my_list, random.choice(my_list))),
+        ('filter', filter_data_structure, (my_list, 500)),
+        ('delete', delete_from_data_structure, (my_list, random.choice(my_list)))
     ]
 
-    for name, func, args in operations:
+    for op_name, op_func, args in operations:
         tracemalloc.start()
-        start_op = time.time()
         gc.collect()
-        func(*args)
-        current_mem = tracemalloc.get_traced_memory()[1] / (1024 * 1024)
-        metrics[name] = {
-            'time': (time.time() - start_op) * 1000,
-            'memory': abs(current_mem)
+        start_op = time.perf_counter()
+
+        op_func(*args)
+        current_mem = tracemalloc.get_traced_memory()
+
+        metrics[op_name] = {
+            'time': float((time.perf_counter() - start_op) * 1000),
+            'memory': current_mem[1] / (1024 * 1024)
         }
+
         tracemalloc.stop()
 
-    end_total = time.time()
-    metrics['TOTAL'] = {
-        'time': (end_total - start_total) * 1000,
-        'memory': max(m['memory'] for m in metrics.values())
+    metrics['output'] = {
+        'total_time': float((time.perf_counter() - start_total) * 1000),
+        'memory_peak': max([op['memory'] for op in metrics.values() if 'memory' in op])
     }
+    display_results(metrics)
 
-    display("", target="pyscript-output")
-    output_element = js.document.getElementById("pyscript-output")
 
-    for op, data in metrics.items():
-        if op == 'TOTAL':
-            continue
-        line = f"{op.upper()} - Time av. : {data['time']:.2f} ms | RAM: {data['memory']:.2f} MB"
-        display(line, target="pyscript-output")
-
-    output_element.innerHTML += f"""
-        <br>
-    """
-    line = f"TOTAL - Time: {metrics['TOTAL']['time']:.2f} ms | RAM Peak: {metrics['TOTAL']['memory']:.2f} MB"
-    display(line, target="pyscript-output")
-    js.window.hideExecutionLoader()
+def display_results(results):
+    for op, data in results.items():
+        if op != 'output':
+            display(
+                f"{op.upper()} - Time: {data['time']:.2f} ms | RAM: {data['memory']:.2f} MB",
+                target="pyscript-output"
+            )
+    display(
+        f"Total ET: {results['output']['total_time']:.2f} ms", target="pyscript-output"
+    )
+    display(
+        f"RAM Peak: {results['output']['memory_peak']:.2f} MB", target="pyscript-output"
+    )
+    js.hideExecutionLoader()
 
 
 def run_py_benchmark(event):

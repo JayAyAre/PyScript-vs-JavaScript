@@ -1,111 +1,105 @@
 let worker = null;
-const pendingPromises = new Map();
+let workerTime = 0;
 
-async function initializeWorker() {
-    if (worker) return;
-    worker = new Worker(
-        window.location.origin +
-        window.document.body.dataset.jsPath +
-        "worker.js"
-    );
-    worker.onmessage = (e) => {
-        const { id, type, payload } = e.data;
-        if (type === "ready") {
-            return;
-        }
-        if (pendingPromises.has(id)) {
-            if (type === "result") {
-                pendingPromises.get(id)(payload);
-            } else if (type === "error") {
-                pendingPromises.get(id)(Promise.reject(new Error(payload)));
-            }
-            pendingPromises.delete(id);
-        }
-    };
-    worker.onerror = (err) => {
-        displayError(err);
-    };
-
-    await new Promise((resolve, reject) => {
-        const onReady = (e) => {
-            if (e.data.type === "ready") {
-                resolve();
-            } else if (e.data.type === "error") {
-                reject(new Error(e.data.payload));
-            }
-        };
-        worker.addEventListener("message", onReady, { once: true });
-    });
-}
-
-function updateUI(metrics) {
-    const out = document.getElementById("javascript-output");
-    out.innerHTML += `
-    <div>Worker Time: ${metrics.workerTime.toFixed(2)} ms</div>
-    <div>Generación datos: ${metrics.dataGenTime.toFixed(2)} ms</div>
-    <div>Renderizado: ${metrics.renderTime.toFixed(2)} ms</div>
-    <div>Memory DS: ${metrics.mem} MB</div>
-    <div>Memory by library: 2,6MB + 1.4MB</div>
-    <div>TOTAL: ${metrics.totalTime.toFixed(2)} ms</div>
-  `;
-}
-
-function displayError(error) {
-    document.getElementById(
-        "javascript-output"
-    ).innerHTML = `<div class="error">Error: ${error.message || error}</div>`;
+function initializeWorker() {
+    if (!worker) {
+        worker = new Worker(
+            window.location.origin +
+            window.document.body.dataset.jsPath +
+            "worker.js"
+        );
+    }
 }
 
 async function _runJsBenchmark() {
     try {
-        clearCell("javascript-output");
+        window.clearCell("javascript-output");
         window.showExecutionLoader();
 
-        const startWorkerTime = performance.now();
-        await initializeWorker();
-        const workerTime = performance.now() - startWorkerTime;
+        const start_time_worker = performance.now();
+        initializeWorker();
+        workerTime = performance.now() - start_time_worker;
 
-        const numSeries = parseInt(
-            document.getElementById("num-series-javascript").value,
-            10
-        );
-        const numPoints = parseInt(
+        const num_points = parseInt(
             document.getElementById("num-points-javascript").value,
             10
         );
+        const num_series = parseInt(
+            document.getElementById("num-series-javascript").value,
+            10
+        );
+        const id = `js-${Date.now()}`;
 
-        const resultPromise = new Promise((resolve, reject) => {
-            const id = `bench-${Date.now()}-${Math.random()}`;
-            pendingPromises.set(id, (res) => {
-                res.metrics.workerTime = workerTime;
-                resolve(res);
-            });
+        const resultJson = await new Promise((resolve, reject) => {
+            function onMessage(e) {
+                if (e.data.id !== id) return;
+                worker.removeEventListener("message", onMessage);
+
+                if (e.data.error) {
+                    reject(new Error(e.data.error));
+                }
+                else if (e.data.payload !== undefined) {
+                    const payload = {
+                        metrics: e.data.payload.metrics,
+                        data: e.data.payload.graphData.traces,
+                        layout: e.data.payload.graphData.layout
+                    };
+                    resolve(JSON.stringify(payload));
+                }
+                else {
+                    reject(new Error("Worker dont return results"));
+                }
+            }
+
+            worker.addEventListener("message", onMessage);
             worker.postMessage({
                 id,
-                type: "runBenchmark",
-                payload: { numSeries, numPoints },
+                type: "do_analisis",
+                num_points,
+                num_series,
             });
         });
 
-        const { metrics, graphData } = await resultPromise;
-        const graphDataJSON = JSON.stringify({
-            data: graphData.traces.map(trace => ({
-                ...trace,
-                x: Array.from(trace.x),
-                y: Array.from(trace.y),
-            })),
-            layout: graphData.layout
-        });
+        const result = JSON.parse(resultJson);
+        displayResult(result.metrics);
 
-        window.displayPlotFromJSON(graphDataJSON, 'javascript-output');
-        updateUI(metrics);
-        window.startFPSMeasurement(3000, "javascript-output")
+        window.displayPlotFromJSON(resultJson, 'javascript-output');
+        window.startFPSMeasurement(3000, "javascript-output");
 
     } catch (err) {
-        displayError(err);
+        console.error("Error:", err);
     } finally {
         window.hideExecutionLoader();
     }
+}
+
+function createDiv() {
+    const div = document.createElement("div");
+    return div;
+}
+
+function displayResult(r) {
+    const output = document.getElementById("javascript-output");
+
+    const workerDiv = createDiv();
+    workerDiv.textContent = `Worker init time: ${workerTime.toFixed(2)} ms`;
+    output.appendChild(workerDiv);
+
+    const avgDataGenDiv = createDiv();
+    avgDataGenDiv.textContent = `Data generation: ${r.dataGenTime.toFixed(2)} ms`;
+    output.appendChild(avgDataGenDiv);
+
+    const avgRenderDiv = createDiv();
+    avgRenderDiv.textContent = `Rendering: ${r.renderTime.toFixed(2)} ms`;
+    output.appendChild(avgRenderDiv);
+
+    const memoryDiv = createDiv();
+    memoryDiv.textContent = `Memory: ${r.mem.toFixed(2)} MB`;
+    output.appendChild(memoryDiv);
+
+    const totalTimeDiv = createDiv();
+    totalTimeDiv.textContent = `Total ET: ${r.totalTime.toFixed(2)} ms`;
+    output.appendChild(totalTimeDiv);
 }
 
 window.runJsBenchmark = _runJsBenchmark;

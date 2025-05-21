@@ -65,7 +65,7 @@
                         outputDiv.appendChild(cpuDiv);
 
                         let memoryDiv = document.createElement('div');
-                        memoryDiv.textContent = `RAM: ${data.memory_usage} MB`;
+                        memoryDiv.textContent = `RAM: ${data.memory_usage.toFixed(2)} MB`;
                         outputDiv.appendChild(memoryDiv);
                     })
                     .catch((error) => console.error('Error:', error));

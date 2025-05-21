@@ -3,9 +3,12 @@ import numpy as np
 from pyscript import sync
 import json
 
+seed = int(time.time() * 1000) % 2**32
+rng = np.random.default_rng(seed)
+
 
 def create_data_structure(size):
-    return np.random.randint(0, 1000, size=size, dtype=np.int32)
+    return rng.integers(0, 1000, size=size, dtype=np.int32)
 
 
 def calculate_sum(data):
@@ -40,7 +43,7 @@ def do_statistical_analysis(size):
         total_start = time.perf_counter()
 
         start = time.perf_counter()
-        data = np.random.randint(0, 1000, size=size, dtype=np.int32)
+        data = rng.integers(0, 1000, size=size, dtype=np.int32)
         create_time = (time.perf_counter() - start) * 1000
         memory_usage = data.nbytes / (1024 ** 2)
         metrics['create'] = {'time': create_time, 'memory': memory_usage}

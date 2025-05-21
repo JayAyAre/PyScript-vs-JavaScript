@@ -1,5 +1,5 @@
 import js  # type: ignore
-from pyscript import display, PyWorker, document
+from pyscript import display, PyWorker
 import json
 import time
 import asyncio
@@ -9,16 +9,15 @@ workers_ready = False
 
 
 async def initialize_worker():
-    global workers
+    global workers, workers_ready
 
     try:
-        num_workers = int(js.document.querySelector(
-            "#parallel-workers-pyscript").value) or 1
-        if num_workers < 1:
-            num_workers = 1
+        num_workers = max(int(js.document.querySelector(
+            "#parallel-workers-pyscript").value) or 1, 1)
 
         if len(workers) > num_workers:
             workers = workers[:num_workers]
+
         elif len(workers) < num_workers:
             to_create = num_workers - len(workers)
             origin = js.window.location.origin
@@ -30,17 +29,17 @@ async def initialize_worker():
                     type="pyodide",
                     config=f"{origin}{py_path.replace('python', 'json')}pyscript-worker.json"
                 )
-            await worker.ready
-            workers.append(worker)
+                await worker.ready
+                workers.append(worker)
+        workers_ready = True
     except Exception as e:
-        display(f"Error al crear workers: {e}", target="pyscript-output")
+        display(f"Error creating workers: {e}", target="pyscript-output")
 
 asyncio.create_task(initialize_worker())
 
 
 async def run_py_benchmark(event):
     global workers
-    await initialize_worker()
     try:
         num_executions = int(js.document.querySelector(
             "#num-executions-pyscript").value)
@@ -54,10 +53,9 @@ async def run_py_benchmark(event):
         tasks = []
         for i in range(num_executions):
             worker = workers[i % num_workers]
-            tasks.append(worker.sync.do_statistical_analysis(10_000_000))
+            tasks.append(worker.sync.do_statistical_analysis(100_000))
 
         results_list = await asyncio.gather(*tasks)
-
         accumulated = {
             'create': {'time': 0.0, 'memory': 0.0},
             'sum': {'time': 0.0, 'memory': 0.0},
@@ -83,26 +81,28 @@ async def run_py_benchmark(event):
             'total_time': (time.perf_counter() - start_time) * 1000
         }
 
-        js.window.hideExecutionLoader()
-        update_ui(results)
+        display_result(results)
 
     except Exception as e:
         display(f"Error: {str(e)}", target="pyscript-output")
 
 
-def update_ui(results):
+def display_result(results):
     for operation in ['create', 'sum', 'mean', 'std']:
         display(
-            f"{operation.upper()} - Time: {results[operation]['time']:.2f} ms | RAM: {results[operation]['memory']:.2f} MB", target=f"pyscript-output")
+            f"{operation.upper()} - Time: {results[operation]['time']:.2f} ms | RAM: {results[operation]['memory']: .2f} MB",
+            target="pyscript-output"
+        )
 
     display(
-        f"Av. Time: {results['total']['average_per_execution']:.2f} ms",
+        f"Avg request time: {results['total']['average_per_execution']:.2f} ms",
         target="pyscript-output"
     )
     display(
-        f"TOTAL - Time: {results['total']['total_time']:.2f} ms",
+        f"Total ET: {results['total']['total_time']:.2f} ms",
         target="pyscript-output"
     )
+    js.hideExecutionLoader()
 
 
 def js_run_py_benchmark(event):

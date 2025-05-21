@@ -1,6 +1,7 @@
 let worker = null;
 let jsTimer = null;
 let jsStartTime = 0;
+let workerTime = 0;
 
 function startJsTimer() {
     jsStartTime = performance.now();
@@ -69,7 +70,7 @@ async function runJsBenchmark() {
         });
 
         const result = JSON.parse(resultJson);
-        displayResult(result, workerTime);
+        displayResult(result);
     } catch (err) {
         console.error("Benchmark error:", err);
     } finally {
@@ -82,7 +83,7 @@ function createDiv() {
     return div;
 }
 
-function displayResult(r, workerTime) {
+function displayResult(r) {
     const out = document.getElementById("javascript-output");
 
     const workerDiv = createDiv();

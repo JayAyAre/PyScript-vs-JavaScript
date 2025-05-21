@@ -1,95 +1,105 @@
-# worker.py
 import js  # type: ignore
-from pyscript import sync, fetch
+from pyscript import sync, fetch, display
 import asyncio
-import uuid
 import time
 import json
+import uuid
 
 
-async def do_ws_requests(num_requests, delay):
-    ws = None
-    pending = {}
-    individual_times = []
-    results = []
-    start_time = time.perf_counter()
-
+async def do_analisis(num_requests, delay, base_url):
     try:
-        api_url = js.location.origin + "/api/4.4.2/socket"
-        resp = await fetch(api_url)
+        rest_url = f"{base_url}/api/4.2.1/socket?delay={delay}"
+        resp = await fetch(rest_url)
         if not resp.ok:
             text = await resp.text()
             raise RuntimeError(
-                f"GET {api_url} devolvió {resp.status}:\n{text}")
+                f"GET {rest_url} devolvió {resp.status}:\n{text}")
+        manifest = json.loads(await resp.text())
+        ws_url = f"ws://localhost:5001{manifest['wsUrl']}"
 
-        text = await resp.text()
-        data = json.loads(text)
-        ws_url = f"ws://localhost:5001{data['wsUrl']}"
+        t0 = time.perf_counter()
+        ws_result = await websocket_benchmark(num_requests, delay, ws_url)
+        total_ms = (time.perf_counter() - t0) * 1000
 
-        ws = js.WebSocket.new(ws_url)
+        individual_times = ws_result["individual_times"]
+        results = ws_result["results"]
 
-        connection_timeout = 5
-        start = time.perf_counter()
-        while ws.readyState not in [1, 3]:
-            if time.perf_counter() - start > connection_timeout:
-                raise TimeoutError("Connection timeout")
-            await asyncio.sleep(0.01)
+        avg_ms = (
+            sum(individual_times) / len(individual_times)
+            if individual_times else 0
+        )
 
-        if ws.readyState != 1:
-            raise ConnectionError("WebSocket connection failed")
+        last_value = None
+        for r in reversed(results):
+            if r and "data" in r and isinstance(r["data"], list):
+                last_value = r["data"][-1]["value"]
+                break
 
-        def on_message(event):
-            try:
-                data = json.loads(event.data)
-                req_id = data.get('id')
-                if req_id and req_id in pending:
-                    pending[req_id]['future'].set_result(data)
-                    del pending[req_id]
-            except Exception as e:
-                print(f"Error processing message: {e}")
-
-        ws.onmessage = on_message
-
-        send_tasks = []
-        for _ in range(num_requests):
-            req_id = str(uuid.uuid4())
-            future = asyncio.Future()
-            t0 = time.perf_counter()
-            pending[req_id] = {
-                'sent': time.perf_counter(),
-                'future': future
-            }
-
-            payload = json.dumps({
-                "delay": delay,
-                "id": req_id
-            })
-            ws.send(payload)
-            send_tasks.append(future)
-
-        timeout = delay/1000 + 2
-        for future in asyncio.as_completed(send_tasks, timeout=timeout * num_requests):
-            try:
-                result = await future
-                elapsed = (time.perf_counter() - t0) * 1000
-                individual_times.append(elapsed)
-                results.append(result)
-            except asyncio.TimeoutError:
-                continue
-
-        total_time = (time.perf_counter() - start_time) * 1000
-        avg_time = sum(individual_times) / \
-            len(individual_times) if individual_times else 0
-
-        return {
-            "individual_times": individual_times,
-            "avg_time": avg_time,
-            "total_time": total_time,
-            "results": results,
+        payload = {
+            "average_time_ms": avg_ms,
+            "total_time_ms":   total_ms,
+            "total_requests":  num_requests,
+            "last_value":      last_value
         }
+        return json.dumps(payload)
 
-    finally:
-        if ws and ws.readyState == 1:
-            ws.close()
+    except Exception as e:
+        display(f"Error on worker: {e}", target="pyscript-output")
 
-sync.do_ws_requests = do_ws_requests
+
+async def websocket_benchmark(num_requests: int, delay: int, ws_url: str):
+    socket = js.WebSocket.new(ws_url)
+    while socket.readyState != js.WebSocket.OPEN:
+        await asyncio.sleep(0.01)
+
+    pending = {}
+    individual_times = []
+    results = []
+
+    def on_message(event):
+        try:
+            data = json.loads(event.data)
+            req_id = data.get("id")
+            if req_id in pending:
+                sent = pending[req_id]["sent"]
+                elapsed = (time.perf_counter() - sent) * 1000
+                individual_times.append(elapsed)
+                pending[req_id]["future"].set_result(data)
+                del pending[req_id]
+        except Exception as err:
+            print(f"WS message error: {err}")
+
+    socket.onmessage = on_message
+
+    futures = []
+    for _ in range(num_requests):
+        req_id = str(uuid.uuid4())
+        fut = asyncio.get_event_loop().create_future()
+        pending[req_id] = {"future": fut, "sent": time.perf_counter()}
+        socket.send(json.dumps({"id": req_id, "delay": delay}))
+        futures.append((req_id, fut))
+
+    timeout = delay / 1000 + 2
+
+    async def wait_fut(req_id, fut):
+        try:
+            return await asyncio.wait_for(fut, timeout=timeout)
+        except asyncio.TimeoutError:
+            return None
+
+    results_data = await asyncio.gather(*(wait_fut(req_id, fut) for req_id, fut in futures))
+
+    for data in results_data:
+        if data is not None:
+            results.append(data)
+
+    if socket.readyState == js.WebSocket.OPEN:
+        socket.close()
+
+    return {
+        "individual_times": individual_times,
+        "results":          results
+    }
+
+
+sync.do_analisis = do_analisis

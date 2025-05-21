@@ -98,12 +98,11 @@
             const container = document.getElementById(id);
             container.innerHTML = "";
         }
-    </script>
-    <script>
+        
         function displayPlotFromJSON(jsonStr, elementId) {
             try {
                 const graphData = JSON.parse(jsonStr);
-                const data = graphData.traces;  
+                const data = graphData.traces;
                 const layout = graphData.layout || {};
                 const containerDiv = document.getElementById(elementId);
                 if (!containerDiv) return;
@@ -122,7 +121,7 @@
                 if (el) el.textContent = 'Error displaying Plotly graph';
             }
         }
-        </script>
+    </script>
 <body>
     <h1>Generation of time series graphs (Plotly.py/Plotly.js)</h1>
 

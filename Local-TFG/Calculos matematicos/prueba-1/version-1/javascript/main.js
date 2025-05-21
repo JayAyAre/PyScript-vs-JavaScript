@@ -61,7 +61,7 @@ function multiplyMatrices(size) {
 
 function getMemoryUsageJS() {
     if (performance.memory) {
-        return performance.memory.usedJSHeapSize / (1024 * 1024);
+        return Math.max(performance.memory.usedJSHeapSize / (1024 * 1024), 0);
     }
     return -1;
 }

@@ -20,7 +20,6 @@ export function displayPlotFromJSON(jsonStr, elementId) {
         let container = document.createElement('div');
         container.id = `container-graph-${elementId}`;
         elementDiv.appendChild(container);
-        console.log(window.Plotly);
         window.Plotly.newPlot(
             container.id,
             graphData.data,

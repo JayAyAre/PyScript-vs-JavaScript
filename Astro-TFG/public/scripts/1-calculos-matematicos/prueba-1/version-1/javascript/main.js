@@ -38,11 +38,10 @@ function multiplyMatrices(size) {
 
 function getMemoryUsageJS() {
     if (performance.memory) {
-        return performance.memory.usedJSHeapSize / (1024 * 1024);
+        return Math.max(performance.memory.usedJSHeapSize / (1024 * 1024), 0);
     }
     return -1;
 }
-
 
 function displayResults(results) {
     const output = document.getElementById("javascript-output");
@@ -55,13 +54,13 @@ function displayResults(results) {
     if (results.memory_usage !== -1) {
         memoryDiv.textContent = `RAM: ${results.memory_usage.toFixed(2)} MB`;
     } else {
-        memoryDiv.textContent = `RAM unsupported measurement in this browser.`;
+        memoryDiv.textContent = `RAM measurement unsupported in this browser.`;
     }
     output.appendChild(memoryDiv);
 }
 
 window.runJsBenchmark = function () {
-    clearCell("javascript-output");
+    window.clearCell("javascript-output");
     window.showExecutionLoader();
 
     requestAnimationFrame(() => {
@@ -71,5 +70,4 @@ window.runJsBenchmark = function () {
             window.hideExecutionLoader();
         }, 0);
     });
-
-}
+};

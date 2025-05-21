@@ -3,12 +3,12 @@ import osu from 'node-os-utils';
 const cpu = osu.cpu;
 
 
-function getMemoryUsage() {
-    return process.memoryUsage().heapUsed / (1024 * 1024);
+function getMemoryUsageJS() {
+    return Math.max(process.memoryUsage().heapUsed / (1024 * 1024), 0);
 }
 
 async function getCpuUsage() {
-    return await cpu.usage();
+    return Math.max(await cpu.usage(), 0);
 }
 
 function is_prime(size) {
@@ -46,7 +46,7 @@ async function primes_to_n(size) {
     }
 
     const executionTime = +(performance.now() - startTime).toFixed(2);
-    const memoryUsage = +((getMemoryUsage() - startMemory)).toFixed(2);
+    const memoryUsage = +getMemoryUsageJS().toFixed(2);
     const endCpu = +(await getCpuUsage()).toFixed(2);
 
     return {

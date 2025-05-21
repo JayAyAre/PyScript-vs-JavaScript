@@ -24,12 +24,12 @@ def get_memory_usage():
 
 
 def primes_to_n(n):
+    gc.collect()
     tracemalloc.start()
 
     primes = []
 
     start = time.perf_counter()
-    gc.collect()
 
     if n > 2:
         primes.append(2)
@@ -39,7 +39,7 @@ def primes_to_n(n):
             primes.append(i)
 
     execution_time = (time.perf_counter() - start) * 1000
-    memory_usage = get_memory_usage()
+    memory_usage = abs(get_memory_usage())
     tracemalloc.stop()
 
     results = {

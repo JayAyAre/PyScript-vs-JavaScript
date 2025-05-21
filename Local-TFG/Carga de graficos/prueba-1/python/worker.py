@@ -6,6 +6,7 @@ import sys
 import matplotlib.pyplot as plt
 import io
 import base64
+import gc
 from pyscript import sync, display
 import js  # type: ignore
 
@@ -13,8 +14,9 @@ GRAPH_SIZE = 100_000
 FIG_W_PIX = 800
 FIG_H_PIX = 600
 DPI = 100
-PADDING = 50
 TICKS = 6
+seed = int(time.time() * 1000) % 2**32
+rng = np.random.default_rng(seed)
 
 
 def mean(arr):
@@ -26,20 +28,23 @@ def png_to_base64(fig):
     fig.savefig(buf, format="png", dpi=DPI, pad_inches=0.5)
     buf.seek(0)
     b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+
     try:
         plt.close(fig)
     except Exception as e:
-        print(f"Error closing figure: {e}")
+        print(f"Error releasing figure memory: {e}")
     return b64
 
 
 def graph_rendering_benchmark(size):
     try:
         t0 = time.perf_counter()
-        coords = np.random.default_rng().random((size, 2))
+        coords = rng.random((size, 2))
         data_gen_time = (time.perf_counter() - t0) * 1000
         mem_mb = (
-            coords.nbytes + sys.getsizeof(coords[:, 0]) + sys.getsizeof(coords[:, 1])) / (1024**2)
+            coords.nbytes +
+            sys.getsizeof(coords[:, 0]) + sys.getsizeof(coords[:, 1])
+        ) / (1024**2)
 
         t1 = time.perf_counter()
         px = 1 / plt.rcParams['figure.dpi']
@@ -95,13 +100,13 @@ def do_analisis():
         last_img = runs[-1]["image_base64"] if runs else ""
 
         result = {
-            "data_gen_time":   avg_data,
-            "render_time":     avg_rend,
-            "memory":          avg_mem,
+            "data_gen_time": avg_data,
+            "render_time": avg_rend,
+            "memory": avg_mem,
             "average_time_ms": avg_tot,
-            "total_time_ms":   total_time,
-            "num_executions":  num_exec,
-            "image_base64":    last_img
+            "total_time_ms": total_time,
+            "num_executions": num_exec,
+            "image_base64": last_img
         }
         return json.dumps(result)
 

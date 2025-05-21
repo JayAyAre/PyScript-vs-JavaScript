@@ -61,25 +61,34 @@ function doStatisticalAnalysis(size) {
     }
 
     metrics['output'] = {
-        totalTime: performance.now() - startTotal,
-        memoryPeak: maxMemory
+        total_time: performance.now() - startTotal,
+        memory_peak: maxMemory
     };
 
-    const outputElement = document.getElementById("javascript-output");
-    if (!outputElement) return;
-    outputElement.innerHTML = "";
+    displayResults(metrics);
+}
 
+function displayResults(results) {
+    const output = document.getElementById("javascript-output");
 
-    for (const [op, data] of Object.entries(metrics)) {
-        if (op === 'output') continue;
-        const line = `${op.toUpperCase()} - Time av. : ${data.time.toFixed(2)} ms | RAM: ${data.memory.toFixed(2)} MB`;
-        outputElement.innerHTML += line + "<br>";
+    for (const [op, data] of Object.entries(results)) {
+        if (op !== 'output') {
+            const timeDiv = document.createElement("div");
+            timeDiv.textContent =
+                `${op.toUpperCase()} - Time: ${data.time.toFixed(2)} ms | RAM: ${data.memory.toFixed(2)} MB`;
+            output.appendChild(timeDiv);
+        }
     }
 
-    outputElement.innerHTML += "<br>";
-    const tot = metrics['output'];
-    const totalLine = `TOTAL - Time: ${tot.totalTime.toFixed(2)} ms | RAM Peak: ${tot.memoryPeak.toFixed(2)} MB`;
-    outputElement.innerHTML += totalLine;
+    const timeTotalDiv = document.createElement("div");
+    timeTotalDiv.textContent =
+        `Total ET: ${results.output.total_time.toFixed(2)} ms`;
+    output.appendChild(timeTotalDiv);
+
+    const memoryDiv = document.createElement("div");
+    memoryDiv.textContent =
+        `RAM Peak: ${results.output.memory_peak.toFixed(2)} MB`;
+    output.appendChild(memoryDiv);
 }
 
 window.runJsBenchmark = function () {

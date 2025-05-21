@@ -46,8 +46,9 @@ function initializeWorkers() {
 }
 const pendingPromises = new Map();
 
-async function runJSBenchmark(event) {
+async function runJsBenchmark(event) {
     try {
+        window.clearCell("javascript-output");
         const numExecutions =
             parseInt(
                 document.getElementById("num-executions-javascript").value
@@ -58,7 +59,6 @@ async function runJSBenchmark(event) {
             ) || 1;
 
         await initializeWorkers();
-        clearCell("javascript");
 
         const simulationStartTime = performance.now();
         const promises = [];
@@ -68,7 +68,7 @@ async function runJSBenchmark(event) {
             const id = `${i}-${Date.now()}`;
 
             promises.push(
-                new Promise((resolve, reject) => {
+                new Promise((resolve) => {
                     pendingPromises.set(id, resolve);
                     worker.postMessage({ id, size: 10_000_000 });
                 })
@@ -113,37 +113,37 @@ async function runJSBenchmark(event) {
 }
 
 function displayResults(results) {
-    let out = document.getElementById("javascript-output");
-    for (const op of ['create', 'sum', 'mean', 'std']) {
-        const data = results[op];
-        const time = Math.round(data.time * 100) / 100;
-        const mem = Math.round(data.memory * 100) / 100;
-        const line = `${op.toUpperCase()} - Time: ${time.toFixed(2)} ms | RAM: ${mem.toFixed(2)} MB`;
+    const output = document.getElementById("javascript-output");
 
-        const div = document.createElement('div');
-        div.textContent = line;
-        out.appendChild(div);
+    for (const [op, data] of Object.entries(results)) {
+        if (op !== 'total') {
+            const div = document.createElement("div");
+            div.textContent =
+                `${op.toUpperCase()} - Time: ${data.time.toFixed(2)} ms | RAM: ${data.memory.toFixed(2)} MB`;
+            output.appendChild(div);
+        }
     }
 
-    const avg = Math.round(results.total.average_per_execution * 100) / 100;
-    const avgDiv = document.createElement('div');
-    avgDiv.textContent = `Av. Time: ${avg.toFixed(2)} ms`;
-    out.appendChild(avgDiv);
+    const avgTimeDiv = document.createElement("div");
+    avgTimeDiv.textContent =
+        `Avg request time: ${results.total.average_per_execution.toFixed(2)} ms`;
+    output.appendChild(avgTimeDiv);
 
-    const tot = Math.round(results.total.total_time * 100) / 100;
-    const totDiv = document.createElement('div');
-    totDiv.textContent = `TOTAL - Time: ${tot.toFixed(2)} ms`;
-    out.appendChild(totDiv);
+    const timeTotalDiv = document.createElement("div");
+    timeTotalDiv.textContent =
+        `Total ET: ${results.total.total_time.toFixed(2)} ms`;
+    output.appendChild(timeTotalDiv);
 }
 
+
 window.runJsBenchmark = async function () {
-    clearCell("javascript-output");
+    window.clearCell("javascript-output");
     window.showExecutionLoader();
 
     await new Promise(requestAnimationFrame);
 
     try {
-        await runJSBenchmark();
+        await runJsBenchmark();
     } finally {
         window.hideExecutionLoader();
     }

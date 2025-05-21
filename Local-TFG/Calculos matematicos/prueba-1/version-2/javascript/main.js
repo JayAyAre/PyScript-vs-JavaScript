@@ -30,8 +30,8 @@ function runNodeBenchmark() {
 }
 
 async function multiplyMatrices(size) {
-    let A = tf.randomNormal([size, size]);
-    let B = tf.randomNormal([size, size]);
+    let A = tf.randomUniform([size, size], 0.0, 1.0);
+    let B = tf.randomUniform([size, size], 0.0, 1.0);
 
     let start = performance.now();
 
@@ -50,7 +50,7 @@ async function multiplyMatrices(size) {
 
 function getMemoryUsageJS() {
     if (performance.memory) {
-        return performance.memory.usedJSHeapSize / (1024 * 1024);
+        return Math.max(performance.memory.usedJSHeapSize / (1024 * 1024), 0);
     }
     return -1;
 }

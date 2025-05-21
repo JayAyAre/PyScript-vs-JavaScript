@@ -4,7 +4,7 @@ import time
 
 
 async def do_requests(worker_time, num_requests, delay, base_url):
-    urls = [f"{base_url}/api/4.4/{delay}.ts" for _ in range(num_requests)]
+    urls = [f"{base_url}/api/4.1.1/{delay}.ts" for _ in range(num_requests)]
     start_time = time.perf_counter()
     individual_times = []
 
@@ -28,10 +28,9 @@ async def do_requests(worker_time, num_requests, delay, base_url):
 
     return {
         "worker_time": worker_time,
-        "individual_times": individual_times,
         "total_time": total_time,
         "avg_time": avg_time,
-        "results": results,
+        "last_value": results[-1]["data"][-1]["value"],
     }
 
 

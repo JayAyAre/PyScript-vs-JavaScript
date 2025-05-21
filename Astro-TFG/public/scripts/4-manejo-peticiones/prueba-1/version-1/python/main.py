@@ -1,15 +1,14 @@
-# public/scripts/main.py
 from pyscript import display, document, PyWorker
 import js  # type: ignore
 import asyncio
 import time
 
 worker = None
+worker_time = 0.0
 
 
-async def launch_worker(event):
+async def initialize_worker():
     global worker
-    t0 = time.perf_counter()
     if worker is None:
         base = js.window.location.origin + js.window.document.body.dataset.pyPath
         worker = PyWorker(
@@ -19,8 +18,12 @@ async def launch_worker(event):
         )
         await worker.ready
 
-    try:
 
+async def launch_worker(event):
+    global worker, worker_time
+    try:
+        t0 = time.perf_counter()
+        await initialize_worker()
         worker_time = (time.perf_counter() - t0) * 1000
 
         num_requests = int(document.getElementById(
@@ -29,24 +32,27 @@ async def launch_worker(event):
         base_url = js.location.origin
 
         res = await worker.sync.do_requests(worker_time, num_requests, delay, base_url)
-        display(f"Worker Time: {res.worker_time:.2f} ms",
-                target="pyscript-output")
-        display(
-            f"Avg Request Time: {res.avg_time:.2f} ms", target="pyscript-output")
-        display(f"Total Time: {res.total_time:.2f} ms",
-                target="pyscript-output")
-        display(
-            f"Finished Requests: {len(res.results)}", target="pyscript-output")
 
-        results = list(res.results)
+        display_result(res, num_requests)
 
-        last_result = results[-1]
-        display(
-            f"Last Result: {last_result.data[0].value}", target="pyscript-output")
-        js.window.hideExecutionLoader()
     except Exception as e:
         display(f"Error: {str(e)}", target="pyscript-output")
         print(e)
+
+
+def display_result(result, num_requests):
+    global worker_time
+    display(
+        f"Worker init time: {worker_time:.2f} ms", target="pyscript-output")
+    display(
+        f"Avg request time: {result.avg_time:.2f} ms", target="pyscript-output")
+    display(
+        f"Total ET: {result.total_time:.2f} ms", target="pyscript-output")
+    display(
+        f"Requests: {num_requests}", target="pyscript-output")
+    display(f"Last value {result.last_value:.2f}",
+            target="pyscript-output")
+    js.window.hideExecutionLoader()
 
 
 def js_run_py_benchmark(event):

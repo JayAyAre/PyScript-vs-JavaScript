@@ -1,16 +1,15 @@
 import time
 import json
 import asyncio
-from pyscript import PyWorker, display, document
+from pyscript import PyWorker, display
 import js  # type: ignore
 
 worker = None
+worker_time = 0.0
 
 
-async def launch_worker(event):
+async def initialize_worker():
     global worker
-    start_worker_time = time.perf_counter()
-
     if worker is None:
         base = js.window.location.origin + js.window.document.body.dataset.pyPath
         worker = PyWorker(
@@ -20,17 +19,10 @@ async def launch_worker(event):
         )
         await worker.ready
 
-    worker_time = (time.perf_counter() - start_worker_time) * 1000
-
-    result_json = await worker.sync.do_hash(worker_time)
-    result = json.loads(result_json)
-
-    display_result(result, worker_time)
-
 
 async def launch_worker(event):
     try:
-        global worker
+        global worker, worker_time
         start_worker_time = time.perf_counter()
 
         if worker is None:
@@ -43,16 +35,16 @@ async def launch_worker(event):
             await worker.ready
 
         worker_time = (time.perf_counter() - start_worker_time) * 1000
-        json_str = await worker.sync.do_hash(worker_time)
+        json_str = await worker.sync.do_analisis()
         result = json.loads(json_str)
 
-        display_result(result, worker_time)
-        js.window.hideExecutionLoader()
+        display_result(result)
     except Exception as e:
         display(f"Error: {e}", target="pyscript-output")
 
 
-def display_result(r, worker_time):
+def display_result(r):
+    global worker_time
     display(f"Worker init time: {worker_time:.2f} ms",
             target="pyscript-output")
     display(
@@ -74,6 +66,7 @@ def display_result(r, worker_time):
         f"Total crypto time: {r['crypto_total_ms']:.2f} ms", target="pyscript-output")
     display(
         f"Overall total time: {r['overall_time_ms']:.2f} ms", target="pyscript-output")
+    js.window.hideExecutionLoader()
 
 
 def js_run_py_benchmark(event):

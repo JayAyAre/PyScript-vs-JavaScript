@@ -8,27 +8,24 @@ const app = express();
 
 app.use(cors());
 
-function getMemoryUsage() {
-    return process.memoryUsage().heapUsed / (1024 * 1024);
+function getMemoryUsageJS() {
+    return Math.max(process.memoryUsage().heapUsed / (1024 * 1024), 0);
 }
 
 async function getCpuUsage() {
-    return await cpu.usage();
+    return Math.max(await cpu.usage(), 0);
 }
 
-
 async function multiplyMatrices(size) {
-    const startMemory = getMemoryUsage();
-
-    let A = tf.randomNormal([size, size]);
-    let B = tf.randomNormal([size, size]);
+    let A = tf.randomUniform([size, size], 0.0, 1.0);
+    let B = tf.randomUniform([size, size], 0.0, 1.0);
 
     const startTime = performance.now();
 
     let C = tf.matMul(A, B);
 
     const executionTime = +(performance.now() - startTime).toFixed(2);
-    const memoryUsage = +((getMemoryUsage() - startMemory)).toFixed(2);
+    const memoryUsage = +getMemoryUsageJS().toFixed(2);
     const endCpu = +(await getCpuUsage()).toFixed(2);
 
     return {
@@ -38,6 +35,7 @@ async function multiplyMatrices(size) {
         memory_usage: `RAM: ${memoryUsage} MB`
     };
 }
+
 (async () => {
     let result = {
         matrices500: await multiplyMatrices(500),

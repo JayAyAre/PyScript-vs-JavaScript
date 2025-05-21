@@ -1,11 +1,9 @@
 self.addEventListener("message", async (event) => {
     const data = event.data;
 
-    if (data.type === "js_run_js_benchmark") {
+    if (data.type === "do_analisis") {
         try {
-            const { id, repetitions, fileSizeMb, workerTime } = data;
-
-            await new Promise((r) => setTimeout(r, 100));
+            const { id, repetitions, fileSizeMb } = data;
 
             const fileSizeBytes = Math.floor(fileSizeMb * 1024 * 1024);
             const buffer = getRandomBuffer(fileSizeBytes);
@@ -13,8 +11,6 @@ self.addEventListener("message", async (event) => {
             let totalHashTime = 0;
             let totalVerifyTime = 0;
             let lastDigest = "";
-
-            const encoder = new TextEncoder();
 
             const startBenchmark = performance.now();
 

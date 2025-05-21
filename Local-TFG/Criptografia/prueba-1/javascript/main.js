@@ -101,11 +101,11 @@ function displayResult(r, workerTime) {
     output.appendChild(repetitionsDiv);
 
     const hashDiv = createDiv();
-    hashDiv.textContent = `Avg hash time: ${r.hash_avg_time_ms.toFixed(2)} %`;
+    hashDiv.textContent = `Avg hash time: ${r.hash_avg_time_ms.toFixed(2)} ms`;
     output.appendChild(hashDiv);
 
     const verifyDiv = createDiv();
-    verifyDiv.textContent = `Avg verify time: ${r.verify_avg_time_ms.toFixed(2)} MB`;
+    verifyDiv.textContent = `Avg verify time: ${r.verify_avg_time_ms.toFixed(2)} ms`;
     output.appendChild(verifyDiv);
 
     const lastDigestDiv = createDiv();

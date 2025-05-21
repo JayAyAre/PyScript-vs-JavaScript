@@ -1,42 +1,17 @@
 let worker = null;
-const pendingPromises = new Map();
+let workerTime = 0;
 
 function initializeWorker() {
-    return new Promise((resolve) => {
-        if (worker) {
-            resolve();
-            return;
-        }
-
-        const workerPath = window.location.origin +
+    if (!worker) {
+        worker = new Worker(
+            window.location.origin +
             window.document.body.dataset.jsPath +
-            "worker.js";
-
-        worker = new Worker(workerPath);
-
-        worker.onmessage = (event) => {
-            const { id, results, error, metrics } = event.data;
-
-            if (error && pendingPromises.has(id)) {
-                pendingPromises.get(id).reject(error);
-                pendingPromises.delete(id);
-                return;
-            }
-
-            if (pendingPromises.has(id)) {
-                pendingPromises.get(id).resolve({
-                    results,
-                    metrics
-                });
-                pendingPromises.delete(id);
-            }
-        };
-
-        resolve();
-    });
+            "worker.js"
+        );
+    }
 }
 
-async function javascriptBenchmark() {
+async function _runJsBenchmark() {
     try {
         window.clearCell("javascript-output");
         window.showExecutionLoader();
@@ -55,66 +30,68 @@ async function javascriptBenchmark() {
             10
         );
 
-        const requestId = crypto.randomUUID();
+        const id = `js-${Date.now()}`;
 
-        const benchmarkPromise = new Promise((resolve, reject) => {
-            pendingPromises.set(requestId, { resolve, reject });
+        let apiUrl = location.origin + "/api/4.2.1/socket";
+
+        const resultJson = await new Promise((resolve, reject) => {
+            function onMessage(e) {
+                if (e.data.id !== id) return;
+                worker.removeEventListener("message", onMessage);
+                if (e.data.error) {
+                    reject(new Error(e.data.error));
+                } else if (e.data.json !== undefined) {
+                    resolve(e.data.json);
+                } else {
+                    reject(new Error("Worker dont return results"));
+                }
+            }
+            worker.addEventListener("message", onMessage);
+            worker.postMessage({
+                id: id,
+                num_requests: numRequests,
+                delay: delay,
+                api_url: apiUrl,
+            });
         });
 
-        let apiUrl = location.origin + "/api/4.4.2/socket";
-
-        worker.postMessage({
-            id: requestId,
-            num_requests: numRequests,
-            delay: delay,
-            api_url: apiUrl,
-        });
-
-        const { results, metrics } = await benchmarkPromise;
-
-        updateResultsUI({
-            workerTime,
-            ...metrics,
-            results
-        });
+        const result = JSON.parse(resultJson);
+        displayResult(result);
 
     } catch (error) {
-        displayError(error);
+        console.error(error);
     } finally {
         window.hideExecutionLoader();
     }
 }
 
-function updateResultsUI({
-    workerTime,
-    total_time,
-    avg_time,
-    individual_times,
-    results
-}) {
-    const output = document.getElementById("javascript-output");
-
-    const lastValue = results.length > 0 && results[results.length - 1]?.data?.length > 0
-        ? results[results.length - 1].data[0].value
-        : null;
-
-    output.innerHTML = `
-        <div>Worker Time: ${workerTime.toFixed(2)} ms</div>
-        <div>Avg. Request Time: ${avg_time.toFixed(2)} ms</div>
-        <div>Total Time: ${total_time.toFixed(2)} ms</div>
-        <div>Completed Requests: ${individual_times.length}</div>
-        ${lastValue ? `
-            <div>Last Value: ${lastValue}</div>` : ''}
-    `;
+function createDiv() {
+    const div = document.createElement("div");
+    return div;
 }
 
-function displayError(error) {
+function displayResult(r) {
     const output = document.getElementById("javascript-output");
-    output.innerHTML = `
-        <div style="color: red;">
-            Error: ${error.message || 'Unknown error'}
-        </div>
-    `;
+
+    const workerDiv = createDiv();
+    workerDiv.textContent = `Worker init time: ${workerTime.toFixed(2)} ms`;
+    output.appendChild(workerDiv);
+
+    const avgTimeDiv = createDiv();
+    avgTimeDiv.textContent = `Avg request time: ${r.average_time_ms.toFixed(2)} ms`;
+    output.appendChild(avgTimeDiv);
+
+    const totalTimeDiv = createDiv();
+    totalTimeDiv.textContent = `Total ET: ${r.total_time_ms.toFixed(2)} ms`;
+    output.appendChild(totalTimeDiv);
+
+    const requestsDiv = createDiv();
+    requestsDiv.textContent = `Requests: ${r.total_requests}`;
+    output.appendChild(requestsDiv);
+
+    const lastValueDiv = createDiv();
+    lastValueDiv.textContent = `Last value: ${r.last_value.toFixed(2)}`;
+    output.appendChild(lastValueDiv);
 }
 
-window.runJsBenchmark = javascriptBenchmark;
+window.runJsBenchmark = _runJsBenchmark;

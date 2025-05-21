@@ -5,9 +5,12 @@ import js  # type: ignore
 from pyscript import display
 import numpy as np
 
+seed = int(time.time() * 1000) % 2**32
+rng = np.random.default_rng(seed)
+
 
 def create_data_structure(size):
-    return np.random.randint(0, 1001, size=size)
+    return rng.integers(0, 1001, size=size)
 
 
 def transform_data_structure(arr):
@@ -50,11 +53,9 @@ def do_operations(size):
     operations = [
         ('transform', transform_data_structure, (my_array,)),
         ('sort', sort_data_structure, (my_array,)),
-        ('search', search_in_data_structure,
-         (my_array, np.random.choice(my_array))),
+        ('search', search_in_data_structure, (my_array, rng.choice(my_array))),
         ('filter', filter_data_structure, (my_array, 500)),
-        ('delete', delete_from_data_structure,
-         (my_array, np.random.choice(my_array)))
+        ('delete', delete_from_data_structure, (my_array, rng.choice(my_array)))
     ]
 
     for op_name, op_func, args in operations:
@@ -77,8 +78,7 @@ def do_operations(size):
         tracemalloc.stop()
 
     metrics['output'] = {
-        'total_time': (time.perf_counter()
-                       - start_total) * 1000,
+        'total_time': (time.perf_counter() - start_total) * 1000,
         'memory_peak': max_memory
     }
 

@@ -1,55 +1,60 @@
 import time
 import json
 import numpy as np
-from plotly.graph_objects import Figure
-from plotly.io import to_json
 from pyscript import sync
+import js  # type: ignore
+
+seed = int(time.time() * 1000) % 2**32
+rng = np.random.default_rng(seed)
 
 
-def js_run_py_benchmark(num_series, num_points):
+def do_analisis():
     try:
         start_time = time.perf_counter()
+        num_series = int(js.document.getElementById(
+            "num-series-pyscript").value)
+        num_points = int(js.document.getElementById(
+            "num-points-pyscript").value)
 
         x = np.linspace(0, 10, num_points)
-        rng = np.random.default_rng()
-        ys = [np.sin(x + i) + rng.normal(0, 0.1, num_points)
-              for i in range(num_series)]
+        noise = rng.normal(0, 0.1, size=(num_series, num_points))
+
+        traces = [{
+            "x": x.tolist(),
+            "y": (np.sin(x + phase) + noise[i]).tolist(),
+            "mode": "lines",
+            "name": f"Serie {i+1}"
+        } for i, phase in enumerate(range(num_series))]
+
+        layout = {
+            "title":  "Series Temporales (PyScript)",
+            "width":   700,
+            "height":  500,
+            "xaxis":  {},
+            "yaxis":  {}
+        }
 
         data_gen_time = (time.perf_counter() - start_time) * 1000
+        total_time = data_gen_time
+        mem_mb = (
+            x.nbytes + sum(np.array(t["y"]).nbytes for t in traces)) / (1024 ** 2)
 
-        mem = (x.nbytes + sum(y.nbytes for y in ys)) / (1024**2)  # MB
-
-        render_start = time.perf_counter()
-        fig = Figure()
-        for i, y in enumerate(ys):
-            fig.add_scatter(
-                x=x.tolist(),
-                y=y.tolist(),
-                mode="lines",
-                name=f"Serie {i+1}",
-                line=dict(width=1)
-            )
-        fig.update_layout(
-            title="Series Temporales (PyScript)",
-            width=700,
-            height=500
-        )
-
-        graph_json = to_json(fig)
-        render_time = (time.perf_counter() - render_start) * 1000
-
-        total_time = (time.perf_counter() - start_time) * 1000
-
-        return json.dumps({
-            "graph_json": graph_json,
-            "data_gen_time": data_gen_time,
-            "render_time": render_time,
-            "total_time": total_time,
-            "memory": mem
-        })
+        result = {
+            "graph": {
+                "data":   traces,
+                "layout": layout
+            },
+            "metrics": {
+                "data_gen_time": data_gen_time,
+                "render_time":   total_time - data_gen_time,
+                "total_time_ms": total_time,
+                "memory":        mem_mb
+            }
+        }
+        return json.dumps(result)
 
     except Exception as e:
         return json.dumps({"error": str(e)})
 
 
-sync.js_run_py_benchmark = js_run_py_benchmark
+sync.do_analisis = do_analisis

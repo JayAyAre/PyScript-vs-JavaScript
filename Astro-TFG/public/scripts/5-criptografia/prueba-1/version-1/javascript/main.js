@@ -1,6 +1,17 @@
 let worker = null;
+let workerTime = 0;
 
-async function javascriptBenchmark() {
+function initializeWorker() {
+    if (!worker) {
+        worker = new Worker(
+            window.location.origin +
+            window.document.body.dataset.jsPath +
+            "worker.js"
+        );
+    }
+}
+
+async function _runJsBenchmark() {
     try {
 
         window.clearCell("javascript-output");
@@ -34,57 +45,65 @@ async function javascriptBenchmark() {
             worker.addEventListener("message", onMessage);
             worker.postMessage({
                 id,
-                type: "js_run_js_benchmark",
-                workerTime,
+                type: "do_analisis",
                 repetitions,
                 fileSizeMb,
             });
         });
 
         const result = JSON.parse(resultJson);
-        displayResult(result, workerTime);
+        displayResult(result);
     } catch (err) {
         console.error("Benchmark error:", err);
-        const out = document.getElementById("javascript-output");
-        out.textContent = `Error: ${err.message}`;
     } finally {
         window.hideExecutionLoader();
     }
 }
 
-function displayResult(result, workerTime) {
-    const out = document.getElementById("javascript-output");
 
-    out.innerHTML = `
-      <div>Worker time: ${workerTime.toFixed(2)} ms</div>
-      <div>Simulated file: ${result.file_size_mb.toFixed(2)} MB</div>
-      <div>Repetitions: ${result.repetitions}</div>
-      <div>Avg hash time: ${result.hash_avg_time_ms.toFixed(2)} ms</div>
-      <div>Avg verify time: ${result.verify_avg_time_ms.toFixed(2)} ms</div>
-      <div>Last hash (shortened): ${result.last_digest.slice(0, 20)}...</div>
-      <div>Total op time: ${result.total_time_ms.toFixed(2)} ms</div>
-      <div>Total time: ${result.total_time.toFixed(2)} ms</div>
-    `;
+function createDiv() {
+    const div = document.createElement("div");
+    return div;
 }
 
-function initializeWorker() {
-    return new Promise((resolve) => {
-        if (worker) {
-            resolve();
-            return;
-        }
+function displayResult(r) {
+    const output = document.getElementById("javascript-output");
 
-        const workerPath = window.location.origin +
-            window.document.body.dataset.jsPath +
-            "worker.js";
+    const workerDiv = createDiv();
+    workerDiv.textContent = `Worker init time: ${workerTime.toFixed(2)} ms`;
+    output.appendChild(workerDiv);
 
-        worker = new Worker(workerPath);
+    const simulatedDiv = createDiv();
+    simulatedDiv.textContent = `Simulated file: ${r.file_size_mb.toFixed(2)} ms`;
+    output.appendChild(simulatedDiv);
 
-        resolve();
-    });
+    const repetitionsDiv = createDiv();
+    repetitionsDiv.textContent = `Repetitions: ${r.repetitions.toFixed(2)} ms`;
+    output.appendChild(repetitionsDiv);
+
+    const hashDiv = createDiv();
+    hashDiv.textContent = `Avg hash time: ${r.hash_avg_time_ms.toFixed(2)} ms`;
+    output.appendChild(hashDiv);
+
+    const verifyDiv = createDiv();
+    verifyDiv.textContent = `Avg verify time: ${r.verify_avg_time_ms.toFixed(2)} ms`;
+    output.appendChild(verifyDiv);
+
+    const lastDigestDiv = createDiv();
+    lastDigestDiv.textContent = `Last hash (shortened): ${r.last_digest.slice(0, 8)}`;
+    output.appendChild(lastDigestDiv);
+
+    const totalOpDiv = createDiv();
+    totalOpDiv.textContent = `Total hash + verify time: ${r.total_time_ms.toFixed(2)} ms`;
+    output.appendChild(totalOpDiv);
+
+    const totalDiv = createDiv();
+    totalDiv.textContent = `Total ET: ${r.total_time.toFixed(2)} ms`;
+    output.appendChild(totalDiv);
 }
 
-window.runJsBenchmark = javascriptBenchmark;
+
+window.runJsBenchmark = _runJsBenchmark;
 
 
 

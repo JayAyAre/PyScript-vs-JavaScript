@@ -1,15 +1,25 @@
-// main.js
 let worker = null;
-let worker_time = 0;
+let workerTime = 0;
 
-async function javascriptBenchmark() {
+function initializeWorker() {
+    if (!worker) {
+        worker = new Worker(
+            window.location.origin +
+            window.document.body.dataset.jsPath +
+            "worker.js",
+            { type: "module" }
+        );
+    }
+}
+
+async function _runJsBenchmark() {
     try {
         window.clearCell("javascript-output");
         window.showExecutionLoader();
 
         const startWorkerTime = performance.now();
         await initializeWorker();
-        const workerTime = performance.now() - startWorkerTime;
+        workerTime = performance.now() - startWorkerTime;
 
         const repetitions = parseInt(
             document.getElementById("num-repetitions-javascript").value,
@@ -31,7 +41,7 @@ async function javascriptBenchmark() {
             worker.addEventListener("message", onMessage);
             worker.postMessage({
                 id,
-                type: "js_run_js_benchmark",
+                type: "do_analisis",
                 repetitions,
             });
         });
@@ -48,34 +58,37 @@ async function javascriptBenchmark() {
     }
 }
 
+function createDiv() {
+    const div = document.createElement("div");
+    return div;
+}
 
 function displayResult(r) {
-    const out = document.getElementById("javascript-output");
+    const output = document.getElementById("javascript-output");
 
-    out.innerHTML = `
-      <div>Worker init time: ${worker_time.toFixed(2)} ms</div>
-      <div>Training  time: ${r.training_time_ms.toFixed(2)} ms
-      <div>Inference time: ${r.inference_time_ms.toFixed(2)} ms</div>
-      <div>Accuracy: ${r.accuracy.toFixed(2)} %</div>
-      <div>Model size: ${r.model_size_mb.toFixed(2)} MB</div>
-      <div>Overall time: ${r.overall_time_ms.toFixed(2)} ms</div>
-    `
+    const workerDiv = createDiv();
+    workerDiv.textContent = `Worker init time: ${workerTime.toFixed(2)} ms`;
+    output.appendChild(workerDiv);
+
+    const trainingDiv = createDiv();
+    trainingDiv.textContent = `Training time: ${r.training_time_ms.toFixed(2)} ms`;
+    output.appendChild(trainingDiv);
+
+    const inferenceDiv = createDiv();
+    inferenceDiv.textContent = `Inference time: ${r.inference_time_ms.toFixed(2)} ms`;
+    output.appendChild(inferenceDiv);
+
+    const accuracyDiv = createDiv();
+    accuracyDiv.textContent = `Accuracy: ${r.accuracy.toFixed(2)} %`;
+    output.appendChild(accuracyDiv);
+
+    const modelSizeDiv = createDiv();
+    modelSizeDiv.textContent = `Model size: ${r.model_size_mb.toFixed(2)} MB`;
+    output.appendChild(modelSizeDiv);
+
+    const totalDiv = createDiv();
+    totalDiv.textContent = `Total ET: ${r.overall_time_ms.toFixed(2)} ms`;
+    output.appendChild(totalDiv);
 }
 
-function initializeWorker() {
-    return new Promise((resolve) => {
-        if (worker) {
-            resolve();
-            return;
-        }
-
-        const workerPath = window.location.origin +
-            window.document.body.dataset.jsPath +
-            "worker.js";
-
-        worker = new Worker(workerPath, { type: "module" });
-        resolve();
-    });
-}
-
-window.runJsBenchmark = javascriptBenchmark;
+window.runJsBenchmark = _runJsBenchmark;

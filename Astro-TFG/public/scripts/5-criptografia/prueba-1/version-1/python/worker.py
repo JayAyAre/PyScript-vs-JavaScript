@@ -1,4 +1,5 @@
-from pyscript import sync, display, document, window, PyWorker
+from pyscript import sync, display, document
+from Crypto.Hash import SHA256
 import asyncio
 import os
 import time
@@ -24,7 +25,6 @@ async def do_hash(worker_time):
         last_digest = None
         for _ in range(num_repetitions):
             start_hash = time.perf_counter()
-            from Crypto.Hash import SHA256
             hasher = SHA256.new()
             hasher.update(buffer)
             digest = hasher.digest()

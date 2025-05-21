@@ -13,19 +13,23 @@ def create_matrix(size):
     return rng.random((size, size))
 
 
+def get_memory_usage():
+    return tracemalloc.get_traced_memory()[1] / (1024 * 1024)
+
+
 def multiply_matrices(size):
+    gc.collect()
     tracemalloc.start()
 
     A = create_matrix(size)
     B = create_matrix(size)
 
     start = time.perf_counter()
-    gc.collect()
 
     C = np.dot(A, B)
 
-    execution_time = (time.time() - start) * 1000
-    memory_usage = tracemalloc.get_traced_memory()[1] / (1024 * 1024)
+    execution_time = (time.perf_counter() - start) * 1000
+    memory_usage = abs(get_memory_usage())
     tracemalloc.stop()
 
     results = {

@@ -1,8 +1,8 @@
 async function multiplyMatrices(size) {
-    let A = tf.randomNormal([size, size]);
-    let B = tf.randomNormal([size, size]);
+    let A = tf.randomUniform([size, size], 0.0, 1.0);
+    let B = tf.randomUniform([size, size], 0.0, 1.0);
 
-    let start = performance.now();
+    const start = performance.now();
 
     let C = tf.matMul(A, B);
 
@@ -19,10 +19,11 @@ async function multiplyMatrices(size) {
 
 function getMemoryUsageJS() {
     if (performance.memory) {
-        return performance.memory.usedJSHeapSize / (1024 * 1024);
+        return Math.max(performance.memory.usedJSHeapSize / (1024 * 1024), 0);
     }
     return -1;
 }
+
 
 function displayResults(results) {
     const output = document.getElementById("javascript-output");
@@ -40,7 +41,7 @@ function displayResults(results) {
     if (results.memory_usage !== -1) {
         memoryDiv.textContent = `RAM: ${results.memory_usage.toFixed(2)} MB`;
     } else {
-        memoryDiv.textContent = `RAM unsupported measurement in this browser.`;
+        memoryDiv.textContent = `RAM measurement unsupported in this browser.`;
     }
     output.appendChild(memoryDiv);
     output.appendChild(document.createElement("br"));

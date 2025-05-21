@@ -1,6 +1,7 @@
 let worker = null;
 let jsTimer = null;
 let jsStartTime = 0;
+let worker_time = 0;
 
 function startJsTimer() {
     jsStartTime = performance.now();
@@ -41,7 +42,7 @@ async function runJsBenchmark() {
 
         const startWorkerTime = performance.now();
         initializeWorker();
-        const workerTime = performance.now() - startWorkerTime;
+        worker_time = performance.now() - startWorkerTime;
 
         const repetitions = parseInt(
             document.getElementById("num-repetitions-javascript")?.value || "1",
@@ -67,7 +68,7 @@ async function runJsBenchmark() {
         });
 
         const r = JSON.parse(resultJson);
-        displayResult(r, workerTime);
+        displayResult(r);
     } catch (err) {
         console.error("Benchmark error:", err);
     } finally {
@@ -80,11 +81,11 @@ function createDiv() {
     return div;
 }
 
-function displayResult(r, workerTime) {
+function displayResult(r) {
     const output = document.getElementById("javascript-output");
 
     const workerDiv = createDiv();
-    workerDiv.textContent = `Worker init time: ${workerTime.toFixed(2)} ms`;
+    workerDiv.textContent = `Worker init time: ${worker_time.toFixed(2)} ms`;
     output.appendChild(workerDiv);
 
     const trainingDiv = createDiv();

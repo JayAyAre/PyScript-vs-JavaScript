@@ -1,3 +1,4 @@
+import gc
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import time
@@ -21,17 +22,15 @@ def is_prime(n):
 
 def get_memory_usage():
     process = psutil.Process(os.getpid())
-    return round(process.memory_info().rss / (1024 * 1024), 2)
-
-
-def get_cpu_usage():
-    return psutil.cpu_percent()
+    return max(process.memory_info().rss / (1024 * 1024), 0)
 
 
 def primes_to_n(n):
+    gc.collect()
     start_memory = get_memory_usage()
-    start_cpu = get_cpu_usage()
     start_time = time.perf_counter()
+    process = psutil.Process(os.getpid())
+    process.cpu_percent(interval=None)
 
     primes = []
 
@@ -43,8 +42,8 @@ def primes_to_n(n):
             primes.append(i)
 
     execution_time = round((time.perf_counter() - start_time) * 1000, 2)
-    memory_used = round(get_memory_usage() - start_memory, 2)
-    cpu_usage = round(get_cpu_usage() - start_cpu, 2)
+    memory_used = abs(get_memory_usage() - start_memory)
+    cpu_usage = abs(process.cpu_percent(interval=1))
 
     return {
         'time': execution_time,

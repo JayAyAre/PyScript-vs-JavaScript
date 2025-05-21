@@ -18,20 +18,18 @@ def get_memory_usage():
 
 
 def multiply_matrices(size):
+    gc.collect()
     tracemalloc.start()
 
     A = create_matrix(size)
     B = create_matrix(size)
 
     start = time.perf_counter()
-    gc.collect()
 
     C = np.dot(A, B)
 
-    end = time.perf_counter()
-    execution_time = (end - start) * 1000
-
-    memory_usage = get_memory_usage()
+    execution_time = (time.perf_counter() - start) * 1000
+    memory_usage = abs(get_memory_usage())
     tracemalloc.stop()
 
     results = {

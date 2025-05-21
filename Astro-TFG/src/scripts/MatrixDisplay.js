@@ -7,7 +7,14 @@ export function display(data, elementId) {
 
         Object.entries(result).forEach(([key, value], index) => {
             const div = document.createElement('div');
-            div.textContent = value;
+
+            if (key === 'size') {
+                div.textContent = `Matriz ${value}`;
+                div.style.fontWeight = 'bold';
+            } else {
+                div.textContent = value;
+            }
+
             outputDiv.appendChild(div);
 
             if (index === 3) {

@@ -92,18 +92,6 @@ async function runJsBenchmark() {
     }
 }
 
-function handleWorkerResult({ metrics, graphData }) {
-    Plotly.newPlot(
-        "graph-container-javascript",
-        graphData.traces,
-        graphData.layout
-    ).then(() => {
-        attachRelayoutListener("graph-container-javascript", "javascript-output");
-    });
-    updateUI(metrics);
-    performance.measureMemory?.();
-}
-
 function createDiv() {
     const div = document.createElement("div");
     return div;

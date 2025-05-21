@@ -52,56 +52,79 @@ function do_operations(size) {
     let start_op = performance.now();
     let my_array = create_data_structure(size);
     metrics['create'] = {
-        'time': performance.now() - start_op,
-        'memory': measureMemory()
+        time: performance.now() - start_op,
+        memory: measureMemory(),
     };
 
     const operations = [
         ['transform', transform_data_structure, [my_array]],
         ['sort', sort_data_structure, [my_array]],
-        ['search', search_in_data_structure, [my_array, my_array[Math.floor(Math.random() * my_array.length)]]],
+        [
+            'search',
+            search_in_data_structure,
+            [my_array, my_array[Math.floor(Math.random() * my_array.length)]],
+        ],
         ['filter', filter_data_structure, [my_array, 500]],
-        ['delete', delete_from_data_structure, [my_array, my_array[Math.floor(Math.random() * my_array.length)]]]
+        [
+            'delete',
+            delete_from_data_structure,
+            [my_array, my_array[Math.floor(Math.random() * my_array.length)]],
+        ],
     ];
 
     for (const [op_name, op_func, args] of operations) {
         start_op = performance.now();
         if (window.gc) window.gc();
-        const mem_before = performance.memory ? (performance.memory.usedJSHeapSize / (1024 * 1024)) : 0;
+        const mem_before = performance.memory
+            ? performance.memory.usedJSHeapSize / (1024 * 1024)
+            : 0;
         let result = op_func(...args);
 
-        const mem_after = performance.memory ? (performance.memory.usedJSHeapSize / (1024 * 1024)) : 0;
+        const mem_after = performance.memory
+            ? performance.memory.usedJSHeapSize / (1024 * 1024)
+            : 0;
         metrics[op_name] = {
-            'time': performance.now() - start_op,
-            'memory': Math.abs(mem_after - mem_before)
+            time: performance.now() - start_op,
+            memory: Math.abs(mem_after - mem_before),
         };
         max_memory = Math.max(max_memory, mem_after);
     }
 
     metrics['output'] = {
-        'total_time': performance.now() - start_total,
-        'memory_peak': max_memory
+        total_time: performance.now() - start_total,
+        memory_peak: max_memory,
     };
 
-    const outputElement = document.getElementById("javascript-output");
-    if (!outputElement) return;
-    outputElement.innerHTML = "";
-
-
-    for (const [op, data] of Object.entries(metrics)) {
-        if (op === 'output') continue;
-        const line = `${op.toUpperCase()} - Time av. : ${data.time.toFixed(2)} ms | RAM: ${data.memory.toFixed(2)} MB`;
-        outputElement.innerHTML += line + "<br>";
-    }
-
-    outputElement.innerHTML += "<br>";
-    const tot = metrics['output'];
-    const totalLine = `TOTAL - Time: ${tot.total_time.toFixed(2)} ms | RAM Peak: ${tot.memory_peak.toFixed(2)} MB`;
-    outputElement.innerHTML += totalLine;
+    displayResults(metrics);
 }
 
+
+function displayResults(results) {
+    const output = document.getElementById("javascript-output");
+
+    for (const [op, data] of Object.entries(results)) {
+        if (op !== 'output') {
+            const timeDiv = document.createElement("div");
+            timeDiv.textContent =
+                `${op.toUpperCase()} - Time: ${data.time.toFixed(2)} ms | RAM: ${data.memory.toFixed(2)} MB`;
+            output.appendChild(timeDiv);
+        }
+    }
+
+    const timeTotalDiv = document.createElement("div");
+    timeTotalDiv.textContent =
+        `Total ET: ${results.output.total_time.toFixed(2)} ms`;
+    output.appendChild(timeTotalDiv);
+
+    const memoryDiv = document.createElement("div");
+    memoryDiv.textContent =
+        `RAM Peak: ${results.output.memory_peak.toFixed(2)} MB`;
+    output.appendChild(memoryDiv);
+}
+
+
 window.runJsBenchmark = function () {
-    clearCell("javascript-output");
+    window.clearCell("javascript-output");
     window.showExecutionLoader();
 
     requestAnimationFrame(() => {

@@ -1,127 +1,140 @@
-function arrayBufferToBase64(buffer) {
+const GRAPH_SIZE = 100_000;
+const CANVAS_WIDTH = 800;
+const CANVAS_HEIGHT = 600;
+const PADDING = 50;
+
+function toBase64(buffer) {
     let binary = "";
     const bytes = new Uint8Array(buffer);
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
+    for (let i = 0; i < bytes.byteLength; i++) {
         binary += String.fromCharCode(bytes[i]);
     }
     return btoa(binary);
 }
 
-self.onmessage = function (event) {
-    const { id, size, draw } = event.data;
-    const start = performance.now();
+const mean = (arr) => arr.reduce((sum, v) => sum + v, 0) / arr.length;
 
-    const coords = new Float64Array(size * 2);
-    for (let i = 0; i < coords.length; i++) {
-        coords[i] = Math.random();
-    }
-    const dataGenTime = performance.now() - start;
-    const memoryUsage = coords.byteLength / 1024 ** 2;
+self.onmessage = async function (e) {
+    const msg = e.data;
+    if (msg.type !== "do_analisis") return;
 
-    let renderTime = 0;
-    let base64 = null;
+    const { id, num_executions } = msg;
 
-    if (draw) {
-        const renderStart = performance.now();
-        const canvas = new OffscreenCanvas(800, 600);
-        const ctx = canvas.getContext("2d");
+    try {
+        const rawResults = [];
 
-        const padding = 50;
-        const chartWidth = canvas.width - 2 * padding;
-        const chartHeight = canvas.height - 2 * padding;
+        for (let run = 0; run < num_executions; run++) {
+            const runStart = performance.now();
 
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const t0 = performance.now();
+            const coords = new Float64Array(GRAPH_SIZE * 2);
+            for (let i = 0; i < coords.length; i++) {
+                coords[i] = Math.random();
+            }
+            const dataGenTime = performance.now() - t0;
+            const memoryMB = coords.byteLength / 1024 ** 2;
 
-        // Ejes
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(padding, padding);
-        ctx.lineTo(padding, canvas.height - padding);
-        ctx.moveTo(padding, canvas.height - padding);
-        ctx.lineTo(canvas.width - padding, canvas.height - padding);
-        ctx.stroke();
+            const t1 = performance.now();
+            const canvas = new OffscreenCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+            const ctx = canvas.getContext("2d");
 
-        // Ticks y etiquetas X
-        ctx.font = "12px sans-serif";
-        ctx.fillStyle = "black";
-        ctx.textAlign = "center";
-        for (let i = 0; i <= 5; i++) {
-            const value = i * 0.2;
-            const xPos = padding + value * chartWidth;
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.moveTo(xPos, canvas.height - padding);
-            ctx.lineTo(xPos, canvas.height - padding + 5);
+            ctx.moveTo(PADDING, PADDING);
+            ctx.lineTo(PADDING, CANVAS_HEIGHT - PADDING);
+            ctx.moveTo(PADDING, CANVAS_HEIGHT - PADDING);
+            ctx.lineTo(CANVAS_WIDTH - PADDING, CANVAS_HEIGHT - PADDING);
             ctx.stroke();
-            ctx.fillText(value.toFixed(1), xPos, canvas.height - padding + 18);
-        }
 
-        // Ticks y etiquetas Y
-        ctx.textAlign = "right";
-        ctx.textBaseline = "middle";
-        for (let i = 0; i <= 5; i++) {
-            const value = i * 0.2;
-            const yPos = canvas.height - padding - value * chartHeight;
-            ctx.beginPath();
-            ctx.moveTo(padding, yPos);
-            ctx.lineTo(padding - 5, yPos);
-            ctx.stroke();
-            ctx.fillText(value.toFixed(1), padding - 10, yPos);
-        }
+            ctx.font = "12px sans-serif";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "center";
+            const chartW = CANVAS_WIDTH - 2 * PADDING;
+            const chartH = CANVAS_HEIGHT - 2 * PADDING;
+            for (let i = 0; i <= 5; i++) {
+                const v = i * 0.2;
+                const x = PADDING + v * chartW;
+                ctx.beginPath();
+                ctx.moveTo(x, CANVAS_HEIGHT - PADDING);
+                ctx.lineTo(x, CANVAS_HEIGHT - PADDING + 5);
+                ctx.stroke();
+                ctx.fillText(v.toFixed(1), x, CANVAS_HEIGHT - PADDING + 18);
+            }
+            ctx.textAlign = "right";
+            ctx.textBaseline = "middle";
+            for (let i = 0; i <= 5; i++) {
+                const v = i * 0.2;
+                const y = CANVAS_HEIGHT - PADDING - v * chartH;
+                ctx.beginPath();
+                ctx.moveTo(PADDING, y);
+                ctx.lineTo(PADDING - 5, y);
+                ctx.stroke();
+                ctx.fillText(v.toFixed(1), PADDING - 10, y);
+            }
 
-        // Dibujar puntos
-        ctx.globalAlpha = 0.5;
-        ctx.fillStyle = "blue";
-        for (let i = 0; i < size; i++) {
-            const x = padding + coords[i * 2] * chartWidth;
-            const y = canvas.height - padding - coords[i * 2 + 1] * chartHeight;
-            ctx.fillRect(x, y, 1, 1);
-        }
+            ctx.globalAlpha = 0.5;
+            ctx.fillStyle = "blue";
+            for (let i = 0; i < GRAPH_SIZE; i++) {
+                const x = PADDING + coords[i * 2] * chartW;
+                const y = CANVAS_HEIGHT - PADDING - coords[i * 2 + 1] * chartH;
+                ctx.fillRect(x, y, 1, 1);
+            }
+            ctx.globalAlpha = 1.0;
 
-        // Título
-        ctx.globalAlpha = 1.0;
-        ctx.fillStyle = "black";
-        ctx.font = "20px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText(
-            `${size.toLocaleString()} Points Scatter Plot`,
-            canvas.width / 2,
-            30
-        );
+            ctx.font = "20px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(
+                `${GRAPH_SIZE.toLocaleString()} Points Scatter Plot`,
+                CANVAS_WIDTH / 2,
+                30
+            );
 
-        canvas
-            .convertToBlob({ type: "image/png" })
-            .then(async (blob) => {
-                const buf = await blob.arrayBuffer();
-                base64 = arrayBufferToBase64(buf);
-                renderTime = performance.now() - renderStart;
-                const totalTime = performance.now() - start;
-                self.postMessage({
-                    id,
-                    results: {
-                        image_base64: base64,
-                        data_gen_time: dataGenTime,
-                        render_time: renderTime,
-                        memory: memoryUsage,
-                        total_time: totalTime,
-                    },
-                });
-            })
-            .catch((e) => {
-                self.postMessage({ id, error: e.message, stack: e.stack });
-            });
-    } else {
-        const totalTime = performance.now() - start;
-        self.postMessage({
-            id,
-            results: {
+            let imageBase64 = null;
+            try {
+                const blob = await canvas.convertToBlob({ type: "image/png" });
+                const buffer = await blob.arrayBuffer();
+                imageBase64 = toBase64(buffer);
+            } catch { }
+
+            const renderTime = performance.now() - t1;
+            const totalTime = performance.now() - runStart;
+
+            rawResults.push({
                 data_gen_time: dataGenTime,
                 render_time: renderTime,
-                memory: memoryUsage,
+                memory: memoryMB,
                 total_time: totalTime,
-            },
+                image_base64: imageBase64
+            });
+        }
+
+        const avgDataGen = mean(rawResults.map(r => r.data_gen_time));
+        const avgRender = mean(rawResults.map(r => r.render_time));
+        const avgMemory = mean(rawResults.map(r => r.memory));
+        const avgTotal = mean(rawResults.map(r => r.total_time));
+
+        const result = {
+            data_gen_time: avgDataGen,
+            render_time: avgRender,
+            memory: avgMemory,
+            average_time_ms: avgTotal,
+            total_time_ms: avgTotal,
+            image_base64: rawResults[rawResults.length - 1].image_base64
+        };
+
+        self.postMessage({
+            id,
+            json: JSON.stringify(result)
+        });
+
+    } catch (err) {
+        self.postMessage({
+            id,
+            error: `Worker error: ${err.message}`
         });
     }
 };

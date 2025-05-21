@@ -76,7 +76,7 @@
                             outputDiv.appendChild(cpuDiv);
 
                             let memoryDiv = document.createElement('div');
-                            memoryDiv.textContent = `RAM: ${value.memory_usage} MB`;
+                            memoryDiv.textContent = `RAM: ${value.memory_usage.toFixed(2)} MB`;
                             outputDiv.appendChild(memoryDiv);
 
                             outputDiv.appendChild(document.createElement('hr'));
@@ -87,7 +87,7 @@
         </script>
     </head>
     <body>
-        <h1>Matrix multiplication (Numpy/TypeArrays)</h1>
+        <h1>Matrix multiplication (Numpy/TensorFlow)</h1>
 
         <button onclick="runJsBenchmark()">Run in JavaScript</button>
         <button onclick="runPyBenchmark()" py-click="run_py_benchmark">

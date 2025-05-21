@@ -6,9 +6,7 @@ self.onmessage = async function (e) {
         const apiData = await apiResponse.json();
         const wsUrl = `ws://localhost:5001${apiData.wsUrl}`;
 
-        console.log(wsUrl);
         const ws = new WebSocket(wsUrl);
-
         await new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
                 reject(new Error("WebSocket connection timeout"));
@@ -27,57 +25,74 @@ self.onmessage = async function (e) {
 
         const pendingRequests = new Map();
         const individualTimes = [];
-        const startTime = performance.now();
+        const results = [];
+
+        let requestId = 0;
 
         ws.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
-                const reqId = data.id;
+                const respId = data.id;
 
-                if (pendingRequests.has(reqId)) {
-                    const { resolve, startTime } = pendingRequests.get(reqId);
-                    const elapsed = performance.now() - startTime;
+                if (pendingRequests.has(respId)) {
+                    const { resolve, start } = pendingRequests.get(respId);
+                    const elapsed = performance.now() - start;
 
                     individualTimes.push(elapsed);
-                    resolve(data);
-                    pendingRequests.delete(reqId);
+                    results.push(data);
+
+                    resolve();
+                    pendingRequests.delete(respId);
                 }
             } catch (error) {
-                console.error("Error processing message:", error);
+                console.error("Error processing WebSocket message:", error);
             }
         };
 
-        const requests = Array.from({ length: num_requests }, (_, i) => {
-            const reqId = crypto.randomUUID();
-            const payload = JSON.stringify({
-                delay: delay,
-                id: reqId
-            });
+        const sendRequestWithTiming = async () => {
+            const currentId = crypto.randomUUID();
+            const payload = JSON.stringify({ delay, id: currentId });
 
             return new Promise((resolve) => {
-                pendingRequests.set(reqId, {
+                pendingRequests.set(currentId, {
                     resolve,
-                    startTime: performance.now()
+                    start: performance.now(),
                 });
                 ws.send(payload);
             });
-        });
+        };
 
-        const results = await Promise.all(requests);
+        const start_time = performance.now();
+        const fetchPromises = Array.from({ length: num_requests }, () => sendRequestWithTiming());
+        await Promise.all(fetchPromises);
+        const total_time = performance.now() - start_time;
+
         ws.close();
 
-        const totalTime = performance.now() - startTime;
-        const avgTime = individualTimes.reduce((a, b) => a + b, 0) / individualTimes.length;
+        const avg_time =
+            individualTimes.length > 0
+                ? individualTimes.reduce((acc, t) => acc + t, 0) / individualTimes.length
+                : 0;
 
-        self.postMessage({
-            id,
-            metrics: {
-                total_time: totalTime,
-                avg_time: avgTime,
-                individual_times: individualTimes,
-            },
-            results
-        });
+        let last_value = null;
+        const resultArray = Object.values(results);
+
+        for (let i = resultArray.length - 1; i >= 0; i--) {
+            const r = resultArray[i];
+            if (r?.data && Array.isArray(r.data) && r.data.length > 0) {
+                last_value = r.data[r.data.length - 1].value;
+                break;
+            }
+        }
+
+        const result = {
+            average_time_ms: avg_time,
+            total_time_ms: total_time,
+            total_requests: num_requests,
+            last_value: last_value
+        };
+
+        self.postMessage({ id, json: JSON.stringify(result) });
 
     } catch (error) {
         self.postMessage({

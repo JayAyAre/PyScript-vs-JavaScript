@@ -1,7 +1,7 @@
 import KNN from "https://cdn.skypack.dev/ml-knn";
 
 self.addEventListener("message", async (e) => {
-    const { id, type, workerTime, repetitions } = e.data;
+    const { id, type, repetitions } = e.data;
     if (type !== "do_analisis") return;
 
     const DIGITS_URL = "/json/digits.json";

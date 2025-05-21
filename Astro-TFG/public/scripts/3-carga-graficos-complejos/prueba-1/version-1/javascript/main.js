@@ -1,118 +1,92 @@
 let worker = null;
-const pendingPromises = new Map();
+let workerTime = 0;
 
 function initializeWorker() {
-    return new Promise((resolve) => {
-        if (worker) {
-            resolve();
-            return;
-        }
-        worker = new Worker(window.location.origin + window.document.body.dataset.jsPath + "worker.js");
-        worker.onmessage = (event) => {
-            const { id, results } = event.data;
-            if (pendingPromises.has(id)) {
-                pendingPromises.get(id)(results);
-                pendingPromises.delete(id);
-            }
-        };
-        resolve();
-    });
-}
-
-
-async function measureMemoryUsage(duration = 500, interval = 50) {
-    const memoryUsages = [];
-    const start = performance.now();
-    return new Promise((resolve) => {
-        const timer = setInterval(() => {
-            if (performance.memory) {
-                memoryUsages.push(performance.memory.usedJSHeapSize);
-            }
-            if (performance.now() - start >= duration) {
-                clearInterval(timer);
-                const maxUsage = Math.max(...memoryUsages);
-                resolve(maxUsage / (1024 * 1024));
-            }
-        }, interval);
-    });
+    if (!worker) {
+        worker = new Worker(new URL("worker.js", import.meta.url), {
+            type: "module",
+        });
+    }
 }
 
 async function _runJSBenchmark() {
     try {
-        const startWorkerTime = performance.now();
+        window.clearCell("javascript-output");
 
-        if (!worker) {
-            await initializeWorker();
-        }
+        let start_time_worker = performance.now();
+        initializeWorker();
+        workerTime = performance.now() - start_time_worker;
 
-        const numExecutions = parseInt(
+        const num_executions = parseInt(
             document.getElementById("num-executions-javascript").value
         ) || 1;
 
-        const workerTime = performance.now() - startWorkerTime;
+        const id = `js-${Date.now()}`;
 
-        window.clearCell("javascript");
-
-        const results = [];
-        const times = [];
-
-        let startTotalTime = performance.now();
-
-        for (let i = 0; i < numExecutions; i++) {
-            const id = `graph-${Date.now()}-${i}`;
-
-            const result = await new Promise((resolve) => {
-                pendingPromises.set(id, resolve);
-                worker.postMessage({ id, size: 100_000, draw: true });
+        const resultJson = await new Promise((resolve, reject) => {
+            function onMessage(e) {
+                if (e.data.id !== id) return;
+                worker.removeEventListener("message", onMessage);
+                if (e.data.error) {
+                    reject(new Error(e.data.error));
+                } else if (e.data.json !== undefined) {
+                    resolve(e.data.json);
+                } else {
+                    reject(new Error("Worker dont return results"));
+                }
+            }
+            worker.addEventListener("message", onMessage);
+            worker.postMessage({
+                id,
+                type: "do_analisis",
+                size: 100_000,
+                num_executions,
             });
-            results.push(result);
-        }
+        });
 
-        const totalTime = performance.now() - startTotalTime;
-
-        const avg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
-        const avgDataGen = avg(results.map(r => r.data_gen_time));
-        const avgRender = avg(results.map(r => r.render_time));
-        const avgMemory = avg(results.map(r => r.memory));
-        const avgElapsed = avg(results.map(r => r.total_time));
-
-        const outputContainer = document.getElementById("javascript-output");
-        if (outputContainer) {
-            outputContainer.innerHTML = "";
-
-            const metrics = [
-                `Av. Worker Time: ${workerTime.toFixed(2)} ms`,
-                `Av. Data Generation: ${avgDataGen.toFixed(2)} ms`,
-                `Av. Rendering: ${avgRender.toFixed(2)} ms`,
-                `Av. Memory: ${avgMemory.toFixed(2)} MB`,
-                `Av. Execution Time: ${avgElapsed.toFixed(2)} ms`,
-            ];
-
-            metrics.forEach((text) => {
-                const div = document.createElement("div");
-                div.textContent = text;
-                outputContainer.appendChild(div);
-            });
-
-            const totalDiv = document.createElement("div");
-            totalDiv.textContent = `TOTAL TIME: ${totalTime.toFixed(2)} ms`;
-            outputContainer.appendChild(totalDiv);
-        }
-
-        const lastResult = results[results.length - 1];
-        if (lastResult.image_base64) {
-            window.displayPlot(lastResult.image_base64, "javascript-output");
-        }
-
-        window.hideExecutionLoader();
+        const result = JSON.parse(resultJson);
+        displayResult(result);
     } catch (error) {
         console.error("Worker error:", error);
     }
 }
 
 
+function createDiv() {
+    const div = document.createElement("div");
+    return div;
+}
+
+function displayResult(r) {
+    const output = document.getElementById("javascript-output");
+
+    const workerDiv = createDiv();
+    workerDiv.textContent = `Worker init time: ${workerTime.toFixed(2)} ms`;
+    output.appendChild(workerDiv);
+
+    const avgDataGenDiv = createDiv();
+    avgDataGenDiv.textContent = `Avg Data generation: ${r.data_gen_time.toFixed(2)} ms`;
+    output.appendChild(avgDataGenDiv);
+
+    const avgRenderDiv = createDiv();
+    avgRenderDiv.textContent = `Avg Rendering: ${r.render_time.toFixed(2)} ms`;
+    output.appendChild(avgRenderDiv);
+
+    const avgExecutionTimeDiv = createDiv();
+    avgExecutionTimeDiv.textContent = `Avg execution time: ${r.average_time_ms.toFixed(2)} ms`;
+    output.appendChild(avgExecutionTimeDiv);
+
+    const totalTimeDiv = createDiv();
+    totalTimeDiv.textContent = `Total ET: ${r.total_time_ms.toFixed(2)} ms`;
+    output.appendChild(totalTimeDiv);
+    window.hideExecutionLoader();
+    window.displayPlot(r.image_base64, "javascript-output");
+
+}
+
+
 window.runJsBenchmark = async function () {
-    clearCell("javascript-output");
+    window.clearCell("javascript-output");
     window.showExecutionLoader();
 
     await new Promise(requestAnimationFrame);

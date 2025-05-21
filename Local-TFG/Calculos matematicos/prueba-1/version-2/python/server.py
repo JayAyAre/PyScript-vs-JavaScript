@@ -1,3 +1,4 @@
+import gc
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import time
@@ -15,7 +16,7 @@ def create_matrix(size):
 
 def get_memory_usage():
     process = psutil.Process(os.getpid())
-    return round(process.memory_info().rss / (1024 * 1024), 2)
+    return max(process.memory_info().rss / (1024 * 1024), 0)
 
 
 def get_cpu_usage():
@@ -23,8 +24,10 @@ def get_cpu_usage():
 
 
 def multiply_matrices(size):
+    gc.collect()
     start_memory = get_memory_usage()
-    start_cpu = get_cpu_usage()
+    process = psutil.Process(os.getpid())
+    process.cpu_percent(interval=None)
 
     A = create_matrix(size)
     B = create_matrix(size)
@@ -34,8 +37,8 @@ def multiply_matrices(size):
     C = np.dot(A, B)
 
     execution_time = round((time.perf_counter() - start_time) * 1000, 2)
-    memory_used = round(get_memory_usage() - start_memory, 2)
-    cpu_usage = round(get_cpu_usage - start_cpu, 2)
+    memory_used = abs(get_memory_usage() - start_memory)
+    cpu_usage = abs(process.cpu_percent(interval=1))
 
     return {
         'size': f'{size}x{size}',
