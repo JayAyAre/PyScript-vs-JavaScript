@@ -1,8 +1,8 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
+import os
 import time
 import psutil
-import tracemalloc
 from mpmath import mp
 import gc
 
@@ -28,35 +28,44 @@ def calculate_pi(digits):
     return pi
 
 
-def get_cpu_usage():
-    return psutil.cpu_percent(interval=0.1)
+def get_memory_usage():
+    process = psutil.Process(os.getpid())
+    return max(process.memory_info().rss / (1024 * 1024), 0)
+
+
+def get_cpu_usage(process):
+    return process.cpu_percent(interval=None)
 
 
 def n_digits_pi(repetitions, digits):
+    gc.collect()
+    process = psutil.Process(os.getpid())
+    process.cpu_percent(interval=None)
+
     total_time = 0
     total_memory = 0
     total_cpu = 0
 
-    start_total = time.time()
+    start_total = time.perf_counter()
 
     for _ in range(repetitions):
-        tracemalloc.start()
-        start = time.time()
         gc.collect()
+        start_memory = get_memory_usage()
+        start = time.perf_counter()
 
-        cpu_before = get_cpu_usage()
+        cpu_before = get_cpu_usage(process)
         pi_value = calculate_pi(digits)
-        cpu_after = get_cpu_usage()
+        cpu_after = get_cpu_usage(process)
 
-        end = time.time()
-        memory_usage = tracemalloc.get_traced_memory()[1] / (1024 * 1024)
-        tracemalloc.stop()
+        end = time.perf_counter()
+        memory_usage = get_memory_usage() - start_memory
+        cpu_usage = cpu_after - cpu_before
 
         total_time += (end - start) * 1000
         total_memory += memory_usage
-        total_cpu += cpu_after
+        total_cpu += cpu_usage
 
-    total_exec_time = round((time.time() - start_total) * 1000, 2)
+    total_exec_time = round((time.perf_counter() - start_total) * 1000, 2)
     avg_time = round(total_time / repetitions, 2)
     avg_memory = round(total_memory / repetitions, 2)
     avg_cpu = round(total_cpu / repetitions, 2)

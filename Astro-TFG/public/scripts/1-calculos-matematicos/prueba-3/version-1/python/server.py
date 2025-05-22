@@ -1,7 +1,7 @@
 import json
+import os
 import time
 import psutil
-import tracemalloc
 import gc
 
 
@@ -18,14 +18,19 @@ def calculate_pi(digits):
 
 
 def get_memory_usage():
-    return tracemalloc.get_traced_memory()[1] / (1024 * 1024)
+    process = psutil.Process(os.getpid())
+    return max(process.memory_info().rss / (1024 * 1024), 0)
 
 
-def get_cpu_usage():
-    return psutil.cpu_percent()
+def get_cpu_usage(process):
+    return process.cpu_percent(interval=None)
 
 
 def n_digits_pi(repetitions, digits):
+    gc.collect()
+    process = psutil.Process(os.getpid())
+    process.cpu_percent(interval=None)
+
     total_time = 0
     total_memory = 0
     total_cpu = 0
@@ -33,19 +38,21 @@ def n_digits_pi(repetitions, digits):
     start_total = time.perf_counter()
 
     for _ in range(repetitions):
-        tracemalloc.start()
-        start = time.perf_counter()
         gc.collect()
+        start_memory = get_memory_usage()
+        start = time.perf_counter()
+
+        cpu_before = get_cpu_usage(process)
         pi_value = calculate_pi(digits)
-        cpu_after = get_cpu_usage()
+        cpu_after = get_cpu_usage(process)
 
         end = time.perf_counter()
-        memory_usage = get_memory_usage()
-        tracemalloc.stop()
+        memory_usage = get_memory_usage() - start_memory
+        cpu_usage = cpu_after - cpu_before
 
         total_time += (end - start) * 1000
         total_memory += memory_usage
-        total_cpu += cpu_after
+        total_cpu += cpu_usage
 
     total_exec_time = round((time.perf_counter() - start_total) * 1000, 2)
     avg_time = round(total_time / repetitions, 2)

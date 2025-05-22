@@ -22,16 +22,18 @@ def get_memory_usage():
 
 
 def n_digits_pi(repetitions, digits):
+    gc.collect()
+    tracemalloc.start()
     total_time = 0
     total_memory = 0
 
     start_total = time.perf_counter()
 
     for _ in range(repetitions):
-        tracemalloc.start()
         gc.collect()
-
+        tracemalloc.start()
         start = time.perf_counter()
+
         pi_value = calculate_pi(digits)
 
         end = time.perf_counter()

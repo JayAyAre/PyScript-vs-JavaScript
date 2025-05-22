@@ -77,8 +77,6 @@ function calculatePiGaussLegendre(digits) {
 }
 
 async function n_digits_pi(repetitions, digits) {
-    const outputDiv = document.getElementById("javascript-output");
-
     let totalTime = 0;
     let totalMemory = 0;
     const startTotal = performance.now();
@@ -89,23 +87,20 @@ async function n_digits_pi(repetitions, digits) {
         const piValue = calculatePiGaussLegendre(digits);
 
         const end = performance.now();
-        const memoryUsage = performance.memory ?
-            (performance.memory.usedJSHeapSize / (1024 * 1024)) : 0;
-
         totalTime += (end - start);
-        totalMemory += memoryUsage;
+        totalMemory += getMemoryUsageJS();
     }
 
     const endTotal = performance.now();
-    const totalExecTime = (endTotal - startTotal).toFixed(2);
-    const avgTime = (totalTime / repetitions).toFixed(2);
+    const totalExecTime = (endTotal - startTotal);
 
-    const avgMemory = (totalMemory / repetitions).toFixed(2);
+    const avgTime = Number((totalTime / repetitions));
+    const avgMemory = Number((totalMemory / repetitions));
 
     displayResults({
-        total_time: totalExecTime,
-        execution_time: avgTime,
-        memory_usage: avgMemory
+        total_time: totalExecTime.toFixed(2),
+        execution_time: avgTime.toFixed(2),
+        memory_usage: avgMemory.toFixed(2)
     });
 
 }
@@ -113,10 +108,11 @@ async function n_digits_pi(repetitions, digits) {
 
 function getMemoryUsageJS() {
     if (performance.memory) {
-        return performance.memory.usedJSHeapSize / (1024 * 1024);
+        return Math.max(performance.memory.usedJSHeapSize / (1024 * 1024), 0);
     }
     return -1;
 }
+
 
 function displayResults(results) {
     const output = document.getElementById("javascript-output");

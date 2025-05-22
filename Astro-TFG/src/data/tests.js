@@ -73,7 +73,7 @@ export const tests = [
                     'El objetivo de esta prueba es evaluar el rendimiento de Python y JavaScript en el cálculo de dígitos de π, tanto sin usar como usando precisión arbitraria. Se busca medir cómo afecta el uso de estructuras de datos nativas y optimizadas a la velocidad de cálculo y al consumo de memoria. Al indicar “precisión arbitraria” se quiere señalar que el algoritmo calcula dígitos que no se pueden representar exactamente con un número de bits, como un float o double.',
                 versions: [
                     {
-                        title: 'Bailey-Borwein-Plouffe (BBP con Estructuras nativas)',
+                        title: 'Bailey-Borwein-Plouffe sin precisión arbitraria',
                         description:
                             'Se calcularán N=10³ dígitos de π con la implementación de la fórmula BBP usando estructuras nativas. Esta simulación se ejecutará 1000 veces para obtener una medición estadística.',
                         jsLibs: null,
@@ -84,7 +84,7 @@ export const tests = [
                         graph: false,
                     },
                     {
-                        title: 'Gauss-Legendre (Estructuras optimizadas)',
+                        title: 'Gauss-Legendre con precisión arbitraria',
                         description:
                             'Se calcularán N=10⁴ dígitos de π con la implementación de Gauss–Legendre usando estructuras optimizadas. Esta simulación se ejecutará 10 veces para obtener una medición estadística mínima.',
                         jsLibs: ["https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.js"],
@@ -192,7 +192,7 @@ export const tests = [
             'En estos escenarios se emplean WebWorkers, por lo que no se bloquearan las pruebas mientras se ejecutan. Sin embargo, se decidio mantener la pantalla de carga (aunque no esten en el hilo principal)) para informar al usuario de que la prueba está en curso.',
         tests: [
             {
-                title: 'Renderizado de gráficos de dispersión masivos (100,000 puntos',
+                title: 'Renderizado de gráficos de dispersión masivos (100,000 puntos)',
                 description:
                     'Esta prueba evaluará la capacidad de Python (Matplotlib) y JavaScript (Canvas) para renderizar un gráfico de dispersión con 100,000 puntos de datos. En JavaScript se usara Float64Array y Canvas 2D, mientras que en PyScript se usara Numpy y Matplotlib. Con eso se lograra generar y renderizar un PNG con el grafico de dispersión.',
                 versions: [

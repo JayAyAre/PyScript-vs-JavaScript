@@ -21,45 +21,48 @@ function calculatePi(digits) {
     return pi;
 }
 
-function getMemoryUsage() {
-    return process.memoryUsage().heapUsed;
+function getMemoryUsageJS() {
+    return Math.max(process.memoryUsage().heapUsed / (1024 * 1024), 0);
 }
 
 async function getCpuUsage() {
-    return await cpu.usage();
+    return Math.max(await cpu.usage(), 0);
 }
 
 async function computePi(digits, repetitions) {
     let totalTime = 0;
     let totalMemory = 0;
-    let totalCpu = 0;
+    let totalCPU = 0;
 
     let startReal = performance.now();
 
     for (let i = 0; i < repetitions; i++) {
-        const startMemory = process.memoryUsage().heapUsed;
+        const startMemory = getMemoryUsageJS();
+        const start = performance.now();
+        const cpuBefore = await getCpuUsage();
 
-        let start = performance.now();
         let piValue = calculatePi(digits);
 
-        let executionTime = performance.now() - start;
-        let memoryUsage = (getMemoryUsage - startMemory) / (1024 * 1024);
+        const cpuAfter = await getCpuUsage();
+        const end = performance.now();
+        const endMemory = getMemoryUsageJS();
 
-        totalTime += executionTime;
-        totalMemory += memoryUsage;
+
+        totalTime += (end - start);
+        totalMemory += (endMemory - startMemory);
+        totalCPU += (cpuAfter - cpuBefore);
     }
 
-    let totalExecTime = ((performance.now() - startReal) / 1000).toFixed(2);
-    totalCpu = await getCpuUsage();
-
-    let avgTime = (totalTime / repetitions).toFixed(2);
-    let avgMemory = (totalMemory / repetitions).toFixed(2);
+    const totalExecTime = (performance.now() - startReal).toFixed(2);
+    const avgTime = (totalTime / repetitions).toFixed(2);
+    const avgMemory = Math.abs((totalMemory / repetitions)).toFixed(2);
+    const avgCPU = Math.abs((totalCPU / repetitions)).toFixed(2);
 
     return {
         totalExecutionTime: totalExecTime,
         avgExecutionTime: avgTime,
         avgMemoryUsage: avgMemory,
-        avgCPUUsage: totalCpu
+        avgCPUUsage: avgCPU
     };
 }
 

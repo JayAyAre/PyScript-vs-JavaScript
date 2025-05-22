@@ -66,23 +66,30 @@
             document.getElementById(elementId).textContent = '';
         }
 
-       function startFPSMeasurement(duration = 3000, id) {
+        function startFPSMeasurement(duration, id) {
             let start = performance.now();
             let frames = 0;
-            fpsMeasurements = [];
+            const fpsMeasurements = [];
+            const endTime = start + duration;
 
             function measure() {
+                const now = performance.now();
+                const delta = now - start;
+                fpsMeasurements.push(1000 / delta);
                 frames++;
-                let now = performance.now();
-                fpsMeasurements.push(1000 / (now - start));
                 start = now;
-                if (now - pyStartTime < duration) {
+
+                if (now < endTime) {
                     requestAnimationFrame(measure);
                 } else {
                     const avgFPS = fpsMeasurements.reduce((a, b) => a + b, 0) / fpsMeasurements.length;
-                    document.getElementById(id).innerHTML += `<div>Average FPS: ${avgFPS.toFixed(2)}</div>`;
+                    const container = document.getElementById(id);
+                    const fpsDiv = document.createElement("div");
+                    fpsDiv.textContent = `Average FPS: ${avgFPS.toFixed(2)}`;
+                    container.appendChild(fpsDiv);
                 }
             }
+
             requestAnimationFrame(measure);
         }
 
@@ -148,7 +155,7 @@
         <div id="graph-container-pyscript"></div>
     </div>
 
-    <table id="metrics-container">
+   <table border="1" id="metrics-container">
         <thead>
             <tr>
                 <th>JavaScript</th><th>PyScript</th>

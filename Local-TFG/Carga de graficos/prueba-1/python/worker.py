@@ -38,6 +38,7 @@ def png_to_base64(fig):
 
 def graph_rendering_benchmark(size):
     try:
+        gc.collect()
         t0 = time.perf_counter()
         coords = rng.random((size, 2))
         data_gen_time = (time.perf_counter() - t0) * 1000

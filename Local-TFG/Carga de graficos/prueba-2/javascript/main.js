@@ -122,7 +122,14 @@ function displayResult(r) {
 
     const graphDiv = document.getElementById("graph-container-javascript");
     graphDiv.innerHTML = "";
-    Plotly.newPlot(graphDiv, r.traces, r.layout);
+
+    const plotDiv = document.createElement("div");
+    plotDiv.id = "plot-js";
+    graphDiv.appendChild(plotDiv);
+
+    Plotly.newPlot(plotDiv.id, r.traces, r.layout).then(() => {
+        startFPSMeasurement(3000, "javascript-output");
+    });
 }
 
 window.runJsBenchmark = runJsBenchmark;

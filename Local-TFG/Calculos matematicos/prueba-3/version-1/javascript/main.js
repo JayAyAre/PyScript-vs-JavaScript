@@ -62,16 +62,16 @@ function n_digits_pi(repetitions, digits) {
     const avgMemory = Number((totalMemory / repetitions));
 
     displayResults({
-        total_time: totalExecTime,
-        execution_time: avgTime,
-        memory_usage: avgMemory
+        total_time: totalExecTime.toFixed(2),
+        execution_time: avgTime.toFixed(2),
+        memory_usage: avgMemory.toFixed(2)
     });
 }
 
 
 function getMemoryUsageJS() {
     if (performance.memory) {
-        return performance.memory.usedJSHeapSize / (1024 * 1024);
+        return Math.abs(performance.memory.usedJSHeapSize / (1024 * 1024), 0);
     }
     return -1;
 }

@@ -27,19 +27,26 @@ function calculateStd(data) {
     return Math.sqrt(squaredDiffSum / data.length);
 }
 
+function getMemoryUsageJS() {
+    if (performance.memory) {
+        return Math.max(performance.memory.usedJSHeapSize / (1024 * 1024), 0);
+    }
+    return -1;
+}
+
 function doStatisticalAnalysis(size) {
     const metrics = {};
     const startTotal = performance.now();
     let maxMemory = 0;
 
-    let memoryBefore = performance.memory?.usedJSHeapSize || 0;
-    let startOp = performance.now();
-    const data = createDataStructure(size);
+    let start_op = performance.now();
+    let data = createDataStructure(size);
     metrics['create'] = {
-        time: performance.now() - startOp,
-        memory: Math.abs(((performance.memory?.usedJSHeapSize || 0) - memoryBefore) / (1024 * 1024))
+        time: performance.now() - start_op,
+        memory: getMemoryUsageJS(),
     };
-    maxMemory = metrics['create'].memory;
+
+    maxMemory = Math.max(maxMemory, getMemoryUsageJS());
 
     const operations = [
         ['sum', calculateSum],
@@ -47,17 +54,19 @@ function doStatisticalAnalysis(size) {
         ['std', calculateStd]
     ];
 
-    for (const [opName, opFunc] of operations) {
-        memoryBefore = performance.memory?.usedJSHeapSize || 0;
-        startOp = performance.now();
+    for (const [op_name, op_func] of operations) {
+        start_op = performance.now();
 
-        const result = opFunc(data);
+        const mem_before = getMemoryUsageJS();
+        op_func(data);
+        const mem_after = getMemoryUsageJS();
 
-        metrics[opName] = {
-            time: performance.now() - startOp,
-            memory: Math.abs(((performance.memory?.usedJSHeapSize || 0) - memoryBefore) / (1024 * 1024))
+        if (mem_after > maxMemory) maxMemory = mem_after;
+
+        metrics[op_name] = {
+            time: performance.now() - start_op,
+            memory: Math.abs(mem_after - mem_before),
         };
-        maxMemory = Math.max(maxMemory, metrics[opName].memory);
     }
 
     metrics['output'] = {

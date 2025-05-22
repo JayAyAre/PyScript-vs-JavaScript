@@ -47,6 +47,13 @@ function deleteFromDataStructure(my_list, value) {
     }
 }
 
+function getMemoryUsageJS() {
+    if (performance.memory) {
+        return Math.max(performance.memory.usedJSHeapSize / (1024 * 1024), 0);
+    }
+    return -1;
+}
+
 let max_memory = 0;
 
 function doOperations(size) {
@@ -54,17 +61,11 @@ function doOperations(size) {
     const metrics = {};
     const start_total = performance.now();
 
-    const measureMemory = () => {
-        const current = performance.memory.usedJSHeapSize / (1024 * 1024);
-        max_memory = Math.abs(Math.max(max_memory, current));
-        return current;
-    };
-
     let start_op = performance.now();
     createDataStructure(my_list, size);
     metrics['create'] = {
         'time': performance.now() - start_op,
-        'memory': measureMemory()
+        'memory': getMemoryUsageJS()
     };
 
     const operations = [
@@ -78,12 +79,11 @@ function doOperations(size) {
     for (const [op_name, op_func, args] of operations) {
         start_op = performance.now();
 
-        if (window.gc) window.gc();
-
-
-        const mem_before = measureMemory();
+        const mem_before = getMemoryUsageJS();
         op_func(...args);
-        const mem_after = measureMemory();
+        const mem_after = getMemoryUsageJS();
+
+        if (mem_after > max_memory) max_memory = mem_after;
 
         metrics[op_name] = {
             'time': performance.now() - start_op,

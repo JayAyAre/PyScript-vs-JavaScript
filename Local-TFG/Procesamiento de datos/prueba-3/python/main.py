@@ -1,9 +1,8 @@
 import js  # type: ignore
-from pyscript import display, PyWorker, document
+from pyscript import display, PyWorker
 import json
 import time
 import asyncio
-import pandas as pd
 
 workers = []
 workers_ready = False

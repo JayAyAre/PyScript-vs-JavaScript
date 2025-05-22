@@ -17,16 +17,16 @@ def get_memory_usage():
 
 
 def benchmark_primes_py(repetitions, n):
+    gc.collect()
     tracemalloc.start()
     start_total_time = time.perf_counter()
-    gc.collect()
 
     total_time = 0
     total_memory = 0
     for _ in range(repetitions):
+        gc.collect()
         tracemalloc.start()
         start = time.perf_counter()
-        gc.collect()
 
         primes = sieve_of_eratosthenes_np(n)
 
@@ -38,8 +38,8 @@ def benchmark_primes_py(repetitions, n):
         total_memory += memory_usage
 
     total_exec_time = (time.perf_counter() - start_total_time) * 1000
-    avg_time = total_time / repetitions
-    avg_memory = total_memory / repetitions
+    avg_time = round(total_time / repetitions, 2)
+    avg_memory = round(total_memory / repetitions, 2)
 
     tracemalloc.stop()
 

@@ -5,7 +5,7 @@ import js  # type: ignore
 from pyscript import display
 import numpy as np
 
-seed = int(time.time() * 1000) % 2**32
+seed = int(time.perf_counter() * 1000) % 2**32
 rng = np.random.default_rng(seed)
 
 
@@ -33,21 +33,29 @@ def delete_from_data_structure(arr, value):
     return arr[arr != value]
 
 
+def get_memory_usage():
+    return tracemalloc.get_traced_memory()[1] / (1024 * 1024)
+
+
 def do_operations(size):
-    metrics = {}
-    start_total = time.perf_counter()
+    gc.collect()
     tracemalloc.start()
+    metrics = {}
     max_memory = 0
 
+    start_total = time.perf_counter()
     start_op = time.perf_counter()
+
     my_array = create_data_structure(size)
-    current_mem = tracemalloc.get_traced_memory()
+
+    tracemalloc.stop()
+
     metrics['create'] = {
         'time': (time.perf_counter() - start_op) * 1000,
-        'memory': current_mem[1] / (1024 * 1024)
+        'memory': get_memory_usage()
     }
-    max_memory = max(max_memory, current_mem[1] / (1024 * 1024))
-    tracemalloc.stop()
+
+    max_memory = max(max_memory, get_memory_usage())
 
     operations = [
         ('transform', transform_data_structure, (my_array,)),
@@ -58,22 +66,18 @@ def do_operations(size):
     ]
 
     for op_name, op_func, args in operations:
+        gc.collect()
         tracemalloc.start()
         start_op = time.perf_counter()
-        gc.collect()
 
         result = op_func(*args)
-        op_time = (time.perf_counter() - start_op) * 1000
-
-        current_mem = tracemalloc.get_traced_memory()
-        op_memory = current_mem[1] / (1024 * 1024)
 
         metrics[op_name] = {
-            'time': op_time,
-            'memory': abs(op_memory)
+            'time': float((time.perf_counter() - start_op) * 1000),
+            'memory': get_memory_usage()
         }
 
-        max_memory = max(max_memory, op_memory)
+        max_memory = max(max_memory, metrics[op_name]["memory"])
         tracemalloc.stop()
 
     metrics['output'] = {
@@ -81,7 +85,6 @@ def do_operations(size):
         'memory_peak': max_memory
     }
 
-    tracemalloc.stop()
     display_results(metrics)
 
 

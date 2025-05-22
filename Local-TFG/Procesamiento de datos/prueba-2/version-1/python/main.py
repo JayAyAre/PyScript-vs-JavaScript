@@ -23,23 +23,29 @@ def calculate_std(data):
     return (sum((x - mean) ** 2 for x in data) / len(data)) ** 0.5
 
 
+def get_memory_usage():
+    current, peak = tracemalloc.get_traced_memory()
+    return peak / (1024 * 1024)
+
+
 def do_statistical_analysis(size):
     metrics = {}
-    start_total = time.perf_counter()
-    tracemalloc.start()
-
     max_memory = 0
+    start_total = time.perf_counter()
 
+    gc.collect()
+    tracemalloc.start()
     start_op = time.perf_counter()
     data = create_data_structure(size)
-    current_mem = tracemalloc.get_traced_memory()
+    create_time = (time.perf_counter() - start_op) * 1000
+    create_memory = get_memory_usage()
+    tracemalloc.stop()
 
     metrics['create'] = {
-        'time': (time.perf_counter() - start_op) * 1000,
-        'memory': abs(current_mem[1] / (1024 * 1024))
+        'time': create_time,
+        'memory': create_memory
     }
-    max_memory = max(max_memory, current_mem[1] / (1024 * 1024))
-    tracemalloc.stop()
+    max_memory = max(max_memory, create_memory)
 
     operations = [
         ('sum', calculate_sum, (data,)),
@@ -48,25 +54,25 @@ def do_statistical_analysis(size):
     ]
 
     for op_name, op_func, args in operations:
+        gc.collect()
         tracemalloc.start()
         start_op = time.perf_counter()
-        gc.collect()
         result = op_func(*args)
         op_time = (time.perf_counter() - start_op) * 1000
-        current_mem = tracemalloc.get_traced_memory()
-        op_memory = current_mem[1] / (1024 * 1024)
+        op_memory = get_memory_usage()
+        tracemalloc.stop()
+
         metrics[op_name] = {
             'time': op_time,
-            'memory': abs(op_memory)
+            'memory': op_memory
         }
         max_memory = max(max_memory, op_memory)
-        tracemalloc.stop()
 
     metrics['output'] = {
         'total_time': (time.perf_counter() - start_total) * 1000,
         'memory_peak': max_memory
     }
-    tracemalloc.stop()
+
     display_results(metrics)
 
 

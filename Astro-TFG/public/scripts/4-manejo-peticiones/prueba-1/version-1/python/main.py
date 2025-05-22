@@ -31,7 +31,7 @@ async def launch_worker(event):
         delay = int(document.getElementById("request-delay-pyscript").value)
         base_url = js.location.origin
 
-        res = await worker.sync.do_requests(worker_time, num_requests, delay, base_url)
+        res = await worker.sync.do_requests(num_requests, delay, base_url)
 
         display_result(res, num_requests)
 

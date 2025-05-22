@@ -42,10 +42,9 @@ async def run_py_benchmark(event):
         tasks = []
         for i in range(num_executions):
             worker = workers[i % num_workers]
-            tasks.append(worker.sync.do_statistical_analysis(10_000_000))
+            tasks.append(worker.sync.do_statistical_analysis(100_000))
 
         results_list = await asyncio.gather(*tasks)
-
         accumulated = {
             'create': {'time': 0.0, 'memory': 0.0},
             'sum': {'time': 0.0, 'memory': 0.0},

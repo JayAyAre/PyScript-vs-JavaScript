@@ -5,7 +5,7 @@ from pyscript import sync
 import json
 
 
-seed = int(time.time() * 1000) % 2**32
+seed = int(time.perf_counter() * 1000) % 2**32
 rng = np.random.default_rng(seed)
 
 

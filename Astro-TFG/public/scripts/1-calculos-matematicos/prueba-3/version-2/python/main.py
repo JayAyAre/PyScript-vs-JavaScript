@@ -27,21 +27,27 @@ def calculate_pi_gauss_legendre(digits):
     return pi
 
 
+def get_memory_usage():
+    return tracemalloc.get_traced_memory()[1] / (1024 * 1024)
+
+
 def n_digits_pi(repetitions, digits):
+    gc.collect()
+    tracemalloc.start()
     total_time = 0
     total_memory = 0
 
     start_total = time.perf_counter()
 
     for _ in range(repetitions):
-        tracemalloc.start()
-
-        start = time.perf_counter()
         gc.collect()
-        pi_value = calculate_pi_gauss_legendre(digits)
-        end = time.perf_counter()
+        tracemalloc.start()
+        start = time.perf_counter()
 
-        memory_usage = tracemalloc.get_traced_memory()[1] / (1024 * 1024)
+        pi_value = calculate_pi_gauss_legendre(digits)
+
+        end = time.perf_counter()
+        memory_usage = get_memory_usage()
         tracemalloc.stop()
 
         total_time += (end - start) * 1000

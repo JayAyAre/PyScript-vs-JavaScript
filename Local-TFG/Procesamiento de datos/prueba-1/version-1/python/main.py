@@ -48,25 +48,27 @@ def delete_from_data_structure(my_list, value):
             i += 1
 
 
+def get_memory_usage():
+    return tracemalloc.get_traced_memory()[1] / (1024 * 1024)
+
+
 def do_operations(size):
+    gc.collect()
+    tracemalloc.start()
     my_list = []
     metrics = {}
-    start_total = time.perf_counter()
 
-    tracemalloc.start()
-    gc.collect()
+    start_total = time.perf_counter()
     start_op = time.perf_counter()
 
     create_data_structure(my_list, size)
 
-    current_mem = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
 
     metrics['create'] = {
         'time': (time.perf_counter() - start_op) * 1000,
-        'memory': current_mem[1] / (1024 * 1024)
+        'memory': get_memory_usage()
     }
-
-    tracemalloc.stop()
 
     operations = [
         ('transform', transform_data_structure, (my_list,)),
@@ -77,16 +79,15 @@ def do_operations(size):
     ]
 
     for op_name, op_func, args in operations:
-        tracemalloc.start()
         gc.collect()
+        tracemalloc.start()
         start_op = time.perf_counter()
 
         op_func(*args)
-        current_mem = tracemalloc.get_traced_memory()
 
         metrics[op_name] = {
             'time': float((time.perf_counter() - start_op) * 1000),
-            'memory': current_mem[1] / (1024 * 1024)
+            'memory': get_memory_usage()
         }
 
         tracemalloc.stop()

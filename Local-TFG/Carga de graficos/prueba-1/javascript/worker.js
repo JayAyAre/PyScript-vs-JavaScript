@@ -17,6 +17,7 @@ const mean = (arr) => arr.reduce((sum, v) => sum + v, 0) / arr.length;
 self.onmessage = async function (e) {
     const msg = e.data;
     if (msg.type !== "do_analisis") return;
+    const benchmarkStart = performance.now();
 
     const { id, num_executions } = msg;
 
@@ -116,6 +117,7 @@ self.onmessage = async function (e) {
         const avgRender = mean(rawResults.map(r => r.render_time));
         const avgMemory = mean(rawResults.map(r => r.memory));
         const avgTotal = mean(rawResults.map(r => r.total_time));
+        const totalBenchmarkTime = performance.now() - benchmarkStart;
 
         const result = {
             data_gen_time: avgDataGen,

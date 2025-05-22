@@ -2,8 +2,6 @@ import type { APIRoute } from 'astro';
 
 export const prerender = false;
 
-// Api que permite ejecutar las peticiones y simular un delay (4. prueba 1, version 1)
-
 export const GET: APIRoute = async ({ params }) => {
     const delayString = params.delay ?? '0';
     const delay = Math.max(0, Number(delayString.split('.')[0]));

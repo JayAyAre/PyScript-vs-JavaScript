@@ -1,3 +1,4 @@
+import gc
 import time
 import json
 import traceback
@@ -15,7 +16,7 @@ FIG_H_PIX = 600
 DPI = 100
 PADDING = 50
 TICKS = 6
-seed = int(time.time() * 1000) % 2**32
+seed = int(time.perf_counter() * 1000) % 2**32
 rng = np.random.default_rng(seed)
 
 
@@ -37,6 +38,7 @@ def png_to_base64(fig):
 
 def graph_rendering_benchmark(size):
     try:
+        gc.collect()
         t0 = time.perf_counter()
         coords = rng.random((size, 2))
         data_gen_time = (time.perf_counter() - t0) * 1000
@@ -82,7 +84,6 @@ def do_analisis():
         for _ in range(num_exec):
             r_json = graph_rendering_benchmark(
                 GRAPH_SIZE)
-            # conviértelo en dict
             r = json.loads(r_json)
             if "error" in r:
                 display(f"Worker Error: {r['error']}",

@@ -12,7 +12,7 @@ function transform_data_structure(arr) {
 }
 
 function sort_data_structure(arr) {
-    const copy = new Float64Array(arr);
+    const copy = new Int32Array(arr);
     return copy.sort((a, b) => a - b);
 }
 
@@ -37,25 +37,25 @@ function delete_from_data_structure(arr, value) {
 
 let max_memory = 0;
 
+function getMemoryUsageJS() {
+    if (performance.memory) {
+        return Math.max(performance.memory.usedJSHeapSize / (1024 * 1024), 0);
+    }
+    return -1;
+}
+
 function do_operations(size) {
     const metrics = {};
     const start_total = performance.now();
-
-    const measureMemory = () => {
-        if (performance.memory) {
-            const current = performance.memory.usedJSHeapSize / (1024 * 1024);
-            max_memory = Math.max(max_memory, current);
-            return current;
-        }
-        return 0;
-    };
 
     let start_op = performance.now();
     let my_array = create_data_structure(size);
     metrics['create'] = {
         time: performance.now() - start_op,
-        memory: measureMemory(),
+        memory: getMemoryUsageJS(),
     };
+
+    max_memory = Math.max(max_memory, getMemoryUsageJS());
 
     const operations = [
         ['transform', transform_data_structure, [my_array]],
@@ -75,20 +75,17 @@ function do_operations(size) {
 
     for (const [op_name, op_func, args] of operations) {
         start_op = performance.now();
-        if (window.gc) window.gc();
-        const mem_before = performance.memory
-            ? performance.memory.usedJSHeapSize / (1024 * 1024)
-            : 0;
-        let result = op_func(...args);
 
-        const mem_after = performance.memory
-            ? performance.memory.usedJSHeapSize / (1024 * 1024)
-            : 0;
+        const mem_before = getMemoryUsageJS();
+        op_func(...args);
+        const mem_after = getMemoryUsageJS();
+
+        if (mem_after > max_memory) max_memory = mem_after;
+
         metrics[op_name] = {
             time: performance.now() - start_op,
             memory: Math.abs(mem_after - mem_before),
         };
-        max_memory = Math.max(max_memory, mem_after);
     }
 
     metrics['output'] = {

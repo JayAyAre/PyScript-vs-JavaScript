@@ -40,6 +40,7 @@ async def launch_worker(event):
     payload_json = json.dumps(payload)
 
     js.displayPlotFromJSON(payload_json, "graph-container-pyscript")
+    js.startFPSMeasurement(3000, "pyscript-output")
 
     display(f"Worker init time: {worker_time:.2f} ms",
             target="pyscript-output")

@@ -15,10 +15,11 @@ function sieveOfEratosthenes(n) {
 
 function getMemoryUsageJS() {
     if (performance.memory) {
-        return performance.memory.usedJSHeapSize / (1024 * 1024);
+        return Math.abs(performance.memory.usedJSHeapSize / (1024 * 1024), 0);
     }
     return -1;
 }
+
 
 function benchmarkPrimesJS(repetitions, n) {
     let totalTime = 0;

@@ -19,20 +19,19 @@ async def do_analisis():
         individual_times = []
 
         async def fetch_url(url):
-            try:
-                start = time.perf_counter()
-                response = await fetch(url)
-                end = time.perf_counter()
+            t0 = time.perf_counter()
+            resp = await fetch(url)
+            elapsed = (time.perf_counter() - t0) * 1000
 
-                individual_times.append((end - start) * 1000)
+            individual_times.append(elapsed)
 
-                if response.status == 200:
-                    return await response.json()
-                else:
-                    return None
-            except Exception as e:
-                print(f"Error{url}: {e}")
-                return None
+            if resp.status == 200:
+                try:
+                    python_dict = await resp.json()
+                    return python_dict
+                except Exception as e:
+                    return {"error": f"JSON parse failed: {str(e)}"}
+            return {"error": f"Request failed with status {resp.status}"}
 
         results = await asyncio.gather(*(fetch_url(url) for url in urls))
 

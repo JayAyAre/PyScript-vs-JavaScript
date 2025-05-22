@@ -41,9 +41,14 @@ function calculatePiGaussLegendre(digits) {
     return pi.toString();
 }
 
-async function n_digits_pi(repetitions, digits) {
-    const outputDiv = document.getElementById("javascript-output");
+function getMemoryUsageJS() {
+    if (performance.memory) {
+        return Math.max(performance.memory.usedJSHeapSize / (1024 * 1024), 0);
+    }
+    return -1;
+}
 
+async function n_digits_pi(repetitions, digits) {
     let totalTime = 0;
     let totalMemory = 0;
     const startTotal = performance.now();
@@ -54,32 +59,49 @@ async function n_digits_pi(repetitions, digits) {
         const piValue = calculatePiGaussLegendre(digits);
 
         const end = performance.now();
-        const memoryUsage = performance.memory ?
-            (performance.memory.usedJSHeapSize / (1024 * 1024)) : 0;
 
         totalTime += (end - start);
-        totalMemory += memoryUsage;
+        totalMemory += getMemoryUsageJS();
     }
 
-    // ET (Execution Time)
-
     const endTotal = performance.now();
-    const totalExecTime = (endTotal - startTotal).toFixed(2);
-    const avgTime = (totalTime / repetitions).toFixed(2);
+    const totalExecTime = (endTotal - startTotal);
 
-    // RAM
+    const avgTime = Number((totalTime / repetitions));
+    const avgMemory = Number((totalMemory / repetitions));
 
-    const avgMemory = (totalMemory / repetitions).toFixed(2);
+    const results = {
+        total_time: totalExecTime,
+        execution_time: avgTime,
+        memory_usage: avgMemory
+    };
 
-    outputDiv.innerHTML = `
-        <div>Total ET (10x): ${totalExecTime} ms</div>
-        <div>ET (avg, 10x): ${avgTime} ms</div>
-        <div>RAM (avg, 10x): ${avgMemory} MB</div>
-    `;
+    displayResults(results);
 }
 
+function displayResults(results) {
+    const output = document.getElementById("javascript-output");
+
+    const timeTotalDiv = document.createElement("div");
+    timeTotalDiv.textContent = `Total ET (10x): ${results.total_time.toFixed(2)} ms`;
+    output.appendChild(timeTotalDiv);
+
+    const timeDiv = document.createElement("div");
+    timeDiv.textContent = `ET (avg, 10x): ${results.execution_time.toFixed(2)} ms`;
+    output.appendChild(timeDiv);
+
+    const memoryDiv = document.createElement("div");
+    if (results.memory_usage !== -1) {
+        memoryDiv.textContent = `RAM (avg, 10x): ${results.memory_usage.toFixed(2)} MB`;
+    } else {
+        memoryDiv.textContent = `RAM unsupported measurement in this browser.`;
+    }
+    output.appendChild(memoryDiv);
+}
+
+
 window.runJsBenchmark = function () {
-    clearCell("javascript-output");
+    window.clearCell("javascript-output");
     window.showExecutionLoader();
 
     requestAnimationFrame(() => {
@@ -89,8 +111,4 @@ window.runJsBenchmark = function () {
         }, 0);
     });
 
-}
-
-function clearCell(elementId) {
-    document.getElementById(elementId).innerHTML = "";
 }

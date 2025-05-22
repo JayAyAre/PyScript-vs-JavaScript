@@ -26,6 +26,14 @@ function initHighPrecisionMath() {
     });
 }
 
+function getMemoryUsageJS() {
+    return Math.max(process.memoryUsage().heapUsed / (1024 * 1024), 0);
+}
+
+async function getCpuUsage() {
+    return Math.max(await cpu.usage(), 0);
+}
+
 function calculatePiGaussLegendre(digits) {
     initHighPrecisionMath()
     const math = highPrecisionMath;
@@ -58,45 +66,42 @@ function calculatePiGaussLegendre(digits) {
 }
 
 async function runBenchmark(repetitions, digits) {
-    const results = {
-        totalTime: 0,
-        totalMemory: 0,
-        totalCPU: 0,
-        executions: []
-    };
+    let totalTime = 0;
+    let totalMemory = 0;
+    let totalCPU = 0;
 
-    const startTotal = process.hrtime();
+    const startTotal = performance.now();
 
     for (let i = 0; i < repetitions; i++) {
-        const startMemory = process.memoryUsage().heapUsed;
-        const cpuStart = await cpu.usage();
-        const startTime = process.hrtime();
+        const startMemory = getMemoryUsageJS();
+        const start = performance.now();
+        const cpuBefore = await getCpuUsage();
 
         const pi = calculatePiGaussLegendre(digits);
 
-        const endTime = process.hrtime(startTime);
-        const cpuEnd = await cpu.usage();
-        const endMemory = process.memoryUsage().heapUsed;
+        const cpuAfter = await getCpuUsage();
+        const end = performance.now();
+        const endMemory = getMemoryUsageJS();
 
-        const execTimeMs = (endTime[0] * 1000) + (endTime[1] / 1000000);
+        const elapsed = end - start;
+        const memoryUsed = endMemory - startMemory;
+        const cpuUsed = cpuAfter - cpuBefore;
 
-        const memoryUsageMb = (endMemory - startMemory) / (1024 * 1024);
-
-        const cpuUsage = cpuEnd - cpuStart;
-
-        results.totalTime += execTimeMs;
-        results.totalMemory += memoryUsageMb;
-        results.totalCPU += cpuUsage;
+        totalTime += elapsed;
+        totalMemory += memoryUsed;
+        totalCPU += cpuUsed;
     }
 
-    const endTotal = process.hrtime(startTotal);
-    const totalExecTimeMs = (endTotal[0] * 1000) + (endTotal[1] / 1000000);
+    const totalExecTime = (performance.now() - startTotal);
+    const avgTime = totalTime / repetitions;
+    const avgMemory = Math.abs(totalMemory / repetitions);
+    const avgCPU = Math.abs(totalCPU / repetitions);
 
     return {
-        totalExecutionTime: totalExecTimeMs.toFixed(2),
-        avgExecutionTime: (results.totalTime / repetitions).toFixed(2),
-        avgMemoryUsage: (results.totalMemory / repetitions).toFixed(2),
-        avgCPUUsage: (results.totalCPU / repetitions).toFixed(2)
+        totalExecutionTime: totalExecTime.toFixed(2),
+        avgExecutionTime: avgTime.toFixed(2),
+        avgMemoryUsage: avgMemory.toFixed(2),
+        avgCPUUsage: avgCPU.toFixed(2)
     };
 }
 

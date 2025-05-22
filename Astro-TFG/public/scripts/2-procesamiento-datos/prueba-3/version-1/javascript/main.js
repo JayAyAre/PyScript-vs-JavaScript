@@ -144,8 +144,9 @@ window.runJsBenchmark = async function () {
     await new Promise(requestAnimationFrame);
 
     try {
-        await runJSBenchmark();
+        await runJsBenchmark();
     } finally {
         window.hideExecutionLoader();
     }
 };
+

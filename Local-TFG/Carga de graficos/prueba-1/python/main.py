@@ -43,6 +43,7 @@ def display_result(result):
         f"Avg Rendering: {result['render_time']:.2f} ms", target="pyscript-output")
     display(
         f"Avg execution time: {result['average_time_ms']:.2f} ms", target="pyscript-output")
+    display(f"Memory: {result['memory']:.2f} MB", target="pyscript-output")
     display(
         f"Total ET: {result['total_time_ms']:.2f} ms", target="pyscript-output")
     if result["image_base64"]:

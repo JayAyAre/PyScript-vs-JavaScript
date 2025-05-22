@@ -7,12 +7,12 @@ const cpu = osu.cpu;
 
 app.use(cors());
 
-function getMemoryUsage() {
-    return process.memoryUsage().heapUsed / (1024 * 1024);
+function getMemoryUsageJS() {
+    return Math.max(process.memoryUsage().heapUsed / (1024 * 1024), 0);
 }
 
 async function getCpuUsage() {
-    return await cpu.usage();
+    return Math.max(await cpu.usage(), 0);
 }
 
 function sieveOfEratosthenes(n) {
@@ -38,7 +38,7 @@ async function benchmarkPrimesJS(repetitions, n) {
     const startTotal = performance.now();
 
     for (let i = 0; i < repetitions; i++) {
-        const startMemory = getMemoryUsage();
+        const startMemory = getMemoryUsageJS();
         const start = performance.now();
         const cpuBefore = await getCpuUsage();
 
@@ -46,7 +46,7 @@ async function benchmarkPrimesJS(repetitions, n) {
 
         const cpuAfter = await getCpuUsage();
         const end = performance.now();
-        const endMemory = getMemoryUsage();
+        const endMemory = getMemoryUsageJS();
 
         totalTime += (end - start);
         totalMemory += (endMemory - startMemory);
@@ -55,8 +55,8 @@ async function benchmarkPrimesJS(repetitions, n) {
 
     const totalExecTime = (performance.now() - startTotal).toFixed(2);
     const avgTime = (totalTime / repetitions).toFixed(2);
-    const avgMemory = (totalMemory / repetitions).toFixed(2);
-    const avgCPU = (totalCPU / repetitions).toFixed(2);
+    const avgMemory = Math.abs((totalMemory / repetitions)).toFixed(2);
+    const avgCPU = Math.abs((totalCPU / repetitions)).toFixed(2);
 
     return {
         totalExecutionTime: `Total ET (50x): ${totalExecTime} ms`,

@@ -24,10 +24,9 @@ function n_digits_pi(repetitions, digits) {
         const piValue = calculatePi(digits);
 
         const end = performance.now();
-        const memoryUsage = getMemoryUsageJS();
 
         totalTime += (end - start);
-        totalMemory += memoryUsage;
+        totalMemory += getMemoryUsageJS();
     }
 
     const endTotal = performance.now();
@@ -45,10 +44,11 @@ function n_digits_pi(repetitions, digits) {
 
 function getMemoryUsageJS() {
     if (performance.memory) {
-        return performance.memory.usedJSHeapSize / (1024 * 1024);
+        return Math.max(performance.memory.usedJSHeapSize / (1024 * 1024), 0);
     }
     return -1;
 }
+
 
 function displayResults(results) {
     const output = document.getElementById("javascript-output");

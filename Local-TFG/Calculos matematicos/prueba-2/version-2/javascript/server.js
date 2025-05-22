@@ -9,13 +9,14 @@ const port = 3000;
 
 app.use(cors());
 
-function getMemoryUsage() {
-    return process.memoryUsage().heapUsed / (1024 * 1024);
+function getMemoryUsageJS() {
+    return Math.max(process.memoryUsage().heapUsed / (1024 * 1024), 0);
 }
 
 async function getCpuUsage() {
-    return await cpu.usage();
+    return Math.max(await cpu.usage(), 0);
 }
+
 
 function sieveOfEratosthenes(n) {
     let primes = new Uint8Array(n + 1).fill(1);
@@ -40,7 +41,7 @@ async function benchmarkPrimesJS(repetitions, n) {
     const startTotal = performance.now();
 
     for (let i = 0; i < repetitions; i++) {
-        const startMemory = getMemoryUsage();
+        const startMemory = getMemoryUsageJS();
         const start = performance.now();
         const cpuBefore = await getCpuUsage();
 
@@ -48,7 +49,7 @@ async function benchmarkPrimesJS(repetitions, n) {
 
         const cpuAfter = await getCpuUsage();
         const end = performance.now();
-        const endMemory = getMemoryUsage();
+        const endMemory = getMemoryUsageJS();
 
         totalTime += (end - start);
         totalMemory += (endMemory - startMemory);

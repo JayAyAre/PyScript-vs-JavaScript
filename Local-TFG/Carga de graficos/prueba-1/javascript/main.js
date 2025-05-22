@@ -110,6 +110,10 @@ function displayResult(r) {
     avgExecutionTimeDiv.textContent = `Avg execution time: ${r.average_time_ms.toFixed(2)} ms`;
     output.appendChild(avgExecutionTimeDiv);
 
+    const memoryDiv = createDiv();
+    memoryDiv.textContent = `Memory: ${r.memory.toFixed(2)} MB`;
+    output.appendChild(memoryDiv);
+
     const totalTimeDiv = createDiv();
     totalTimeDiv.textContent = `Total ET: ${r.total_time_ms.toFixed(2)} ms`;
     output.appendChild(totalTimeDiv);
