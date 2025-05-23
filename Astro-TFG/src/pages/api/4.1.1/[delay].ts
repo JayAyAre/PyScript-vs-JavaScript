@@ -11,13 +11,9 @@ export const GET: APIRoute = async ({ params }) => {
     const delayString = params.delay ?? '0';
     const delay = Math.max(0, Number(delayString.split('.')[0]));
 
-    const start_time = performance.now();
-
     if (delay > 0) {
         await new Promise((r) => setTimeout(r, delay));
     }
-
-    const response_time = performance.now() - start_time;
 
     activeRequests--;
 
@@ -30,7 +26,6 @@ export const GET: APIRoute = async ({ params }) => {
         JSON.stringify({
             status: 'success',
             delay,
-            response_time,
             data,
         }),
         {

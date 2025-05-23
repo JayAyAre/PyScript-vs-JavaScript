@@ -265,18 +265,22 @@ const { title } = Astro.props;
                         >
                             <li>
                                 <strong>JavaScript</strong><br />
-                                Sobresalió en operaciones nativas, aunque su rendimiento
-                                se degradó con estructuras de datos más complejas.
+                                Durante las primeras versiones destaco, sin embargo
+                                al implementar las optimizaciones de rendimiento
+                                en ambos entornos, fue superado abismalmente.
                             </li>
                             <li>
                                 <strong>PyScript</strong><br />
                                 Gracias a bibliotecas especializadas, superó a JavaScript
-                                en tareas ETL complejas, logrando un mejor equilibrio
-                                entre velocidad y consumo de memoria.
+                                en las tareas, logrando el mejor equilibrio entre
+                                velocidad y consumo de memoria, y superando en ambas
+                                a JavaScript..
 
                                 <br /><br />
                                 La implementación con Web Workers mostró una escalabilidad
-                                más notable en PyScript que en JavaScript.
+                                más notable en PyScript que en JavaScript. Sin embargo,
+                                la inicialización de los workers en PyScript es mucho
+                                mas lenta que en JavaScript.
                             </li>
                         </ol>
                     </ResultsCard>
@@ -288,13 +292,15 @@ const { title } = Astro.props;
                         >
                             <li>
                                 <strong>JavaScript</strong><br />
-                                Mantuvo un rendimiento constante con tiempos de renderizado
-                                significativamente inferiores en gráficos interactivos.
+                                Realmente en ambos tipos de graficos, tanto en graficos
+                                png o graficos interactivos tuvo la delantera ante
+                                PyScript.
                             </li>
                             <li>
                                 <strong>PyScript</strong><br />
                                 Requirió un tiempo considerablemente mayor para generar
-                                imágenes vectoriales de alta complejidad.
+                                los dos tipos de graficos, y ademas tuvo un rendimiento
+                                inferior en cada uno de los tiempos medidos.
                             </li>
                         </ol>
                     </ResultsCard>
@@ -303,13 +309,11 @@ const { title } = Astro.props;
                     <ResultsCard title="4. Manejo de solicitudes concurrentes">
                         <ol class="list-decimal list-inside space-y-2">
                             <li>
-                                <strong>JavaScript</strong><br />
-                                Superó a PyScript en todos los escenarios HTTP.
-                            </li>
-                            <li>
-                                <strong>PyScript</strong><br />
-                                Mostró una mejor escalabilidad al trabajar con WebSockets,
-                                acercándose al rendimiento de JavaScript.
+                                Realmente fueron los resultados mas parejos, en
+                                ambos casos tuvieron un rendimiento realmente
+                                parecido, sin embargo, por unas centesimas de
+                                segundos podriamos decir que JavaScript tuvo el
+                                mejor rendimiento en ambos escenarios.
                             </li>
                         </ol>
                     </ResultsCard>
@@ -320,8 +324,10 @@ const { title } = Astro.props;
                     >
                         <span class="block">
                             JavaScript demostró una superioridad absoluta en
-                            operaciones criptográficas SHA-256, acompañado de un
-                            menor consumo de memoria.
+                            operaciones criptográficas, tanto en las pruebas
+                            donde analizabamos los hashes de SHA-256 como en las
+                            pruebas donde analizabamos el cifrado y descifrado
+                            simétrico con AES-GCM.
                         </span>
                     </ResultsCard>
 
@@ -331,15 +337,11 @@ const { title } = Astro.props;
                     >
                         <ol class="list-decimal list-inside space-y-2">
                             <li>
-                                <strong>JavaScript</strong><br />
-                                Ejecutó el entrenamiento con mayor rapidez, aunque
-                                con una precisión ligeramente inferior en modelos
-                                complejos.
-                            </li>
-                            <li>
-                                <strong>PyScript</strong><br />
-                                Consumió más memoria, pero alcanzó una precisión
-                                superior a la de JavaScript.
+                                Estos resultados tambien dio unos valores
+                                iniciales parejos, donde ambos tenian una
+                                precision, uso de memoria, y tiempos parecidos,
+                                sin embargo en la segunda prueba JavaScript tuvo
+                                un rendimiento mucho mas optimo que en PyScript.
                             </li>
                         </ol>
                     </ResultsCard>
@@ -354,13 +356,35 @@ const { title } = Astro.props;
                         <p class="mt-4">
                             El análisis revela que JavaScript mantiene la
                             ventaja en la mayoría de los escenarios evaluados,
-                            especialmente en operaciones nativas y en tiempo
+                            especialmente en algoritmos e implementaciones tanto
+                            de forma nativa como en operaciones y en tiempo
                             real. Por su parte, PyScript exhibe un potencial
-                            destacado en el procesamiento científico gracias a
-                            bibliotecas especializadas, aunque su sobrecarga
-                            inicial (carga de WASM e inicialización del
-                            intérprete) limita su uso en situaciones que exigen
-                            tiempos de respuesta inmediatos.
+                            destacado en el procesamiento de datos, donde las
+                            funciones y estructuras aplicadas a los datos
+                            gracias a bibliotecas especializadas, son realmente
+                            notables a la hora de analizar su rendimiento. Sin
+                            embargo, para realmente sacarle provecho a PyScript
+                            tenemos que tener dos entornos muy concretos, el
+                            primero es el entorno donde no tengamos recursos
+                            altos disponibles de memoria, y donde se este
+                            dispuesto a sacrificar tiempos de ejecución un poco
+                            más lento de lo normal. El problema? estos entornos
+                            son limitados ya que el mas parecido son los
+                            sistemas empotrados, pero estos requieren respuestas
+                            inmediatas, por lo que no podemos esperar mucho
+                            tiempo para obtener los resultados. El segundo es
+                            donde se requiera analizar un gran conjunto de
+                            datos, y donde el tiempo de respuesta es realmente
+                            importante, por lo que es necesario que se puedan
+                            obtener resultados en un tiempo razonable. Sin
+                            embargo, en ambos casos, PyScript sigue necesitando
+                            un tiempo de carga de la pagina inicial, que
+                            dependera de los modulos y del codigo Python, sin
+                            embargo eso afecta a la escalabilidad de su uso en
+                            el navegador. Por otro lado, si se usan Web Workers,
+                            se debe tener en cuenta el tiempo de inicialización
+                            de los workers, que en PyScript dio resultados muy
+                            lentos.
                         </p>
                         <p class="mt-4">
                             La integración de Web Workers puso de manifiesto
@@ -370,7 +394,11 @@ const { title } = Astro.props;
                             inicialización, lo que sugiere una mayor
                             escalabilidad para procesos que contengan gran
                             numero de workers. Sin embargo su espera a la
-                            creación de workers fue muy grande.
+                            creación de workers fue muy grande. Por lo tanto,
+                            PyScript es usable en entornos donde se requiere una
+                            escalabilidad de procesos, pero no en entornos donde
+                            el tiempo de carga inicial y el tiempo de creación
+                            de workers son importantes.
                         </p>
                     </div>
                 </div>

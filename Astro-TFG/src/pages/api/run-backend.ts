@@ -4,12 +4,6 @@ import { spawn } from 'child_process';
 // Desactiva el prerender en Astro para permitir ejecución dinámica del lado servidor
 export const prerender = false;
 
-/**
- * Ejecuta un script externo (Python o Node) como un proceso hijo
- * @param type - Tipo de script a ejecutar ('python' o 'node')
- * @param scriptPath - Ruta absoluta del script en el sistema de archivos
- */
-
 function runWorkerProcess(
     type: 'python' | 'node',
     scriptPath: string
@@ -44,10 +38,7 @@ function runWorkerProcess(
     });
 }
 
-/**
- * Endpoint HTTP POST que recibe tipo y ruta del script,
- * lo ejecuta en el servidor y devuelve su salida
- */
+// Ejecuta un script externo (Python o Node) como un proceso hijo
 
 export async function POST({ request }: { request: Request }) {
     const { type, path: relativePath } = await request.json();
