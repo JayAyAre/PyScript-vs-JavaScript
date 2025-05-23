@@ -22,7 +22,6 @@ async def do_analisis():
             t0 = time.perf_counter()
             resp = await fetch(url)
             elapsed = (time.perf_counter() - t0) * 1000
-
             individual_times.append(elapsed)
 
             if resp.status == 200:

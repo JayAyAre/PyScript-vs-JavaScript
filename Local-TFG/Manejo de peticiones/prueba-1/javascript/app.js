@@ -5,7 +5,12 @@ const PORT = 5002;
 
 app.use(cors());
 
+let activeRequests = 0;
+
 app.get("/mock-api/:delay", (req, res) => {
+    activeRequests++;
+    // console.log(`Concurrent requests now: ${activeRequests}`);
+
     const delay = Math.max(0, parseInt(req.params.delay, 10) || 0);
 
     const reply = () => {
@@ -13,7 +18,12 @@ app.get("/mock-api/:delay", (req, res) => {
             id: i,
             value: Math.random(),
         }));
-        res.json({ status: "success", delay, data });
+        res.json({
+            status: "success",
+            delay,
+            data,
+        });
+        activeRequests--;
     };
 
     if (delay > 0) {

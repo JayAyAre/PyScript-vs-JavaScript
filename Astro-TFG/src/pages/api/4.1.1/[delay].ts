@@ -2,7 +2,12 @@ import type { APIRoute } from 'astro';
 
 export const prerender = false;
 
+let activeRequests = 0;
+
 export const GET: APIRoute = async ({ params }) => {
+    activeRequests++;
+    // console.log(`Concurrent requests: ${activeRequests}`);
+
     const delayString = params.delay ?? '0';
     const delay = Math.max(0, Number(delayString.split('.')[0]));
 
@@ -13,6 +18,8 @@ export const GET: APIRoute = async ({ params }) => {
     }
 
     const response_time = performance.now() - start_time;
+
+    activeRequests--;
 
     const data = Array.from({ length: 10 }, (_, i) => ({
         id: i,

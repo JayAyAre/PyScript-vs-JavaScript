@@ -1,0 +1,11 @@
+pycryptodome
+numpy
+scikit-learn
+websockets
+mpmath
+matplotlib
+pandas
+sympy
+flask
+flask-cors
+psutil
