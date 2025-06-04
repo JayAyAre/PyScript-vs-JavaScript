@@ -52,7 +52,6 @@ Todas las pruebas están diseñadas para ejecutarse **directamente en el navegad
 - Web Workers para paralelismo
 - `performance.now()` y otras herramientas nativas para medir tiempos
 
-
 ## 🚀 Ejecución del proyecto
 
 ### 1. Clonar el repositorio
@@ -69,12 +68,15 @@ cd PyScript-vs-JavaScript
 1. Instala las dependencias de Python:
 
 ```bash
+cd LOCAL-TFG
 pip install -r requirements.txt
 ```
 
 2. Instala las dependencias de Node.js:
 
 ```bash
+npm install
+cd ASTRO-TFG
 npm install
 ```
 
@@ -91,10 +93,13 @@ python ./start_servers.py
 ```
 http://localhost:8000
 ```
+
 o bien
+
 ```
 https://localhost:8000
 ```
+
 dependiendo de la prueba.
 
 #### b) Si ejecutas el **ASTRO-TFG**
